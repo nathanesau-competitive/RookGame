@@ -3,6 +3,10 @@
 
 #include <map>
 
+namespace Utils
+{
+namespace Stat
+{
 double phi(double x)
 {
     // constants
@@ -25,6 +29,8 @@ double phi(double x)
 
     return 0.5 * (1.0 + sign * y);
 }
+} // namespace Stats
+} // namespace Utils
 
 CpuPlayer::CpuPlayer()
 {
@@ -34,7 +40,7 @@ int CpuPlayer::getBid(int playerNum)
 {
     vector<Card> &cards = gc.playerArr[playerNum].cardArr;
 
-    sortCardArray(cards);
+    Utils::Game::sortCardArray(cards);
 
     double totalValue = 0.0;
 
@@ -48,7 +54,7 @@ int CpuPlayer::getBid(int playerNum)
     const double MU = 7.54;
     const double SIGMA = 0.987;
 
-    double P = phi((averageValue - MU) / SIGMA); // percentile
+    double P = Utils::Stat::phi((averageValue - MU) / SIGMA); // percentile
 
     map<double, int> bidMap{
         make_pair(0.1, 50), make_pair(0.2, 55), make_pair(0.3, 60), make_pair(0.4, 65),
@@ -57,8 +63,15 @@ int CpuPlayer::getBid(int playerNum)
 
     auto It = bidMap.upper_bound(P);
     auto maxBid = It != bidMap.end() ? It->second : 95;
-    
+
     int bid = maxBid > gc.currentBid ? gc.currentBid + 5 : 0;
 
     return bid;
+}
+
+Card CpuPlayer::getCardToPlay(int playerNum)
+{
+    vector<Card> &cards = gc.playerArr[playerNum].cardArr;
+
+    return cards[0];
 }

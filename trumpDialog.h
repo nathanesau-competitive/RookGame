@@ -35,8 +35,12 @@ private:
     Ui::TrumpDialog *ui;
 
     void selectSuitButtonPressed();
+    void autoSelectSuitButtonPressed();
     void selectCardButtonPressed();
+    void autoSelectCardButtonPressed();
     void okButtonPressed();
+
+    void setupTrumpLabel(int suit);
 };
 
 // for selecting a trump suit

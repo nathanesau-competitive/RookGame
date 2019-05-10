@@ -126,5 +126,5 @@ void BidDialog::showBidResultMsgBox()
         break;
     }
 
-    showMessageBox(QString::fromStdString(bidResultMsg), "Bid Result");
+    Utils::Ui::showMessageBox(QString::fromStdString(bidResultMsg), "Bid Result");
 }

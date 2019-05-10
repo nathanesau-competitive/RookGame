@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <algorithm>
+#include <map>
 #include <random>
 #include <chrono>
 #include <assert.h>
@@ -62,6 +63,7 @@ struct Card
 
     Card(int pSuit = SUIT_UNDEFINED, int pValue = VALUE_UNDEFINED);
     bool operator==(const Card &p);
+    bool operator!=(const Card &p);
 
     int getPointValue();
 };
@@ -92,9 +94,25 @@ struct SuitInfo
     }
 };
 
-// global functions
+namespace Utils
+{
+namespace Game
+{
 void sortCardArray(vector<Card> &cardArr);
-vector<SuitInfo> getSuitInfoArr(vector<Card> &cardArr);
+vector<SuitInfo> getSuitInfoArray(vector<Card> &cardArr);
+vector<Card> getAggregateCardArray(vector<const vector<Card> *> &cardArrays);
+} // namespace Game
+} // namespace Utils
+
+struct HandInfo
+{
+    map<int /*PLAYER_NUM*/, Card> cardPlayed;
+
+    int points;
+
+    HandInfo();
+    void clear();
+};
 
 class GameController
 {
@@ -106,11 +124,14 @@ public:
     int winningBidder; // who won the bid, i.e. PLAYER_1
     int currentPhase;  // PHASE_BID, PHASE_MIDDLE, PHASE_PLAY
     int trump;         // trump for this round, i.e. SUIT_BLACK
+    HandInfo handInfo;
+    map<int /*PLAYER_NUM*/, int> scores;
 
     vector<Card> deck;
     vector<Player> playerArr;
     vector<Card> nest;
 
+public:
     GameController();
 
     void clear();
@@ -119,6 +140,9 @@ public:
     void bid(int bidAmount); // corresponds to "Bid Dialog->Bid"
     void pass();             // corresponds to "Bid Dialog->Pass"
     void startGame();
+
+    // todo
+    void playHand(Card cardPlayed);
 
 private:
     void initializeDeck();

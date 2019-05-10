@@ -18,7 +18,11 @@ extern GameController gc;
 
 class NestDialog : public QDialogWithClickableCardArray
 {
+    QLabel centerCardsLabel;
     ClickableCardArray centerCards;
+
+    QLabel bottomCardsPreviewLabel;
+    ClickableCardArray bottomCardsPreview;
 
 public:
     NestDialog(QWidget *parent = nullptr);

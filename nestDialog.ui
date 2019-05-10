@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>600</width>
-    <height>300</height>
+    <width>911</width>
+    <height>506</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -16,8 +16,8 @@
   <widget class="QPushButton" name="autoChooseMiddleButton">
    <property name="geometry">
     <rect>
-     <x>140</x>
-     <y>250</y>
+     <x>220</x>
+     <y>450</y>
      <width>161</width>
      <height>28</height>
     </rect>
@@ -29,8 +29,8 @@
   <widget class="QPushButton" name="doneMiddleButton">
    <property name="geometry">
     <rect>
-     <x>360</x>
-     <y>250</y>
+     <x>480</x>
+     <y>450</y>
      <width>131</width>
      <height>28</height>
     </rect>

@@ -10,9 +10,14 @@ bool Card::operator==(const Card &p)
     return p.value == value && p.suit == suit;
 }
 
+bool Card::operator!=(const Card &p)
+{
+    return p.value != value || p.suit != suit;
+}
+
 int Card::getPointValue()
 {
-    switch(value)
+    switch (value)
     {
     case VALUE_10:
     case VALUE_14:
@@ -31,25 +36,12 @@ Player::Player(const int pPlayerNum) : playerNum(pPlayerNum)
     bid = 0;
 }
 
-// global functions
+namespace Utils
+{
+namespace Game
+{
 void sortCardArray(vector<Card> &cardArr)
 {
-    struct CardCompareValue
-    {
-        inline bool operator()(const Card &card1, const Card &card2)
-        {
-            return card1.value < card2.value;
-        }
-    };
-
-    struct CardCompareSuit
-    {
-        inline bool operator()(const Card &card1, const Card &card2)
-        {
-            return card1.suit < card2.suit;
-        }
-    };
-
     struct CardCompare
     {
         inline bool operator()(const Card &card1, const Card &card2)
@@ -58,9 +50,9 @@ void sortCardArray(vector<Card> &cardArr)
             {
                 return true;
             }
-            else if(card1.suit == card2.suit)
+            else if (card1.suit == card2.suit)
             {
-                if(card1.value < card2.value)
+                if (card1.value < card2.value)
                 {
                     return true;
                 }
@@ -71,13 +63,10 @@ void sortCardArray(vector<Card> &cardArr)
     };
 
     sort(cardArr.begin(), cardArr.end(), CardCompare());
-
-    //sort(cardArr.begin(), cardArr.end(), CardCompareSuit());
-    //sort(cardArr.begin(), cardArr.end(), CardCompareValue());
 }
 
 // used for auto-selecting middle cards
-vector<SuitInfo> getSuitInfoArr(vector<Card> &cardArr)
+vector<SuitInfo> getSuitInfoArray(vector<Card> &cardArr)
 {
     struct SuitInfoCompareCount // ascending order
     {
@@ -125,6 +114,41 @@ vector<SuitInfo> getSuitInfoArr(vector<Card> &cardArr)
     return suitInfoArr;
 }
 
+vector<Card> getAggregateCardArray(vector<const vector<Card> *> &cardArrays)
+{
+    auto fillCardArray = [](vector<Card> &outCardArr, const vector<Card> &inCardArr) {
+        for (auto card : inCardArr)
+        {
+            outCardArr.push_back(card);
+        }
+    };
+
+    vector<Card> aggregateCardArr;
+
+    for (auto cardArr : cardArrays)
+    {
+        if (cardArr)
+        {
+            fillCardArray(aggregateCardArr, *cardArr);
+        }
+    }
+
+    return aggregateCardArr;
+}
+} // namespace Game
+} // namespace Utils
+
+HandInfo::HandInfo()
+{
+    clear();
+}
+
+void HandInfo::clear()
+{
+    cardPlayed.clear();
+    points = 0;
+}
+
 GameController::GameController()
 {
     clear();
@@ -141,6 +165,8 @@ void GameController::clear()
     winningBidder = PLAYER_UNDEFINED;
     currentPhase = PHASE_UNDEFINED;
     trump = SUIT_UNDEFINED;
+    handInfo.clear();
+    scores.clear();
 }
 
 void GameController::newGame()
@@ -156,6 +182,8 @@ void GameController::newGame()
     winningBidder = PLAYER_UNDEFINED;
     currentPhase = PHASE_BID;
     trump = SUIT_UNDEFINED;
+    handInfo.clear();
+    scores.clear();
 }
 
 void GameController::bid(int bidAmount)
@@ -221,6 +249,39 @@ void GameController::startGame()
     currentPhase = PHASE_PLAY;
 
     // todo
+}
+
+void GameController::playHand(Card cardPlayed)
+{
+    auto removePlayedCardFromHand = [&](int playerNum) {
+        Card card = handInfo.cardPlayed[playerNum];
+
+        auto &cardArr = playerArr[playerNum].cardArr;
+        auto cardIt = std::find(cardArr.begin(), cardArr.end(), card);
+        cardArr.erase(cardIt);
+    };
+
+    handInfo.clear();
+
+    handInfo.cardPlayed[PLAYER_1] = cardPlayed;
+    handInfo.points += cardPlayed.getPointValue();
+
+    removePlayedCardFromHand(PLAYER_1);
+
+    vector<int> playerNumArr = {PLAYER_2, PLAYER_3, PLAYER_4}; // cpu players
+
+    for (auto playerNum : playerNumArr)
+    {
+        Card cardToPlay = cpu.getCardToPlay(playerNum);
+
+        handInfo.cardPlayed[playerNum] = cardToPlay;
+        handInfo.points += cardToPlay.getPointValue();
+
+        removePlayedCardFromHand(playerNum);
+    }
+
+    scores[PLAYER_1] += handInfo.points;
+    scores[PLAYER_2] += handInfo.points;
 }
 
 void GameController::initializeDeck()
@@ -309,8 +370,8 @@ void GameController::dealDeck()
         nest.push_back(currentCard);
     }
 
-    sortCardArray(nest);
-    sortCardArray(playerArr[PLAYER_1].cardArr);
+    Utils::Game::sortCardArray(nest);
+    Utils::Game::sortCardArray(playerArr[PLAYER_1].cardArr);
 }
 
 int GameController::getNumPassed()

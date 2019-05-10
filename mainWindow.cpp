@@ -4,6 +4,7 @@
 
 #include <QApplication>
 #include <string>
+#include <QThread>
 #include <algorithm>
 #include <vector>
 
@@ -13,7 +14,11 @@
 
 using namespace std;
 
-void moveDialogToCenter(QDialog *dialog, int VERTICAL_SHIFT)
+namespace Utils
+{
+namespace Ui
+{
+void moveDialogToCenter(QDialog *dialog, int VERTICAL_SHIFT, int HORIZONTAL_SHIFT)
 {
     auto mwPos = gui.mw->pos();
     auto mwSize = gui.mw->size();
@@ -22,20 +27,40 @@ void moveDialogToCenter(QDialog *dialog, int VERTICAL_SHIFT)
 
     auto dialogSize = dialog->size();
 
-    auto dialogTopLeft = QPoint(mwCenter.x() - dialogSize.width() / 2,
+    auto dialogTopLeft = QPoint(mwCenter.x() - dialogSize.width() / 2 + HORIZONTAL_SHIFT,
                                 mwCenter.y() - dialogSize.height() / 2 + VERTICAL_SHIFT);
 
     dialog->move(dialogTopLeft);
 }
 
-void showMessageBox(QString msg, QString title)
+void showMessageBox(QString msg, QString title, int VERTICAL_SHIFT, int HORIZONTAL_SHIFT, QSize size)
 {
     MessageBox msgBox;
+    msgBox.resize(size);
     msgBox.setText(msg);
     msgBox.setWindowTitle(title);
-    moveDialogToCenter(&msgBox);
+    Utils::Ui::moveDialogToCenter(&msgBox, VERTICAL_SHIFT, HORIZONTAL_SHIFT);
     msgBox.exec();
 }
+
+string getPlayerName(int playerNum) // player name to display on screen
+{
+    switch (playerNum)
+    {
+    case PLAYER_1:
+        return "Player 1";
+    case PLAYER_2:
+        return "Player 2";
+    case PLAYER_3:
+        return "Player 3";
+    case PLAYER_4:
+        return "Player 4";
+    default:
+        return "Unknown player"; // not implemented
+    }
+}
+} // namespace Ui
+} // namespace Utils
 
 GameInfoWidget::GameInfoWidget(QWidget *parent) : QDialogWithClickableCardArray(parent)
 {
@@ -63,13 +88,28 @@ GameInfoWidget::GameInfoWidget(QWidget *parent) : QDialogWithClickableCardArray(
     setupCategoryLabel(&pointsMiddleCategoryLabel, "Points Middle", {340, 10});
     setupLabel(&pointsMiddleLabel, "No middle cards selected", {150, 50}, {365, 35});
 
-    setupCategoryLabel(&scoresCategoryLabel, "Scores", {575, 10});
-    setupLabel(&player1ScoreLabel, "Player 1: 0", {100, 50}, {600, 35});
-    setupLabel(&player2ScoreLabel, "Player 2: 0", {100, 50}, {600, 85});
-    setupLabel(&player3ScoreLabel, "Player 3: 0", {100, 50}, {720, 35});
-    setupLabel(&player4ScoreLabel, "Player 4: 0", {100, 50}, {720, 85});
+    setupCategoryLabel(&roundScoresCategoryLabel, "Round Scores", {575, 10});
+    setupLabel(&player1RoundScoreLabel, "Player 1: 0", {100, 50}, {600, 35});
+    setupLabel(&player2RoundScoreLabel, "Player 2: 0", {100, 50}, {600, 85});
+    setupLabel(&player3RoundScoreLabel, "Player 3: 0", {100, 50}, {720, 35});
+    setupLabel(&player4RoundScoreLabel, "Player 4: 0", {100, 50}, {720, 85});
+
+    setupCategoryLabel(&overallScoresCategoryLabel, "Overall Scores", {865, 10});
+    setupLabel(&player1OverallScoreLabel, "Player 1: 0", {100, 50}, {890, 35});
+    setupLabel(&player2OverallScoreLabel, "Player 2: 0", {100, 50}, {890, 85});
+    setupLabel(&player3OverallScoreLabel, "Player 3: 0", {100, 50}, {1010, 35});
+    setupLabel(&player4OverallScoreLabel, "Player 4: 0", {100, 50}, {1010, 85});
 
     setStyleSheet("background-color: white");
+}
+
+void GameInfoWidget::resetInfoToDefaults()
+{
+    updateRoundScores(0,0,0,0);
+    updateOverallScores(0,0,0,0);
+    updatePartner(Card());
+    updateTrump(SUIT_UNDEFINED);
+    updatePointsMiddle(0);
 }
 
 void GameInfoWidget::onCardClicked(ClickableCard *clickableCard)
@@ -79,7 +119,7 @@ void GameInfoWidget::onCardClicked(ClickableCard *clickableCard)
 
 void GameInfoWidget::updatePartner(Card partnerCard)
 {
-    topLeftCards.showCards({partnerCard}, DRAW_POSITION_TOP_LEFT, SIZE_SMALL);
+    topLeftCards.showCards({partnerCard}, DRAW_POSITION_TOP_LEFT, SIZE_TINY);
 }
 
 void GameInfoWidget::updateTrump(int trumpSuit)
@@ -103,6 +143,8 @@ void GameInfoWidget::updateTrump(int trumpSuit)
         trumpLabel.setText("Yellow");
         break;
     default:
+        trumpLabel.setStyleSheet("");
+        trumpLabel.setText("None selected");
         break;
     }
 }
@@ -112,33 +154,30 @@ void GameInfoWidget::updatePointsMiddle(int pointsMiddle)
     pointsMiddleLabel.setText(QString::number(pointsMiddle));
 }
 
-void GameInfoWidget::updateScores(int player1Score, int player2Score, int player3Score, int player4Score)
+void GameInfoWidget::updateRoundScores(int player1Score, int player2Score, int player3Score, int player4Score)
 {
     auto setupLabel = [this](QLabel *label, int score, int playerNum) {
-        string playerName = [playerNum]() {
-            switch (playerNum)
-            {
-            case PLAYER_1:
-                return "Player 1";
-            case PLAYER_2:
-                return "Player 2";
-            case PLAYER_3:
-                return "Player 3";
-            case PLAYER_4:
-                return "Player 4";
-            default:
-                return "Unknown player"; // not implemented
-            }
-        }();
-
-        string text = playerName + ": " + to_string(score);
+        string text = Utils::Ui::getPlayerName(playerNum) + ": " + to_string(score);
         label->setText(QString::fromStdString(text));
     };
 
-    setupLabel(&player1ScoreLabel, player1Score, PLAYER_1);
-    setupLabel(&player2ScoreLabel, player2Score, PLAYER_2);
-    setupLabel(&player3ScoreLabel, player3Score, PLAYER_3);
-    setupLabel(&player4ScoreLabel, player4Score, PLAYER_4);
+    setupLabel(&player1RoundScoreLabel, player1Score, PLAYER_1);
+    setupLabel(&player2RoundScoreLabel, player2Score, PLAYER_2);
+    setupLabel(&player3RoundScoreLabel, player3Score, PLAYER_3);
+    setupLabel(&player4RoundScoreLabel, player4Score, PLAYER_4);
+}
+
+void GameInfoWidget::updateOverallScores(int player1Score, int player2Score, int player3Score, int player4Score)
+{
+    auto setupLabel = [this](QLabel *label, int score, int playerNum) {
+        string text = Utils::Ui::getPlayerName(playerNum) + ": " + to_string(score);
+        label->setText(QString::fromStdString(text));
+    };
+
+    setupLabel(&player1OverallScoreLabel, player1Score, PLAYER_1);
+    setupLabel(&player2OverallScoreLabel, player2Score, PLAYER_2);
+    setupLabel(&player3OverallScoreLabel, player3Score, PLAYER_3);
+    setupLabel(&player4OverallScoreLabel, player4Score, PLAYER_4);
 }
 
 MainWidget::MainWidget(QWidget *parent) : QDialogWithClickableCardArray(parent)
@@ -147,50 +186,78 @@ MainWidget::MainWidget(QWidget *parent) : QDialogWithClickableCardArray(parent)
     infoWidget.move(QPoint(0, 0));
     infoWidget.resize(1200, 130);
 
+    player1CardPlayed.setParent(this);
+    player2CardPlayed.setParent(this);
+    player3CardPlayed.setParent(this);
+    player4CardPlayed.setParent(this);
+
     bottomCards.setParent(this);
-
-    //trumpLabel.setParent(this);
-    //trumpLabel.setText("Red");
-    //trumpLabel.setStyleSheet("background-color: red");
-
-    //QLabel pointsMiddleCategoryLabel; // i.e. POINTS IN MIDDLE
-    //QLabel pointsMiddleLabel; // i.e. Yes
 }
 
 void MainWidget::onCardClicked(ClickableCard *clickableCard)
 {
-    int x = 5; // todo
-    /*Card card = clickableCard->data;
+    // todo: MAKE sure it is a card in player 1's hand otherwise don't do anything (i.e. ignore click on played cards)
 
-    if (gc.currentPhase == PHASE_MIDDLE)
+    Card card = clickableCard->data;
+
+    gc.playHand(card);
+
+    showBottomCards(gc.playerArr[PLAYER_1].cardArr);
+
+    showCardPlayed(card, PLAYER_1);
+    repaint();
+
+    QThread::msleep(500);
+
+    showCardPlayed(gc.handInfo.cardPlayed[PLAYER_2], PLAYER_2);
+    repaint();
+
+    QThread::msleep(500);
+
+    showCardPlayed(gc.handInfo.cardPlayed[PLAYER_3], PLAYER_3);
+    repaint();
+
+    QThread::msleep(500);
+
+    showCardPlayed(gc.handInfo.cardPlayed[PLAYER_4], PLAYER_4);
+    repaint();
+
+    //QThread::msleep(500);
+
+    infoWidget.updateRoundScores(gc.scores[PLAYER_1], gc.scores[PLAYER_2],
+                            gc.scores[PLAYER_3], gc.scores[PLAYER_4]);
+
+    Utils::Ui::showMessageBox("Player 1 won the hand", "Hand result", 0, 400, {200, 220});
+
+    player1CardPlayed.hideCards();
+    player2CardPlayed.hideCards();
+    player3CardPlayed.hideCards();
+    player4CardPlayed.hideCards();
+}
+
+void MainWidget::showCardPlayed(const Card &card, int playerNum)
+{
+    // todo: implement timer
+    switch (playerNum)
     {
-        auto &nest = gc.nest;
-        auto &hand = gc.playerArr[PLAYER_1].cardArr;
-
-        auto nestIt = std::find(nest.begin(), nest.end(), card);
-        auto handIt = std::find(hand.begin(), hand.end(), card);
-
-        if (nestIt != nest.end())
-        {
-            nest.erase(nestIt);
-
-            hand.push_back(card);
-            sortCardArray(hand);
-            bottomCards.showCards(hand, DRAW_POSITION_BOTTOM);
-        }
-        else // handIt != hand.end()
-        {
-            hand.erase(handIt);
-            bottomCards.showCards(hand, DRAW_POSITION_BOTTOM);
-
-            nest.push_back(card);
-            sortCardArray(nest);
-        }
+    case PLAYER_1:
+        player1CardPlayed.showCards({card}, DRAW_POSITION_CARD_PLAYED_BOTTOM);
+        break;
+    case PLAYER_2:
+        player2CardPlayed.showCards({card}, DRAW_POSITION_CARD_PLAYED_LEFT);
+        break;
+    case PLAYER_3:
+        player3CardPlayed.showCards({card}, DRAW_POSITION_CARD_PLAYED_TOP);
+        break;
+    case PLAYER_4:
+        player4CardPlayed.showCards({card}, DRAW_POSITION_CARD_PLAYED_RIGHT);
+        break;
     }
-    else if (gc.currentPhase == PHASE_PLAY)
-    {
-        // todo
-    }*/
+}
+
+void MainWidget::showBottomCards(const vector<Card> &cardArr)
+{
+    bottomCards.showCards(cardArr, DRAW_POSITION_BOTTOM);
 }
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
@@ -270,11 +337,6 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     setPalette(palette);
 }
 
-void MainWindow::drawBottomCards(const vector<Card> &cardArr)
-{
-    widget.bottomCards.showCards(cardArr, DRAW_POSITION_BOTTOM);
-}
-
 void MainWindow::onTrumpClicked(TrumpLabel *trumpLabel)
 {
     gc.trump = SUIT_BLACK;
@@ -284,10 +346,11 @@ void MainWindow::onNewGameAction()
 {
     gc.newGame();
 
-    widget.bottomCards.showCards(gc.playerArr[PLAYER_1].cardArr, DRAW_POSITION_BOTTOM);
+    widget.infoWidget.resetInfoToDefaults();
+    widget.showBottomCards(gc.playerArr[PLAYER_1].cardArr);
 
     BidDialog bidDlg;
-    moveDialogToCenter(&bidDlg);
+    Utils::Ui::moveDialogToCenter(&bidDlg);
     auto bidDlgFinished = bidDlg.exec();
 
     if (!bidDlgFinished)
@@ -297,7 +360,7 @@ void MainWindow::onNewGameAction()
 
     // todo: only show nest if PLAYER_1 won bid
     NestDialog nestDlg;
-    moveDialogToCenter(&nestDlg);
+    Utils::Ui::moveDialogToCenter(&nestDlg, -40);
     auto nestDlgFinished = nestDlg.exec();
 
     if (!nestDlgFinished)
@@ -305,11 +368,13 @@ void MainWindow::onNewGameAction()
         return; // todo: show some error here, close application
     }
 
+    widget.showBottomCards(gc.playerArr[PLAYER_1].cardArr);
+
     int trumpSuitSelected = SUIT_UNDEFINED;
     Card partnerCardSelected = Card(SUIT_UNDEFINED, VALUE_UNDEFINED);
 
     TrumpDialog trumpDlg(trumpSuitSelected, partnerCardSelected);
-    moveDialogToCenter(&trumpDlg);
+    Utils::Ui::moveDialogToCenter(&trumpDlg);
     auto trumpDlgFinished = trumpDlg.exec();
 
     if (!trumpDlgFinished)
@@ -317,21 +382,20 @@ void MainWindow::onNewGameAction()
         return; // todo: show some error here, close application
     }
 
-    int pointsMiddle = []()
-    {
+    int pointsMiddle = []() {
         int total = 0;
-        for(auto &card : gc.nest)
+        for (auto &card : gc.nest)
         {
             total += card.getPointValue();
         }
         return total;
-    } ();
+    }();
 
     widget.infoWidget.updateTrump(trumpSuitSelected);
     widget.infoWidget.updatePartner(partnerCardSelected);
     widget.infoWidget.updatePointsMiddle(pointsMiddle);
 
-    showMessageBox("Game starting...", "Start Game");
+    Utils::Ui::showMessageBox("Game starting...", "Start Game");
 
     /*centerCards.showCards(gc.nest, DRAW_POSITION_CENTER);
     autoChooseMiddleButton.show();

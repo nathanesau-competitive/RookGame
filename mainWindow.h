@@ -15,6 +15,7 @@
 #include <QSize>
 #include <QPushButton>
 #include <QMessageBox>
+#include <string>
 
 #include "bidDialog.h"
 #include "nestDialog.h"
@@ -28,9 +29,15 @@ using namespace std;
 // global declarations
 extern GameController gc;
 
-// global functions
-void moveDialogToCenter(QDialog *dialog, int VERTICAL_SHIFT = 0);
-void showMessageBox(QString msg, QString title);
+namespace Utils
+{
+namespace Ui
+{
+void moveDialogToCenter(QDialog *dialog, int VERTICAL_SHIFT = 0, int HORIZONTAL_SHIFT = 0);
+void showMessageBox(QString msg, QString title, int VERTICAL_SHIFT = 0, int HORIZONTAL_SHIFT = 0, QSize size = {477, 220});
+string getPlayerName(int playerNum);
+} // namespace Ui
+} // namespace Utils
 
 class GameInfoWidget : public QDialogWithClickableCardArray
 {
@@ -44,31 +51,49 @@ public:
     QLabel pointsMiddleCategoryLabel; // i.e. POINTS IN MIDDLE
     QLabel pointsMiddleLabel;         // i.e. Yes
 
-    QLabel scoresCategoryLabel;       // i.e. SCORES
-    QLabel player1ScoreLabel;
-    QLabel player2ScoreLabel;
-    QLabel player3ScoreLabel;
-    QLabel player4ScoreLabel;
+    QLabel roundScoresCategoryLabel; // i.e. ROUND SCORES
+    QLabel player1RoundScoreLabel; // i.e. [20]
+    QLabel player2RoundScoreLabel; // i.e. [50]
+    QLabel player3RoundScoreLabel; // i.e. [0]
+    QLabel player4RoundScoreLabel; // i.e. [0]
+
+    QLabel overallScoresCategoryLabel; // i.e. OVERALL SCORES
+    QLabel player1OverallScoreLabel;
+    QLabel player2OverallScoreLabel;
+    QLabel player3OverallScoreLabel;
+    QLabel player4OverallScoreLabel;
 
     GameInfoWidget(QWidget *parent = nullptr);
+
+    void resetInfoToDefaults();
 
     virtual void onCardClicked(ClickableCard *clickableCard);
 
     void updatePartner(Card partnerCard);
     void updateTrump(int trumpSuit);
     void updatePointsMiddle(int pointsMiddle);
-    void updateScores(int player1Score, int player2Score, int player3Score, int player4Score);
+    void updateRoundScores(int player1Score, int player2Score, int player3Score, int player4Score);
+    void updateOverallScores(int player1Score, int player2Score, int player3Score, int player4Score);
 };
 
 class MainWidget : public QDialogWithClickableCardArray
 {
 public:
     GameInfoWidget infoWidget;
+
+    ClickableCardArray player1CardPlayed;
+    ClickableCardArray player2CardPlayed;
+    ClickableCardArray player3CardPlayed;
+    ClickableCardArray player4CardPlayed;
+
     ClickableCardArray bottomCards;
 
     MainWidget(QWidget *parent = nullptr);
 
     virtual void onCardClicked(ClickableCard *clickableCard);
+
+    void showCardPlayed(const Card &card, int playerNum);
+    void showBottomCards(const vector<Card> &cardArr);
 };
 
 class MainWindow : public QMainWindow
@@ -93,8 +118,6 @@ class MainWindow : public QMainWindow
 
 public:
     MainWindow(QWidget *parent = nullptr);
-
-    void drawBottomCards(const vector<Card> &cardArr);
 
     //void onCardClicked(ClickableCard *clickableCard);
     void onTrumpClicked(TrumpLabel *trumpLabel);
