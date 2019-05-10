@@ -8,8 +8,10 @@
 #include "mainWindow.h"
 #include "ui_TrumpDialog.h"
 
-TrumpDialog::TrumpDialog(QWidget *parent) : QDialogWithClickableCardArray(parent),
-                                            ui(new Ui::TrumpDialog)
+TrumpDialog::TrumpDialog(int &pTrumpSuitSelected, Card &pPartnerCardSelected, QWidget *parent) : trumpSuitSelected(pTrumpSuitSelected),
+                                                                                                 partnerCardSelected(pPartnerCardSelected),
+                                                                                                 QDialogWithClickableCardArray(parent),
+                                                                                                 ui(new Ui::TrumpDialog)
 {
     ui->setupUi(this);
 
@@ -42,9 +44,7 @@ void TrumpDialog::onCardClicked(ClickableCard *clickableCard)
 
 void TrumpDialog::selectSuitButtonPressed()
 {
-    int suitSelected = SUIT_UNDEFINED;
-
-    TrumpSuitSubDialog subDlg(suitSelected);
+    TrumpSuitSubDialog subDlg(trumpSuitSelected);
     moveDialogToCenter(&subDlg);
     auto subDlgFinished = subDlg.exec();
 
@@ -76,21 +76,19 @@ void TrumpDialog::selectSuitButtonPressed()
 
     if (subDlgFinished)
     {
-        setupTrumpLabel(ui->selectTrumpLabel, suitSelected);
+        setupTrumpLabel(ui->selectTrumpLabel, trumpSuitSelected);
     }
 }
 
 void TrumpDialog::selectCardButtonPressed()
 {
-    Card cardSelected = Card(SUIT_UNDEFINED, VALUE_UNDEFINED);
-
-    TrumpPartnerSubDialog subDlg(cardSelected);
-    moveDialogToCenter(&subDlg);
+    TrumpPartnerSubDialog subDlg(partnerCardSelected);
+    moveDialogToCenter(&subDlg, -100);
     auto subDlgFinished = subDlg.exec();
 
     if (subDlgFinished)
     {
-        bottomRightCards.showCards({cardSelected}, DRAW_POSITION_TRUMP_DLG, SIZE_SMALL);
+        bottomRightCards.showCards({partnerCardSelected}, DRAW_POSITION_TRUMP_DLG, SIZE_SMALL);
     }
 }
 
@@ -110,12 +108,12 @@ TrumpSuitSubDialog::TrumpSuitSubDialog(int &pSuitSelected, QWidget *parent) : su
     };
 
     setupTrumpLabel(redLabel, "Red", "background-color: red", QPoint(25, 25));
-    setupTrumpLabel(blackLabel, "Black", "background-color: black; color: white", QPoint(25, 125));
-    setupTrumpLabel(greenLabel, "Green", "background-color: green", QPoint(25, 225));
-    setupTrumpLabel(yellowLabel, "Yellow", "background-color: yellow", QPoint(25, 325));
+    setupTrumpLabel(blackLabel, "Black", "background-color: black; color: white", QPoint(25, 75));
+    setupTrumpLabel(greenLabel, "Green", "background-color: green", QPoint(25, 125));
+    setupTrumpLabel(yellowLabel, "Yellow", "background-color: yellow", QPoint(25, 175));
 
-    setGeometry(0, 0, 600, 450);
-    setMaximumSize(QSize(600, 450));
+    setGeometry(0, 0, 600, 250);
+    setMaximumSize(QSize(600, 250));
     setFixedSize(maximumSize());
     setWindowTitle("Choose Trump Suit...");
     setWindowFlags(Qt::WindowTitleHint | Qt::WindowMinimizeButtonHint);
@@ -163,52 +161,54 @@ TrumpPartnerSubDialog::TrumpPartnerSubDialog(Card &pCardSelected, QWidget *paren
 
     setWindowTitle("Click partner card...");
     setWindowIcon(QIcon(":rookicon.gif"));
-    setGeometry(0, 0, 1000, 650);
-    setMaximumSize(QSize(1000, 650));
+    setGeometry(0, 0, 1000, 400);
+    setMaximumSize(QSize(1000, 400));
     setFixedSize(maximumSize());
 
-    vector<Card> blackCardArr;
-    vector<Card> greenCardArr;
-    vector<Card> redCardArr;
-    vector<Card> yellowCardArr;
-    vector<Card> specialCardArr;
+    vector<Card> cardArr;
+    vector<Card> row1Arr;
+    vector<Card> row2Arr;
+    vector<Card> row3Arr;
+    vector<vector<Card> *> rowArrays = {&row1Arr, &row2Arr, &row3Arr};
 
-    auto fillColorCardArrays = [&blackCardArr,
-                                &greenCardArr,
-                                &redCardArr,
-                                &yellowCardArr,
-                                &specialCardArr](vector<Card> &cardArr) {
-        for (auto card : cardArr)
+    auto fillCardArray = [](vector<Card> &outCardArr, const vector<Card> &inCardArr) {
+        for (auto card : inCardArr)
         {
-            if (card.suit == SUIT_BLACK)
-                blackCardArr.push_back(card);
-            else if (card.suit == SUIT_GREEN)
-                greenCardArr.push_back(card);
-            else if (card.suit == SUIT_RED)
-                redCardArr.push_back(card);
-            else if (card.suit == SUIT_YELLOW)
-                yellowCardArr.push_back(card);
-            else if (card.suit == SUIT_SPECIAL)
-                specialCardArr.push_back(card);
+            outCardArr.push_back(card);
         }
     };
 
-    fillColorCardArrays(gc.playerArr[PLAYER_2].cardArr);
-    fillColorCardArrays(gc.playerArr[PLAYER_3].cardArr);
-    fillColorCardArrays(gc.playerArr[PLAYER_4].cardArr);
-    fillColorCardArrays(gc.nest);
+    auto splitCardArray = [](vector<vector<Card> *> &outCardArrays, vector<Card> &inCardArr) {
+        int subsetSize = (int)ceil((double)inCardArr.size() / (double)outCardArrays.size());
 
-    sortCardArray(blackCardArr);
-    sortCardArray(greenCardArr);
-    sortCardArray(redCardArr);
-    sortCardArray(yellowCardArr);
-    sortCardArray(specialCardArr); // technically, not needed
+        for (int i = 0; i < outCardArrays.size(); i++)
+        {
+            auto outCardArr = outCardArrays[i];
 
-    blackCards.showCards(blackCardArr, DRAW_POSITION_PARTNER_DLG_ROW1, SIZE_SMALL);
-    greenCards.showCards(greenCardArr, DRAW_POSITION_PARTNER_DLG_ROW2, SIZE_SMALL);
-    redCards.showCards(redCardArr, DRAW_POSITION_PARTNER_DLG_ROW3, SIZE_SMALL);
-    yellowCards.showCards(yellowCardArr, DRAW_POSITION_PARTNER_DLG_ROW4, SIZE_SMALL);
-    specialCards.showCards(specialCardArr, DRAW_POSITION_PARTNER_DLG_ROW5, SIZE_SMALL);
+            for (int j = 0; j < subsetSize; j++)
+            {
+                outCardArr->push_back(inCardArr.front());
+                inCardArr.erase(inCardArr.begin());
+
+                if (inCardArr.empty())
+                {
+                    return;
+                }
+            }
+        }
+    };
+
+    fillCardArray(cardArr, gc.playerArr[PLAYER_2].cardArr);
+    fillCardArray(cardArr, gc.playerArr[PLAYER_3].cardArr);
+    fillCardArray(cardArr, gc.playerArr[PLAYER_4].cardArr);
+    fillCardArray(cardArr, gc.nest);
+
+    sortCardArray(cardArr);
+    splitCardArray(rowArrays, cardArr);
+
+    blackCards.showCards(row1Arr, DRAW_POSITION_PARTNER_DLG_ROW1, SIZE_SMALL);
+    greenCards.showCards(row2Arr, DRAW_POSITION_PARTNER_DLG_ROW2, SIZE_SMALL);
+    redCards.showCards(row3Arr, DRAW_POSITION_PARTNER_DLG_ROW3, SIZE_SMALL);
 }
 
 TrumpPartnerSubDialog::~TrumpPartnerSubDialog()

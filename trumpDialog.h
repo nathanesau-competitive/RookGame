@@ -20,10 +20,13 @@ extern GameController gc;
 
 class TrumpDialog : public QDialogWithClickableCardArray
 {
+    int &trumpSuitSelected;
+    Card &partnerCardSelected;
+
     ClickableCardArray bottomRightCards;
 
 public:
-    TrumpDialog(QWidget *parent = nullptr);
+    TrumpDialog(int &pTrumpSuitSelected, Card &pPartnerCardSelected, QWidget *parent = nullptr);
     virtual ~TrumpDialog();
 
     virtual void onCardClicked(ClickableCard *clickableCard);

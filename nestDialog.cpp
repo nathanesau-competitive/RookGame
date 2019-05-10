@@ -163,6 +163,7 @@ void NestDialog::autoChooseMiddleButtonPressed()
     }
 
     centerCards.showCards(gc.nest, DRAW_POSITION_CENTER);
+
     gui.mw->drawBottomCards(gc.playerArr[PLAYER_1].cardArr);
 }
 

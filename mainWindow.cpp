@@ -13,7 +13,7 @@
 
 using namespace std;
 
-void moveDialogToCenter(QDialog *dialog)
+void moveDialogToCenter(QDialog *dialog, int VERTICAL_SHIFT)
 {
     auto mwPos = gui.mw->pos();
     auto mwSize = gui.mw->size();
@@ -23,7 +23,7 @@ void moveDialogToCenter(QDialog *dialog)
     auto dialogSize = dialog->size();
 
     auto dialogTopLeft = QPoint(mwCenter.x() - dialogSize.width() / 2,
-                                mwCenter.y() - dialogSize.height() / 2);
+                                mwCenter.y() - dialogSize.height() / 2 + VERTICAL_SHIFT);
 
     dialog->move(dialogTopLeft);
 }
@@ -37,8 +37,124 @@ void showMessageBox(QString msg, QString title)
     msgBox.exec();
 }
 
-MainWidget::MainWidget(QWidget *parent) : QDialogWithClickableCardArray (parent)
+GameInfoWidget::GameInfoWidget(QWidget *parent) : QDialogWithClickableCardArray(parent)
 {
+    auto setupCategoryLabel = [this](QLabel *categoryLabel, QString text, QPoint pos) {
+        categoryLabel->setParent(this);
+        categoryLabel->setText(text);
+        categoryLabel->setFont(QFont("Times", 12, QFont::Weight::Bold));
+        categoryLabel->move(pos);
+    };
+
+    auto setupLabel = [this](QLabel *label, QString text, QSize size, QPoint pos) {
+        label->setParent(this);
+        label->setText(text);
+        label->setFont(QFont("Times", 10, QFont::Weight::Normal));
+        label->resize(size);
+        label->move(pos);
+    };
+
+    setupCategoryLabel(&partnerCardCategoryLabel, "Partner", {25, 10});
+    topLeftCards.setParent(this);
+
+    setupCategoryLabel(&trumpCategoryLabel, "Trump", {180, 10});
+    setupLabel(&trumpLabel, "None selected", {105, 50}, {205, 35});
+
+    setupCategoryLabel(&pointsMiddleCategoryLabel, "Points Middle", {340, 10});
+    setupLabel(&pointsMiddleLabel, "No middle cards selected", {150, 50}, {365, 35});
+
+    setupCategoryLabel(&scoresCategoryLabel, "Scores", {575, 10});
+    setupLabel(&player1ScoreLabel, "Player 1: 0", {100, 50}, {600, 35});
+    setupLabel(&player2ScoreLabel, "Player 2: 0", {100, 50}, {600, 85});
+    setupLabel(&player3ScoreLabel, "Player 3: 0", {100, 50}, {720, 35});
+    setupLabel(&player4ScoreLabel, "Player 4: 0", {100, 50}, {720, 85});
+
+    setStyleSheet("background-color: white");
+}
+
+void GameInfoWidget::onCardClicked(ClickableCard *clickableCard)
+{
+    // do nothing
+}
+
+void GameInfoWidget::updatePartner(Card partnerCard)
+{
+    topLeftCards.showCards({partnerCard}, DRAW_POSITION_TOP_LEFT, SIZE_SMALL);
+}
+
+void GameInfoWidget::updateTrump(int trumpSuit)
+{
+    switch (trumpSuit)
+    {
+    case SUIT_BLACK:
+        trumpLabel.setStyleSheet("background-color: black; color: white");
+        trumpLabel.setText("Black");
+        break;
+    case SUIT_GREEN:
+        trumpLabel.setStyleSheet("background-color: green");
+        trumpLabel.setText("Green");
+        break;
+    case SUIT_RED:
+        trumpLabel.setStyleSheet("background-color: red");
+        trumpLabel.setText("Red");
+        break;
+    case SUIT_YELLOW:
+        trumpLabel.setStyleSheet("background-color: yellow");
+        trumpLabel.setText("Yellow");
+        break;
+    default:
+        break;
+    }
+}
+
+void GameInfoWidget::updatePointsMiddle(int pointsMiddle)
+{
+    pointsMiddleLabel.setText(QString::number(pointsMiddle));
+}
+
+void GameInfoWidget::updateScores(int player1Score, int player2Score, int player3Score, int player4Score)
+{
+    auto setupLabel = [this](QLabel *label, int score, int playerNum) {
+        string playerName = [playerNum]() {
+            switch (playerNum)
+            {
+            case PLAYER_1:
+                return "Player 1";
+            case PLAYER_2:
+                return "Player 2";
+            case PLAYER_3:
+                return "Player 3";
+            case PLAYER_4:
+                return "Player 4";
+            default:
+                return "Unknown player"; // not implemented
+            }
+        }();
+
+        string text = playerName + ": " + to_string(score);
+        label->setText(QString::fromStdString(text));
+    };
+
+    setupLabel(&player1ScoreLabel, player1Score, PLAYER_1);
+    setupLabel(&player2ScoreLabel, player2Score, PLAYER_2);
+    setupLabel(&player3ScoreLabel, player3Score, PLAYER_3);
+    setupLabel(&player4ScoreLabel, player4Score, PLAYER_4);
+}
+
+MainWidget::MainWidget(QWidget *parent) : QDialogWithClickableCardArray(parent)
+{
+    infoWidget.setParent(this);
+    infoWidget.move(QPoint(0, 0));
+    infoWidget.resize(1200, 130);
+
+    bottomCards.setParent(this);
+
+    //trumpLabel.setParent(this);
+    //trumpLabel.setText("Red");
+    //trumpLabel.setStyleSheet("background-color: red");
+
+    //QLabel pointsMiddleCategoryLabel; // i.e. POINTS IN MIDDLE
+    //QLabel pointsMiddleLabel; // i.e. Yes
 }
 
 void MainWidget::onCardClicked(ClickableCard *clickableCard)
@@ -81,7 +197,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 {
     widget.setParent(this);
 
-    bottomCards.setParent(&widget);
+    widget.infoWidget.updatePartner(Card(SUIT_UNDEFINED, VALUE_UNDEFINED));
 
     newGameAction.setText(QMenu::tr("&New"));
     newGameAction.setShortcuts(QKeySequence::New);
@@ -152,18 +268,11 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     QPalette palette;
     palette.setBrush(QPalette::Background, bkgnd);
     setPalette(palette);
-
-    hideWidgets();
 }
 
-void MainWindow::hideWidgets()
+void MainWindow::drawBottomCards(const vector<Card> &cardArr)
 {
-    bottomCards.hideCards();
-}
-
-void MainWindow::drawBottomCards(vector<Card> &cardArr)
-{
-    bottomCards.showCards(cardArr, DRAW_POSITION_BOTTOM);
+    widget.bottomCards.showCards(cardArr, DRAW_POSITION_BOTTOM);
 }
 
 void MainWindow::onTrumpClicked(TrumpLabel *trumpLabel)
@@ -175,7 +284,7 @@ void MainWindow::onNewGameAction()
 {
     gc.newGame();
 
-    bottomCards.showCards(gc.playerArr[PLAYER_1].cardArr, DRAW_POSITION_BOTTOM);
+    widget.bottomCards.showCards(gc.playerArr[PLAYER_1].cardArr, DRAW_POSITION_BOTTOM);
 
     BidDialog bidDlg;
     moveDialogToCenter(&bidDlg);
@@ -196,7 +305,10 @@ void MainWindow::onNewGameAction()
         return; // todo: show some error here, close application
     }
 
-    TrumpDialog trumpDlg;
+    int trumpSuitSelected = SUIT_UNDEFINED;
+    Card partnerCardSelected = Card(SUIT_UNDEFINED, VALUE_UNDEFINED);
+
+    TrumpDialog trumpDlg(trumpSuitSelected, partnerCardSelected);
     moveDialogToCenter(&trumpDlg);
     auto trumpDlgFinished = trumpDlg.exec();
 
@@ -204,6 +316,22 @@ void MainWindow::onNewGameAction()
     {
         return; // todo: show some error here, close application
     }
+
+    int pointsMiddle = []()
+    {
+        int total = 0;
+        for(auto &card : gc.nest)
+        {
+            total += card.getPointValue();
+        }
+        return total;
+    } ();
+
+    widget.infoWidget.updateTrump(trumpSuitSelected);
+    widget.infoWidget.updatePartner(partnerCardSelected);
+    widget.infoWidget.updatePointsMiddle(pointsMiddle);
+
+    showMessageBox("Game starting...", "Start Game");
 
     /*centerCards.showCards(gc.nest, DRAW_POSITION_CENTER);
     autoChooseMiddleButton.show();

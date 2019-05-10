@@ -10,6 +10,22 @@ bool Card::operator==(const Card &p)
     return p.value == value && p.suit == suit;
 }
 
+int Card::getPointValue()
+{
+    switch(value)
+    {
+    case VALUE_10:
+    case VALUE_14:
+        return 10;
+    case VALUE_ROOK:
+        return 20;
+    case VALUE_5:
+        return 5;
+    default:
+        return 0;
+    }
+}
+
 Player::Player(const int pPlayerNum) : playerNum(pPlayerNum)
 {
     bid = 0;
@@ -34,8 +50,30 @@ void sortCardArray(vector<Card> &cardArr)
         }
     };
 
-    sort(cardArr.begin(), cardArr.end(), CardCompareValue());
-    sort(cardArr.begin(), cardArr.end(), CardCompareSuit());
+    struct CardCompare
+    {
+        inline bool operator()(const Card &card1, const Card &card2)
+        {
+            if (card1.suit < card2.suit)
+            {
+                return true;
+            }
+            else if(card1.suit == card2.suit)
+            {
+                if(card1.value < card2.value)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+    };
+
+    sort(cardArr.begin(), cardArr.end(), CardCompare());
+
+    //sort(cardArr.begin(), cardArr.end(), CardCompareSuit());
+    //sort(cardArr.begin(), cardArr.end(), CardCompareValue());
 }
 
 // used for auto-selecting middle cards

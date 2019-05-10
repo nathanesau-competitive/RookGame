@@ -62,6 +62,8 @@ struct Card
 
     Card(int pSuit = SUIT_UNDEFINED, int pValue = VALUE_UNDEFINED);
     bool operator==(const Card &p);
+
+    int getPointValue();
 };
 
 struct Player

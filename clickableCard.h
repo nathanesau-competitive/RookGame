@@ -15,9 +15,9 @@ const int DRAW_POSITION_CENTER = 1;
 const int DRAW_POSITION_PARTNER_DLG_ROW1 = 2;
 const int DRAW_POSITION_PARTNER_DLG_ROW2 = 3;
 const int DRAW_POSITION_PARTNER_DLG_ROW3 = 4;
-const int DRAW_POSITION_PARTNER_DLG_ROW4 = 5;
-const int DRAW_POSITION_PARTNER_DLG_ROW5 = 6;
-const int DRAW_POSITION_TRUMP_DLG = 7;
+const int DRAW_POSITION_TRUMP_DLG = 5;
+
+const int DRAW_POSITION_TOP_LEFT = 6; // main widget
 
 const int SIZE_NORMAL = 0;
 const int SIZE_SMALL = 1; // for partner card dialog

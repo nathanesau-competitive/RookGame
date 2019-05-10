@@ -142,14 +142,14 @@ QPoint ClickableCardArray::getCardPosition(int n, int index, const int drawPosit
         case DRAW_POSITION_BOTTOM:
             return make_pair(1200, 850);
         case DRAW_POSITION_CENTER:
-            return make_pair(700, 350);
+            return make_pair(600, 300);
         case DRAW_POSITION_PARTNER_DLG_ROW1:
         case DRAW_POSITION_PARTNER_DLG_ROW2:
         case DRAW_POSITION_PARTNER_DLG_ROW3:
-        case DRAW_POSITION_PARTNER_DLG_ROW4:
-        case DRAW_POSITION_PARTNER_DLG_ROW5:
-            return make_pair(800, 650);
+            return make_pair(1000, 400);
         default:
+            // DRAW_POSITION_TOP_LEFT
+            // ...
             return make_pair(0, 0); // dynamic positioning not implemented
         }
     }();
@@ -163,16 +163,14 @@ QPoint ClickableCardArray::getCardPosition(int n, int index, const int drawPosit
         case DRAW_POSITION_CENTER:
             return 0;
         case DRAW_POSITION_PARTNER_DLG_ROW1:
-            return -150;
+            return -50;
         case DRAW_POSITION_PARTNER_DLG_ROW2:
-            return -40;
+            return 60;
         case DRAW_POSITION_PARTNER_DLG_ROW3:
-            return 70;
-        case DRAW_POSITION_PARTNER_DLG_ROW4:
-            return 180;
-        case DRAW_POSITION_PARTNER_DLG_ROW5:
-            return 290;
+            return 170;
         default:
+            // DRAW_POSITION_TOP_LEFT
+            // ...
             return 0; // dynamic positioning not implemented
         }
     }();
@@ -186,10 +184,10 @@ QPoint ClickableCardArray::getCardPosition(int n, int index, const int drawPosit
         case DRAW_POSITION_PARTNER_DLG_ROW1:
         case DRAW_POSITION_PARTNER_DLG_ROW2:
         case DRAW_POSITION_PARTNER_DLG_ROW3:
-        case DRAW_POSITION_PARTNER_DLG_ROW4:
-        case DRAW_POSITION_PARTNER_DLG_ROW5:
             return 100;
         default:
+            // DRAW_POSITION_TOP_LEFT
+            // ...
             return 0; // dynamic positioning not implemented
         }
     }();
@@ -203,10 +201,10 @@ QPoint ClickableCardArray::getCardPosition(int n, int index, const int drawPosit
         case DRAW_POSITION_PARTNER_DLG_ROW1:
         case DRAW_POSITION_PARTNER_DLG_ROW2:
         case DRAW_POSITION_PARTNER_DLG_ROW3:
-        case DRAW_POSITION_PARTNER_DLG_ROW4:
-        case DRAW_POSITION_PARTNER_DLG_ROW5:
             return 55;
         default:
+            // DRAW_POSITION_TOP_LEFT
+            // ...
             return 0; // dynamic positioning not implemented
         }
     }();
@@ -240,8 +238,6 @@ QPoint ClickableCardArray::getCardPosition(int n, int index, const int drawPosit
     case DRAW_POSITION_PARTNER_DLG_ROW1:
     case DRAW_POSITION_PARTNER_DLG_ROW2:
     case DRAW_POSITION_PARTNER_DLG_ROW3:
-    case DRAW_POSITION_PARTNER_DLG_ROW4:
-    case DRAW_POSITION_PARTNER_DLG_ROW5:
 
         return {(WIN_WIDTH - TOTAL_WIDTH) / 2 + index * CARDGAP + WIDTH_OFFSET + HORIZONTAL_SHIFT,
                 (WIN_HEIGHT) / 2 + NEST_HEIGHT_OFFSET + VERTICAL_SHIFT};
@@ -249,6 +245,10 @@ QPoint ClickableCardArray::getCardPosition(int n, int index, const int drawPosit
     case DRAW_POSITION_TRUMP_DLG: // only one card display (win_dim: 661x302)
 
         return {450,120};
+
+    case DRAW_POSITION_TOP_LEFT: // only one card display (win_dim: 1200x850)
+
+        return {50,35};
 
     default: // not implemented
 
