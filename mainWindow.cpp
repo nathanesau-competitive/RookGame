@@ -37,6 +37,46 @@ void showMessageBox(QString msg, QString title)
     msgBox.exec();
 }
 
+MainWidget::MainWidget(QWidget *parent) : QDialogWithClickableCardArray (parent)
+{
+}
+
+void MainWidget::onCardClicked(ClickableCard *clickableCard)
+{
+    int x = 5; // todo
+    /*Card card = clickableCard->data;
+
+    if (gc.currentPhase == PHASE_MIDDLE)
+    {
+        auto &nest = gc.nest;
+        auto &hand = gc.playerArr[PLAYER_1].cardArr;
+
+        auto nestIt = std::find(nest.begin(), nest.end(), card);
+        auto handIt = std::find(hand.begin(), hand.end(), card);
+
+        if (nestIt != nest.end())
+        {
+            nest.erase(nestIt);
+
+            hand.push_back(card);
+            sortCardArray(hand);
+            bottomCards.showCards(hand, DRAW_POSITION_BOTTOM);
+        }
+        else // handIt != hand.end()
+        {
+            hand.erase(handIt);
+            bottomCards.showCards(hand, DRAW_POSITION_BOTTOM);
+
+            nest.push_back(card);
+            sortCardArray(nest);
+        }
+    }
+    else if (gc.currentPhase == PHASE_PLAY)
+    {
+        // todo
+    }*/
+}
+
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 {
     widget.setParent(this);
@@ -124,41 +164,6 @@ void MainWindow::hideWidgets()
 void MainWindow::drawBottomCards(vector<Card> &cardArr)
 {
     bottomCards.showCards(cardArr, DRAW_POSITION_BOTTOM);
-}
-
-void MainWindow::onCardClicked(ClickableCard *clickableCard)
-{
-    Card card = clickableCard->data;
-
-    if (gc.currentPhase == PHASE_MIDDLE)
-    {
-        auto &nest = gc.nest;
-        auto &hand = gc.playerArr[PLAYER_1].cardArr;
-
-        auto nestIt = std::find(nest.begin(), nest.end(), card);
-        auto handIt = std::find(hand.begin(), hand.end(), card);
-
-        if (nestIt != nest.end())
-        {
-            nest.erase(nestIt);
-
-            hand.push_back(card);
-            sortCardArray(hand);
-            bottomCards.showCards(hand, DRAW_POSITION_BOTTOM);
-        }
-        else // handIt != hand.end()
-        {
-            hand.erase(handIt);
-            bottomCards.showCards(hand, DRAW_POSITION_BOTTOM);
-
-            nest.push_back(card);
-            sortCardArray(nest);
-        }
-    }
-    else if (gc.currentPhase == PHASE_PLAY)
-    {
-        // todo
-    }
 }
 
 void MainWindow::onTrumpClicked(TrumpLabel *trumpLabel)

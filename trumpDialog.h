@@ -18,37 +18,46 @@ class GameController;
 // global declarations
 extern GameController gc;
 
-class TrumpDialog : public QDialog
+class TrumpDialog : public QDialogWithClickableCardArray
 {
+    ClickableCardArray bottomRightCards;
+
 public:
     TrumpDialog(QWidget *parent = nullptr);
     virtual ~TrumpDialog();
+
+    virtual void onCardClicked(ClickableCard *clickableCard);
 
 private:
     Ui::TrumpDialog *ui;
 
     void selectSuitButtonPressed();
     void selectCardButtonPressed();
+    void okButtonPressed();
 };
 
 // for selecting a trump suit
 class TrumpSuitSubDialog : public QDialog
 {
+    int &suitSelected;
+
     TrumpLabel blackLabel;
     TrumpLabel greenLabel;
     TrumpLabel redLabel;
     TrumpLabel yellowLabel;
 
 public:
-    TrumpSuitSubDialog(QWidget *parent = nullptr);
+    TrumpSuitSubDialog(int &pSuitSelected, QWidget *parent = nullptr);
     virtual ~TrumpSuitSubDialog();
 
     void onTrumpLabelClicked(TrumpLabel *label);
 };
 
 // for selecting a partner card from available cards
-class TrumpPartnerSubDialog : public QDialog
+class TrumpPartnerSubDialog : public QDialogWithClickableCardArray
 {
+    Card &cardSelected;
+
     ClickableCardArray blackCards;
     ClickableCardArray greenCards;
     ClickableCardArray redCards;
@@ -56,8 +65,10 @@ class TrumpPartnerSubDialog : public QDialog
     ClickableCardArray specialCards;
 
 public:
-    TrumpPartnerSubDialog(QWidget *parent = nullptr);
+    TrumpPartnerSubDialog(Card &pCardSelected, QWidget *parent = nullptr);
     virtual ~TrumpPartnerSubDialog();
+
+    virtual void onCardClicked(ClickableCard *clickableCard);
 };
 
 #endif

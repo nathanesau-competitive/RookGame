@@ -8,16 +8,22 @@
 #include "mainWindow.h"
 #include "ui_TrumpDialog.h"
 
-TrumpDialog::TrumpDialog(QWidget *parent) : QDialog(parent),
+TrumpDialog::TrumpDialog(QWidget *parent) : QDialogWithClickableCardArray(parent),
                                             ui(new Ui::TrumpDialog)
 {
     ui->setupUi(this);
+
+    bottomRightCards.setParent(this);
+    bottomRightCards.showCards({Card(SUIT_UNDEFINED, VALUE_UNDEFINED)}, DRAW_POSITION_TRUMP_DLG, SIZE_SMALL);
 
     QObject::connect(ui->selectTrumpButton, &QPushButton::pressed,
                      this, &TrumpDialog::selectSuitButtonPressed);
 
     QObject::connect(ui->selectCardButton, &QPushButton::pressed,
                      this, &TrumpDialog::selectCardButtonPressed);
+
+    QObject::connect(ui->okButton, &QPushButton::pressed,
+                     this, &TrumpDialog::okButtonPressed);
 
     setWindowFlags(Qt::WindowTitleHint | Qt::WindowMinimizeButtonHint);
     setWindowIcon(QIcon(":rookicon.gif"));
@@ -29,31 +35,71 @@ TrumpDialog::~TrumpDialog()
     delete ui;
 }
 
+void TrumpDialog::onCardClicked(ClickableCard *clickableCard)
+{
+    // do nothing
+}
+
 void TrumpDialog::selectSuitButtonPressed()
 {
-    TrumpSuitSubDialog subDlg;
+    int suitSelected = SUIT_UNDEFINED;
+
+    TrumpSuitSubDialog subDlg(suitSelected);
     moveDialogToCenter(&subDlg);
     auto subDlgFinished = subDlg.exec();
 
+    auto setupTrumpLabel = [](QLabel *trumpLabel, int suit) {
+        switch (suit)
+        {
+        case SUIT_BLACK:
+            trumpLabel->setStyleSheet("background-color: black; color: white");
+            trumpLabel->setText("Black");
+            break;
+        case SUIT_GREEN:
+            trumpLabel->setStyleSheet("background-color: green");
+            trumpLabel->setText("Green");
+            break;
+        case SUIT_RED:
+            trumpLabel->setStyleSheet("background-color: red");
+            trumpLabel->setText("Red");
+            break;
+        case SUIT_YELLOW:
+            trumpLabel->setStyleSheet("background-color: yellow");
+            trumpLabel->setText("Yellow");
+            break;
+        default:
+            trumpLabel->setStyleSheet(""); // empty style
+            trumpLabel->setText("No Trump Selected");
+            break;
+        }
+    };
+
     if (subDlgFinished)
     {
-        // todo
+        setupTrumpLabel(ui->selectTrumpLabel, suitSelected);
     }
 }
 
 void TrumpDialog::selectCardButtonPressed()
 {
-    TrumpPartnerSubDialog subDlg;
+    Card cardSelected = Card(SUIT_UNDEFINED, VALUE_UNDEFINED);
+
+    TrumpPartnerSubDialog subDlg(cardSelected);
     moveDialogToCenter(&subDlg);
     auto subDlgFinished = subDlg.exec();
 
     if (subDlgFinished)
     {
-        // todo
+        bottomRightCards.showCards({cardSelected}, DRAW_POSITION_TRUMP_DLG, SIZE_SMALL);
     }
 }
 
-TrumpSuitSubDialog::TrumpSuitSubDialog(QWidget *parent) : QDialog(parent)
+void TrumpDialog::okButtonPressed()
+{
+    accept();
+}
+
+TrumpSuitSubDialog::TrumpSuitSubDialog(int &pSuitSelected, QWidget *parent) : suitSelected(pSuitSelected), QDialog(parent)
 {
     auto setupTrumpLabel = [this](TrumpLabel &label, QString text, QString style, QPoint pos) {
         label.setFont(QFont("Times", 12));
@@ -63,7 +109,7 @@ TrumpSuitSubDialog::TrumpSuitSubDialog(QWidget *parent) : QDialog(parent)
         label.move(pos);
     };
 
-    setupTrumpLabel(redLabel, "Red", "background-color: red", QPoint(25,25));
+    setupTrumpLabel(redLabel, "Red", "background-color: red", QPoint(25, 25));
     setupTrumpLabel(blackLabel, "Black", "background-color: black; color: white", QPoint(25, 125));
     setupTrumpLabel(greenLabel, "Green", "background-color: green", QPoint(25, 225));
     setupTrumpLabel(yellowLabel, "Yellow", "background-color: yellow", QPoint(25, 325));
@@ -84,12 +130,30 @@ TrumpSuitSubDialog::~TrumpSuitSubDialog()
 
 void TrumpSuitSubDialog::onTrumpLabelClicked(TrumpLabel *label)
 {
-    int x = 5; // todo8
+    string text = label->text().toStdString();
+
+    if (text == "Black")
+    {
+        suitSelected = SUIT_BLACK;
+    }
+    else if (text == "Green")
+    {
+        suitSelected = SUIT_GREEN;
+    }
+    else if (text == "Red")
+    {
+        suitSelected = SUIT_RED;
+    }
+    else if (text == "Yellow")
+    {
+        suitSelected = SUIT_YELLOW;
+    }
 
     accept();
 }
 
-TrumpPartnerSubDialog::TrumpPartnerSubDialog(QWidget *parent) : QDialog(parent)
+TrumpPartnerSubDialog::TrumpPartnerSubDialog(Card &pCardSelected, QWidget *parent) : cardSelected(pCardSelected),
+                                                                                     QDialogWithClickableCardArray(parent)
 {
     blackCards.setParent(this);
     greenCards.setParent(this);
@@ -99,8 +163,8 @@ TrumpPartnerSubDialog::TrumpPartnerSubDialog(QWidget *parent) : QDialog(parent)
 
     setWindowTitle("Click partner card...");
     setWindowIcon(QIcon(":rookicon.gif"));
-    setGeometry(0, 0, 800, 650);
-    setMaximumSize(QSize(800, 650));
+    setGeometry(0, 0, 1000, 650);
+    setMaximumSize(QSize(1000, 650));
     setFixedSize(maximumSize());
 
     vector<Card> blackCardArr;
@@ -134,6 +198,12 @@ TrumpPartnerSubDialog::TrumpPartnerSubDialog(QWidget *parent) : QDialog(parent)
     fillColorCardArrays(gc.playerArr[PLAYER_4].cardArr);
     fillColorCardArrays(gc.nest);
 
+    sortCardArray(blackCardArr);
+    sortCardArray(greenCardArr);
+    sortCardArray(redCardArr);
+    sortCardArray(yellowCardArr);
+    sortCardArray(specialCardArr); // technically, not needed
+
     blackCards.showCards(blackCardArr, DRAW_POSITION_PARTNER_DLG_ROW1, SIZE_SMALL);
     greenCards.showCards(greenCardArr, DRAW_POSITION_PARTNER_DLG_ROW2, SIZE_SMALL);
     redCards.showCards(redCardArr, DRAW_POSITION_PARTNER_DLG_ROW3, SIZE_SMALL);
@@ -144,4 +214,12 @@ TrumpPartnerSubDialog::TrumpPartnerSubDialog(QWidget *parent) : QDialog(parent)
 TrumpPartnerSubDialog::~TrumpPartnerSubDialog()
 {
     // todo
+}
+
+void TrumpPartnerSubDialog::onCardClicked(ClickableCard *clickableCard)
+{
+    cardSelected.suit = clickableCard->data.suit;
+    cardSelected.value = clickableCard->data.value;
+
+    accept();
 }

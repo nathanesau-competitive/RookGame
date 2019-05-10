@@ -3,7 +3,7 @@
 #include "mainWindow.h"
 #include "ui_NestDialog.h"
 
-NestDialog::NestDialog(QWidget *parent) : QDialog(parent),
+NestDialog::NestDialog(QWidget *parent) : QDialogWithClickableCardArray(parent),
                                           ui(new Ui::NestDialog)
 {
     ui->setupUi(this);
@@ -14,10 +14,12 @@ NestDialog::NestDialog(QWidget *parent) : QDialog(parent),
     QObject::connect(ui->doneMiddleButton, &QPushButton::pressed,
                      this, &NestDialog::doneMiddleButtonPressed);
 
-    setWindowFlags(Qt::WindowTitleHint | Qt::WindowMinimizeButtonHint);
-    setWindowIcon(QIcon(":rookicon.gif"));
-    setStyleSheet("background-color: white");
+    QDialog::setWindowFlags(Qt::WindowTitleHint | Qt::WindowMinimizeButtonHint);
+    QDialog::setWindowIcon(QIcon(":rookicon.gif"));
+    QDialog::setStyleSheet("background-color: white");
     
+    //auto cardParent = dynamic_cast<QObjectWithClickableCardArray*>(this);
+
     centerCards.setParent(this);
     centerCards.showCards(gc.nest, DRAW_POSITION_CENTER, SIZE_NORMAL);
 }
@@ -171,21 +173,7 @@ void NestDialog::doneMiddleButtonPressed()
 
 void NestDialog::onCardClicked(ClickableCard *clickableCard)
 {
-    /*centerCards.hideCards();
-    autoChooseMiddleButton.hide();
-    doneMiddleButton.hide();
-
-    TrumpDialog trumpDlg(&widget);
-    trumpDlg.move(QPoint(300, 200));
-    auto trumpDlgFinished = trumpDlg.exec();
-    trumpDlg.deleteLater();
-
-    if (trumpDlgFinished)
-    {
-        showMessageBox("Game starting...", "Start Game", &widget);
-        gc.startGame();
-        int x = 5;
-    }*/
+    int x = 5; // todo
 
     centerCards.showCards(gc.nest, DRAW_POSITION_CENTER);
 

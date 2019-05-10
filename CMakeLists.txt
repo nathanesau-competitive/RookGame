@@ -16,7 +16,7 @@ set(CMAKE_AUTOUIC ON)
 # Auto handling of qrc resource files
 set(CMAKE_AUTORCC ON)
 
-set (CMAKE_PREFIX_PATH "C:/Qt/5.12.0/msvc2017_64")
+set (CMAKE_PREFIX_PATH "D:/Qt/5.12.3/msvc2017_64")
 
 # Find the Qt libraries
 find_package(Qt5Widgets CONFIG REQUIRED)

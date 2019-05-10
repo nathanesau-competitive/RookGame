@@ -6,14 +6,14 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>661</width>
-    <height>302</height>
+    <width>627</width>
+    <height>295</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Trump Dialog</string>
   </property>
-  <widget class="QLabel" name="trumpLabel">
+  <widget class="QLabel" name="trumpCategoryLabel">
    <property name="geometry">
     <rect>
      <x>80</x>
@@ -46,7 +46,7 @@
     <string>Select card...</string>
    </property>
   </widget>
-  <widget class="QLabel" name="partnerCardLabel">
+  <widget class="QLabel" name="partnerCardCategoryLabel">
    <property name="geometry">
     <rect>
      <x>80</x>
@@ -79,7 +79,7 @@
     <string>Select trump...</string>
    </property>
   </widget>
-  <widget class="QLabel" name="trumpSuitLabel">
+  <widget class="QLabel" name="selectTrumpLabel">
    <property name="geometry">
     <rect>
      <x>450</x>
@@ -92,17 +92,17 @@
     <string>No Trump Selected</string>
    </property>
   </widget>
-  <widget class="QLabel" name="trumpSuitLabel_2">
+  <widget class="QPushButton" name="okButton">
    <property name="geometry">
     <rect>
-     <x>450</x>
-     <y>110</y>
-     <width>111</width>
-     <height>141</height>
+     <x>490</x>
+     <y>250</y>
+     <width>75</width>
+     <height>23</height>
     </rect>
    </property>
    <property name="text">
-    <string>No Card Selected</string>
+    <string>OK</string>
    </property>
   </widget>
  </widget>

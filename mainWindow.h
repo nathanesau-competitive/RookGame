@@ -32,9 +32,17 @@ extern GameController gc;
 void moveDialogToCenter(QDialog *dialog);
 void showMessageBox(QString msg, QString title);
 
+class MainWidget : public QDialogWithClickableCardArray
+{
+public:
+    MainWidget(QWidget *parent = nullptr);
+
+    virtual void onCardClicked(ClickableCard *clickableCard);
+};
+
 class MainWindow : public QMainWindow
 {
-    QWidget widget; // central widget
+    MainWidget widget; // central widget
 
     ClickableCardArray bottomCards;
 
@@ -61,7 +69,7 @@ public:
 
     void drawBottomCards(vector<Card> &cardArr);
 
-    void onCardClicked(ClickableCard *clickableCard);
+    //void onCardClicked(ClickableCard *clickableCard);
     void onTrumpClicked(TrumpLabel *trumpLabel);
 
     void onNewGameAction();

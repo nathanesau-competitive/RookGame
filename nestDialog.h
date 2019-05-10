@@ -16,7 +16,7 @@ class GameController;
 // global declarations
 extern GameController gc;
 
-class NestDialog : public QDialog
+class NestDialog : public QDialogWithClickableCardArray
 {
     ClickableCardArray centerCards;
 
@@ -27,9 +27,10 @@ public:
 private:
     Ui::NestDialog *ui;
     
+    virtual void onCardClicked(ClickableCard *clickableCard);
+
     void autoChooseMiddleButtonPressed();
     void doneMiddleButtonPressed();
-    void onCardClicked(ClickableCard *clickableCard);
 };
 
 #endif

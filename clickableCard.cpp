@@ -74,7 +74,7 @@ void ClickableCard::setData(const Card &pData, int size)
         case SUIT_SPECIAL:
             return "";
         default: // SUIT_UNDEFINED
-            return "";
+            return "blank";
         }
     }();
 
@@ -96,8 +96,9 @@ void ClickableCard::setData(const Card &pData, int size)
 
 void ClickableCard::mousePressEvent(QMouseEvent *event)
 {
-    // todo: call parent method onCardClicked
-    gui.mw->onCardClicked(this);
+    auto parentWidgetWithClickableCardArray = dynamic_cast<QDialogWithClickableCardArray*>(parent());
+
+    parentWidgetWithClickableCardArray->onCardClicked(this);
 }
 
 ClickableCardArray::ClickableCardArray(QWidget *parent) : QObject(parent)
@@ -149,7 +150,7 @@ QPoint ClickableCardArray::getCardPosition(int n, int index, const int drawPosit
         case DRAW_POSITION_PARTNER_DLG_ROW5:
             return make_pair(800, 650);
         default:
-            return make_pair(0, 0); // not implemented
+            return make_pair(0, 0); // dynamic positioning not implemented
         }
     }();
 
@@ -172,7 +173,24 @@ QPoint ClickableCardArray::getCardPosition(int n, int index, const int drawPosit
         case DRAW_POSITION_PARTNER_DLG_ROW5:
             return 290;
         default:
-            return 0; // not implemented
+            return 0; // dynamic positioning not implemented
+        }
+    }();
+
+    auto HORIZONTAL_SHIFT = [drawPosition]() {
+        switch (drawPosition)
+        {
+        case DRAW_POSITION_BOTTOM:
+        case DRAW_POSITION_CENTER:
+            return 0;
+        case DRAW_POSITION_PARTNER_DLG_ROW1:
+        case DRAW_POSITION_PARTNER_DLG_ROW2:
+        case DRAW_POSITION_PARTNER_DLG_ROW3:
+        case DRAW_POSITION_PARTNER_DLG_ROW4:
+        case DRAW_POSITION_PARTNER_DLG_ROW5:
+            return 100;
+        default:
+            return 0; // dynamic positioning not implemented
         }
     }();
 
@@ -189,7 +207,7 @@ QPoint ClickableCardArray::getCardPosition(int n, int index, const int drawPosit
         case DRAW_POSITION_PARTNER_DLG_ROW5:
             return 55;
         default:
-            return 0; // not implemented
+            return 0; // dynamic positioning not implemented
         }
     }();
 
@@ -225,11 +243,19 @@ QPoint ClickableCardArray::getCardPosition(int n, int index, const int drawPosit
     case DRAW_POSITION_PARTNER_DLG_ROW4:
     case DRAW_POSITION_PARTNER_DLG_ROW5:
 
-        return {(WIN_WIDTH - TOTAL_WIDTH) / 2 + index * CARDGAP + WIDTH_OFFSET,
+        return {(WIN_WIDTH - TOTAL_WIDTH) / 2 + index * CARDGAP + WIDTH_OFFSET + HORIZONTAL_SHIFT,
                 (WIN_HEIGHT) / 2 + NEST_HEIGHT_OFFSET + VERTICAL_SHIFT};
+
+    case DRAW_POSITION_TRUMP_DLG: // only one card display (win_dim: 661x302)
+
+        return {450,120};
 
     default: // not implemented
 
         return {0, 0};
     }
+}
+
+QDialogWithClickableCardArray::QDialogWithClickableCardArray(QWidget *parent) : QDialog(parent)
+{
 }

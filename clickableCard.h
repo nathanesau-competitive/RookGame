@@ -5,6 +5,7 @@
 #include <QWidget>
 #include <QMouseEvent>
 #include <QPoint>
+#include <QDialog>
 
 #include "gameController.h"
 
@@ -16,6 +17,7 @@ const int DRAW_POSITION_PARTNER_DLG_ROW2 = 3;
 const int DRAW_POSITION_PARTNER_DLG_ROW3 = 4;
 const int DRAW_POSITION_PARTNER_DLG_ROW4 = 5;
 const int DRAW_POSITION_PARTNER_DLG_ROW5 = 6;
+const int DRAW_POSITION_TRUMP_DLG = 7;
 
 const int SIZE_NORMAL = 0;
 const int SIZE_SMALL = 1; // for partner card dialog
@@ -56,6 +58,14 @@ public:
 
 private:
     QPoint getCardPosition(int n, int index, const int drawPosition);
+};
+
+class QDialogWithClickableCardArray : public QDialog
+{
+public:
+    QDialogWithClickableCardArray(QWidget *parent = nullptr);
+
+    virtual void onCardClicked(ClickableCard *clickableCard) = 0;
 };
 
 #endif
