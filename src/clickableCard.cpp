@@ -1,9 +1,11 @@
+#include <QBrush>
+#include <QPainter>
+#include <QTransform>
+
 #include "clickableCard.h"
 #include "mainWindow.h"
 
-#include <QTransform>
-
-ClickableCard::ClickableCard(QWidget *parent) : QLabel(parent)
+ClickableCard::ClickableCard(QDialogWithClickableCardArray *parent) : QLabel(parent)
 {
 }
 
@@ -83,18 +85,17 @@ void ClickableCard::setData(const Card &pData, const int drawPosition, int size)
     string imageName = ":" + valueString + suitString + ".gif";
     QString qImageName = QString::fromStdString(imageName);
 
-    auto transform = [](const int drawPosition) -> QTransform
-    {
+    auto transform = [](const int drawPosition) -> QTransform {
         QTransform transform;
-        switch(drawPosition)
+        switch (drawPosition)
         {
-        case DRAW_POSITION_CARD_PLAYED_LEFT:
+        case DRAW_POSITION_MAIN_WIDGET_CENTER_LEFT:
             transform.rotate(90);
             break;
-        case DRAW_POSITION_CARD_PLAYED_TOP:
+        case DRAW_POSITION_MAIN_WIDGET_CENTER_TOP:
             transform.rotate(180);
             break;
-        case DRAW_POSITION_CARD_PLAYED_RIGHT:
+        case DRAW_POSITION_MAIN_WIDGET_CENTER_RIGHT:
             transform.rotate(270);
             break;
         default:
@@ -103,19 +104,23 @@ void ClickableCard::setData(const Card &pData, const int drawPosition, int size)
         }
 
         return transform;
-    } (drawPosition);
+    }(drawPosition);
 
-    // todo: use draw position to rotate
+    auto setPixmap = [this](const QString &fileName, const QSize &size, const QTransform &transform) {
+        auto pixmap = QPixmap(fileName).scaled(size, Qt::KeepAspectRatio, Qt::SmoothTransformation).transformed(transform);
+        this->setPixmap(pixmap);
+    };
+
     switch (size)
     {
     case SIZE_NORMAL:
-        setPixmap(QPixmap(qImageName).scaled(180, 180, Qt::KeepAspectRatio, Qt::SmoothTransformation).transformed(transform));
+        setPixmap(qImageName, {180, 180}, transform);
         break;
     case SIZE_SMALL:
-        setPixmap(QPixmap(qImageName).scaled(135, 135, Qt::KeepAspectRatio, Qt::SmoothTransformation).transformed(transform));
+        setPixmap(qImageName, {135, 135}, transform);
         break;
     case SIZE_TINY:
-        setPixmap(QPixmap(qImageName).scaled(90, 90, Qt::KeepAspectRatio, Qt::SmoothTransformation).transformed(transform));
+        setPixmap(qImageName, {90, 90}, transform);
         break;
     }
 
@@ -129,28 +134,44 @@ void ClickableCard::mousePressEvent(QMouseEvent *event)
     parentWidgetWithClickableCardArray->onCardClicked(this);
 }
 
-ClickableCardArray::ClickableCardArray(QWidget *parent) : QObject(parent)
+void ClickableCard::enterEvent(QEvent *event)
 {
+   auto parentWidgetWithClickableCardArray = dynamic_cast<QDialogWithClickableCardArray *>(parent());
+
+    parentWidgetWithClickableCardArray->onCardHoverEnter(this);
 }
 
-void ClickableCardArray::showCards(const vector<Card> &cardArr, const int drawPosition, const int size)
+void ClickableCard::leaveEvent(QEvent *event)
 {
-    int numCards = (int)cardArr.size();
+    auto parentWidgetWithClickableCardArray = dynamic_cast<QDialogWithClickableCardArray *>(parent());
+
+    parentWidgetWithClickableCardArray->onCardHoverLeave(this);
+}
+
+ClickableCardArray::ClickableCardArray(QWidget *parent) : QObject(parent)
+{
+    drawPosition = DRAW_POSITION_UNDEFINED;
+    size = SIZE_UNDEFINED;
+}
+
+void ClickableCardArray::showCards(const vector<Card> &cardArr, const int pDrawPosition, const int pSize)
+{
+    drawPosition = pDrawPosition;
+    size = pSize;
+
+    int n = (int)cardArr.size();
 
     clickableCards.clear();
-    clickableCards.resize(numCards);
+    clickableCards.resize(n);
 
     auto parentWidget = dynamic_cast<QWidget *>(parent());
 
-    for (auto i = 0; i < numCards; i++)
+    for (auto i = 0; i < n; i++)
     {
-        auto &currentCard = cardArr[i];
-        auto &currentClickableCard = clickableCards[i];
-
-        currentClickableCard.setParent(parentWidget);
-        currentClickableCard.setData(currentCard, drawPosition, size);
-        currentClickableCard.move(getCardPosition(numCards, i, drawPosition));
-        currentClickableCard.showNormal();
+        clickableCards[i].setParent(parentWidget);
+        clickableCards[i].setData(cardArr[i], drawPosition, size);
+        clickableCards[i].move(getCardPosition(i, n, drawPosition, size));
+        clickableCards[i].showNormal();
     }
 }
 
@@ -162,23 +183,23 @@ void ClickableCardArray::hideCards()
     }
 }
 
-QPoint ClickableCardArray::getCardPosition(int n, int index, const int drawPosition)
+QPoint ClickableCardArray::getCardPosition(int i, int n, const int drawPosition, const int size)
 {
     auto WIN_DIMENSIONS = [drawPosition]() {
         switch (drawPosition)
         {
-        case DRAW_POSITION_BOTTOM:
+        case DRAW_POSITION_MAIN_WIDGET_BOTTOM:
             return make_pair(1200, 850);
-        case DRAW_POSITION_CENTER:
-        case DRAW_POSITION_CENTER_PREVIEW:
+        case DRAW_POSITION_MIDDLE_DLG_NEST:
+            return make_pair(724, 435);
+        case DRAW_POSITION_NEST_DLG_TOP:
+        case DRAW_POSITION_NEST_DLG_BOTTOM:
             return make_pair(600, 300);
         case DRAW_POSITION_PARTNER_DLG_ROW1:
         case DRAW_POSITION_PARTNER_DLG_ROW2:
         case DRAW_POSITION_PARTNER_DLG_ROW3:
             return make_pair(1000, 400);
         default:
-            // DRAW_POSITION_TOP_LEFT
-            // ...
             return make_pair(0, 0); // dynamic positioning not implemented
         }
     }();
@@ -187,12 +208,14 @@ QPoint ClickableCardArray::getCardPosition(int n, int index, const int drawPosit
     auto VERTICAL_SHIFT = [drawPosition]() {
         switch (drawPosition)
         {
-        case DRAW_POSITION_BOTTOM:
-            return 0;
-        case DRAW_POSITION_CENTER:
-            return 0;
-        case DRAW_POSITION_CENTER_PREVIEW:
-            return 225;
+        case DRAW_POSITION_MAIN_WIDGET_BOTTOM:
+            return 170;
+        case DRAW_POSITION_MIDDLE_DLG_NEST:
+            return -200;
+        case DRAW_POSITION_NEST_DLG_TOP:
+            return -100;
+        case DRAW_POSITION_NEST_DLG_BOTTOM:
+            return 125;
         case DRAW_POSITION_PARTNER_DLG_ROW1:
             return -50;
         case DRAW_POSITION_PARTNER_DLG_ROW2:
@@ -200,8 +223,6 @@ QPoint ClickableCardArray::getCardPosition(int n, int index, const int drawPosit
         case DRAW_POSITION_PARTNER_DLG_ROW3:
             return 170;
         default:
-            // DRAW_POSITION_TOP_LEFT
-            // ...
             return 0; // dynamic positioning not implemented
         }
     }();
@@ -209,82 +230,82 @@ QPoint ClickableCardArray::getCardPosition(int n, int index, const int drawPosit
     auto HORIZONTAL_SHIFT = [drawPosition]() {
         switch (drawPosition)
         {
-        case DRAW_POSITION_BOTTOM:
-            return 90;
-        case DRAW_POSITION_CENTER:
-        case DRAW_POSITION_CENTER_PREVIEW:
+        case DRAW_POSITION_MAIN_WIDGET_BOTTOM:
+            return 45;
+        case DRAW_POSITION_MIDDLE_DLG_NEST:
+            return 230;
+        case DRAW_POSITION_NEST_DLG_TOP:
+        case DRAW_POSITION_NEST_DLG_BOTTOM:
             return 170;
         case DRAW_POSITION_PARTNER_DLG_ROW1:
         case DRAW_POSITION_PARTNER_DLG_ROW2:
         case DRAW_POSITION_PARTNER_DLG_ROW3:
             return 100;
         default:
-            // DRAW_POSITION_TOP_LEFT
-            // ...
             return 0; // dynamic positioning not implemented
+        }
+    }();
+
+    auto CARDHEIGHT = [size]() {
+        switch(size)
+        {
+        case SIZE_NORMAL:
+            return 180;
+        case SIZE_SMALL:
+            return 135;
+        case SIZE_TINY:
+            return 90;
+        default:
+            return 0; // unknown size
         }
     }();
 
     auto CARDGAP = [drawPosition]() {
         switch (drawPosition)
         {
-        case DRAW_POSITION_BOTTOM:
-        case DRAW_POSITION_CENTER:
-        case DRAW_POSITION_CENTER_PREVIEW:
+        case DRAW_POSITION_MAIN_WIDGET_BOTTOM:
+        case DRAW_POSITION_MIDDLE_DLG_NEST:
+        case DRAW_POSITION_NEST_DLG_TOP:
+        case DRAW_POSITION_NEST_DLG_BOTTOM:
             return 40;
         case DRAW_POSITION_PARTNER_DLG_ROW1:
         case DRAW_POSITION_PARTNER_DLG_ROW2:
         case DRAW_POSITION_PARTNER_DLG_ROW3:
             return 55;
         default:
-            // DRAW_POSITION_TOP_LEFT
-            // ...
-            return 0; // dynamic positioning not implemented
+            return 0; // only one card shown for this draw position
         }
     }();
 
     const int WIN_WIDTH = WIN_DIMENSIONS.first;
     const int WIN_HEIGHT = WIN_DIMENSIONS.second;
-
-    const int WIDTH_OFFSET = 25;
-    const int HEIGHT_OFFSET = -10; // NOT USED
-
-    const int BOTTOM_BORDER_GAP = 90;
-    const int TOP_BORDER_GAP = 20;   // NOT USED
-    const int LEFT_BORDER_GAP = 20;  // NOT USED
-    const int RIGHT_BORDER_GAP = 50; // NOT USED
-
-    const int CARDHEIGHT = 180;
-    const int CARDWIDTH = 180; // NOT USED
-
-    const int NEST_HEIGHT_OFFSET = -100;
-
     const int TOTAL_WIDTH = CARDHEIGHT + (n - 1) * CARDGAP;
 
     switch (drawPosition)
     {
-    case DRAW_POSITION_BOTTOM:
-        return {(WIN_WIDTH - TOTAL_WIDTH) / 2 + index * CARDGAP + WIDTH_OFFSET,
-                WIN_HEIGHT - CARDHEIGHT - BOTTOM_BORDER_GAP};
-    case DRAW_POSITION_CENTER:
-    case DRAW_POSITION_CENTER_PREVIEW:
+    case DRAW_POSITION_MAIN_WIDGET_BOTTOM:
+    case DRAW_POSITION_MIDDLE_DLG_NEST:
+    case DRAW_POSITION_NEST_DLG_TOP:
+    case DRAW_POSITION_NEST_DLG_BOTTOM:
     case DRAW_POSITION_PARTNER_DLG_ROW1:
     case DRAW_POSITION_PARTNER_DLG_ROW2:
     case DRAW_POSITION_PARTNER_DLG_ROW3:
-        return {(WIN_WIDTH - TOTAL_WIDTH) / 2 + index * CARDGAP + WIDTH_OFFSET + HORIZONTAL_SHIFT,
-                (WIN_HEIGHT) / 2 + NEST_HEIGHT_OFFSET + VERTICAL_SHIFT};
-    case DRAW_POSITION_TRUMP_DLG: // only one card display (win_dim: 661x302)
-        return {450, 120};
-    case DRAW_POSITION_TOP_LEFT: // only one card display (win_dim: 1200x850)
-        return {50, 35};
-    case DRAW_POSITION_CARD_PLAYED_BOTTOM:
+        return {(WIN_WIDTH - TOTAL_WIDTH) / 2 + i * CARDGAP + HORIZONTAL_SHIFT,
+                (WIN_HEIGHT) / 2 + VERTICAL_SHIFT};
+    case DRAW_POSITION_MAIN_WIDGET_CENTER_BOTTOM:
         return {500, 375};
-    case DRAW_POSITION_CARD_PLAYED_LEFT:
+    case DRAW_POSITION_MAIN_WIDGET_CENTER_LEFT:
         return {300, 300};
-    case DRAW_POSITION_CARD_PLAYED_TOP:
+    case DRAW_POSITION_MAIN_WIDGET_CENTER_TOP:
         return {500, 180};
-    case DRAW_POSITION_CARD_PLAYED_RIGHT:
+    case DRAW_POSITION_MAIN_WIDGET_CENTER_RIGHT:
         return {630, 300};
+    case DRAW_POSITION_MIDDLE_DLG_PARTNER:
+        return {510, 260};
+    case DRAW_POSITION_GAME_INFO_WIDGET:
+        return {145, 35};
+    case DRAW_POSITION_MESSAGE_BOX:
+        return {75, 50};
     default: // not implemented
         return {0, 0};
     }

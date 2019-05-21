@@ -1,23 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>TrumpDialog</class>
- <widget class="QDialog" name="TrumpDialog">
+ <class>MiddleDialog</class>
+ <widget class="QDialog" name="MiddleDialog">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>627</width>
-    <height>295</height>
+    <width>724</width>
+    <height>435</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Trump Dialog</string>
+   <string>Middle Dialog</string>
   </property>
   <widget class="QLabel" name="trumpCategoryLabel">
    <property name="geometry">
     <rect>
-     <x>80</x>
-     <y>40</y>
+     <x>90</x>
+     <y>160</y>
      <width>121</width>
      <height>31</height>
     </rect>
@@ -33,24 +33,24 @@
     <string>Trump</string>
    </property>
   </widget>
-  <widget class="QPushButton" name="selectCardButton">
+  <widget class="QPushButton" name="selectPartnerButton">
    <property name="geometry">
     <rect>
-     <x>280</x>
-     <y>130</y>
-     <width>121</width>
+     <x>260</x>
+     <y>270</y>
+     <width>141</width>
      <height>28</height>
     </rect>
    </property>
    <property name="text">
-    <string>Select card...</string>
+    <string>Select partner...</string>
    </property>
   </widget>
-  <widget class="QLabel" name="partnerCardCategoryLabel">
+  <widget class="QLabel" name="partnerCategoryLabel">
    <property name="geometry">
     <rect>
-     <x>80</x>
-     <y>130</y>
+     <x>90</x>
+     <y>270</y>
      <width>131</width>
      <height>31</height>
     </rect>
@@ -63,15 +63,15 @@
     </font>
    </property>
    <property name="text">
-    <string>Partner Card</string>
+    <string>Partner</string>
    </property>
   </widget>
   <widget class="QPushButton" name="selectTrumpButton">
    <property name="geometry">
     <rect>
-     <x>280</x>
-     <y>40</y>
-     <width>121</width>
+     <x>260</x>
+     <y>160</y>
+     <width>141</width>
      <height>31</height>
     </rect>
    </property>
@@ -79,11 +79,11 @@
     <string>Select trump...</string>
    </property>
   </widget>
-  <widget class="QLabel" name="selectTrumpLabel">
+  <widget class="QLabel" name="trumpLabel">
    <property name="geometry">
     <rect>
-     <x>450</x>
-     <y>40</y>
+     <x>510</x>
+     <y>150</y>
      <width>121</width>
      <height>51</height>
     </rect>
@@ -91,12 +91,15 @@
    <property name="text">
     <string>No Trump Selected</string>
    </property>
+   <property name="alignment">
+    <set>Qt::AlignCenter</set>
+   </property>
   </widget>
   <widget class="QPushButton" name="okButton">
    <property name="geometry">
     <rect>
-     <x>490</x>
-     <y>250</y>
+     <x>620</x>
+     <y>390</y>
      <width>75</width>
      <height>23</height>
     </rect>
@@ -108,9 +111,9 @@
   <widget class="QPushButton" name="autoSelectTrumpButton">
    <property name="geometry">
     <rect>
-     <x>280</x>
-     <y>70</y>
-     <width>121</width>
+     <x>260</x>
+     <y>190</y>
+     <width>141</width>
      <height>31</height>
     </rect>
    </property>
@@ -118,17 +121,63 @@
     <string>Auto select trump...</string>
    </property>
   </widget>
-  <widget class="QPushButton" name="autoSelectCardButton">
+  <widget class="QPushButton" name="autoSelectPartnerButton">
    <property name="geometry">
     <rect>
-     <x>280</x>
-     <y>160</y>
-     <width>121</width>
+     <x>260</x>
+     <y>300</y>
+     <width>141</width>
      <height>28</height>
     </rect>
    </property>
    <property name="text">
-    <string>Auto select card...</string>
+    <string>Auto select partner...</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="nestCategoryLabel">
+   <property name="geometry">
+    <rect>
+     <x>90</x>
+     <y>40</y>
+     <width>121</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>12</pointsize>
+     <weight>75</weight>
+     <bold>true</bold>
+    </font>
+   </property>
+   <property name="text">
+    <string>Nest</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="selectNestButton">
+   <property name="geometry">
+    <rect>
+     <x>260</x>
+     <y>40</y>
+     <width>141</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Select nest...</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="autoSelectNestButton">
+   <property name="geometry">
+    <rect>
+     <x>260</x>
+     <y>70</y>
+     <width>141</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Auto select nest...</string>
    </property>
   </widget>
  </widget>

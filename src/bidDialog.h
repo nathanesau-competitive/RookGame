@@ -2,6 +2,7 @@
 #define BIDDIALOG_H
 
 #include <QDialog>
+#include <QMainWindow>
 
 namespace Ui {
     class BidDialog;
@@ -15,9 +16,11 @@ extern GameController gc;
 
 class BidDialog : public QDialog
 {
+    QMainWindow *mainWindow;
+
 public:
 
-    BidDialog(QWidget *parent = nullptr);
+    BidDialog(QMainWindow *pMainWindow, QWidget *parent = nullptr);
     virtual ~BidDialog();
 
     void resetLabelsAndComboBox();

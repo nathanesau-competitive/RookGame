@@ -1,15 +1,18 @@
-#include <QPushButton>
-#include <QObject>
 #include <QMessageBox>
+#include <QObject>
+#include <QPushButton>
 #include <string>
 
 #include "bidDialog.h"
 #include "gameController.h"
-#include "mainWindow.h"
 #include "ui_BidDialog.h"
+#include "utils.h"
 
-BidDialog::BidDialog(QWidget *parent) : QDialog(parent),
-                                        ui(new Ui::BidDialog)
+using namespace std;
+
+BidDialog::BidDialog(QMainWindow *pMainWindow, QWidget *parent) : mainWindow(pMainWindow),
+                                                                  QDialog(parent),
+                                                                  ui(new Ui::BidDialog)
 {
     ui->setupUi(this);
 
@@ -57,14 +60,14 @@ void BidDialog::onBidButtonPressed()
     showBid(ui->player3BidLabel, gc.playerArr[PLAYER_3].bid);
     showBid(ui->player4BidLabel, gc.playerArr[PLAYER_4].bid);
 
-    if (gc.winningBidder != PLAYER_UNDEFINED) // bidding round over
+    if (gc.bidPlayer != PLAYER_UNDEFINED) // bidding round over
     {
         accept(); // close bid dialog
         showBidResultMsgBox();
     }
     else
     {
-        setupComboBox(gc.currentBid + 5, 120, 5);
+        setupComboBox(gc.bidAmount + 5, 120, 5);
     }
 }
 
@@ -105,26 +108,11 @@ int BidDialog::getNumPassed()
 
 void BidDialog::showBidResultMsgBox()
 {
-    string bidResultMsg;
+    string bidResultMsg = Utils::Ui::getPlayerName(gc.bidPlayer) + " won the bid for " +
+                          to_string(gc.bidAmount) + ". " + "Bid updated.";
 
-    switch (gc.winningBidder)
-    {
-    case PLAYER_1:
-        bidResultMsg = "Player 1 won the bid for " + to_string(gc.currentBid);
-        break;
-    case PLAYER_2:
-        bidResultMsg = "Player 2 won the bid for " + to_string(gc.currentBid);
-        break;
-    case PLAYER_3:
-        bidResultMsg = "Player 3 won the bid for " + to_string(gc.currentBid);
-        break;
-    case PLAYER_4:
-        bidResultMsg = "Player 4 won the bid for " + to_string(gc.currentBid);
-        break;
-    default:
-        bidResultMsg = "Unknown error occured in bidding phase";
-        break;
-    }
-
-    Utils::Ui::showMessageBox(QString::fromStdString(bidResultMsg), "Bid Result");
+    MessageBox msgBox;
+    Utils::Ui::setupMessageBox(&msgBox, QString::fromStdString(bidResultMsg), "Bid Result");
+    Utils::Ui::moveDialogToCenter(&msgBox, mainWindow);
+    msgBox.exec();
 }

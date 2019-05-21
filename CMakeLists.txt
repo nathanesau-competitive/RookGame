@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.1.0)
 
 project(rook)
 
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 17)
 
 # Find includes in corresponding build directories
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
@@ -26,30 +26,41 @@ get_target_property(QtCore_location Qt5::Core LOCATION)
 
 # Populate a CMake variable with the sources
 set(rook_SRCS
-        resources.qrc
-        cpuPlayer.cpp
-        cpuPlayer.h
-        gamecontroller.cpp
-        gamecontroller.h
-        mainwindow.cpp
-        mainwindow.h
-        messageBox.ui
-        messageBox.h
-        messageBox.cpp
-        nestDialog.ui
-        nestDialog.h
-        nestDialog.cpp
-        bidDialog.ui
-        bidDialog.h
-        bidDialog.cpp
-        trumpLabel.cpp
-        trumpLabel.h
-        trumpDialog.ui
-        trumpDialog.h
-        trumpDialog.cpp
-        clickableCard.h
-        clickableCard.cpp
-        main.cpp
+        src/bidDialog.cpp
+        src/bidDialog.h
+        src/bidDialog.ui
+        src/card.cpp
+        src/card.h
+        src/clickableCard.cpp
+        src/clickableCard.h
+        src/cpuPlayer.cpp
+        src/cpuPlayer.h
+        src/gameController.cpp
+        src/gameController.h
+        src/gameInfoWidget.cpp
+        src/gameInfoWidget.h
+        src/handInfo.cpp
+        src/handInfo.h
+        src/main.cpp
+        src/mainWidget.cpp
+        src/mainWidget.h
+        src/mainWindow.cpp
+        src/mainWindow.h
+        src/messageBox.cpp
+        src/messageBox.h
+        src/messageBox.ui
+        src/middleDialog.cpp
+        src/middleDialog.h
+        src/middleDialog.ui
+        src/player.cpp
+        src/player.h
+        src/resources.qrc
+        src/roundSummaryDialog.cpp
+        src/roundSummaryDialog.h
+        src/trumpLabel.cpp
+        src/trumpLabel.h
+        src/utils.cpp
+        src/utils.h
 )
 
 # Tell Cmake to create the hello world executable

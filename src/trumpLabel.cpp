@@ -1,5 +1,6 @@
-#include "trumpLabel.h"
 #include "mainWindow.h"
+#include "middleDialog.h"
+#include "trumpLabel.h"
 
 TrumpLabel::TrumpLabel(QWidget *parent) : QLabel(parent)
 {
@@ -7,7 +8,7 @@ TrumpLabel::TrumpLabel(QWidget *parent) : QLabel(parent)
 
 void TrumpLabel::mousePressEvent(QMouseEvent *event)
 {
-    TrumpSuitSubDialog *parentDialog = dynamic_cast<TrumpSuitSubDialog *>(parentWidget ());
+    TrumpDialog *parentDialog = dynamic_cast<TrumpDialog *>(parentWidget ());
 
     parentDialog->onTrumpLabelClicked(this);
 }

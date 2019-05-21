@@ -4,12 +4,6 @@
 #include <QLabel>
 #include <QWidget>
 
-// forward declarations
-struct Interface;
-
-// global declarations
-extern Interface gui;
-
 class TrumpLabel : public QLabel
 {
     Q_OBJECT // mousePressEvent
