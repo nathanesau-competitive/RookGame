@@ -1,11 +1,44 @@
+#include <QApplication>
+#include <QDesktopWidget>
+
+#include "bidDialog.h"
+#include "ui_BidDialog.h"
+#include "clickableCard.h"
 #include "gameController.h"
+#include "mainWidget.h"
+#include "mainWindow.h"
+#include "messageBox.h"
+#include "ui_MessageBox.h"
+#include "middleDialog.h"
+#include "ui_MiddleDialog.h"
+#include "roundSummaryDialog.h"
 #include "utils.h"
 
 namespace Utils
 {
 namespace Ui
 {
-void moveDialogToCenter(QDialog *dialog, QMainWindow *mainWindow, const QPoint &offset)
+float getScaleFactor(float desiredScreenRatio)
+{
+    float screenRatio = min(0.925F, desiredScreenRatio);
+
+    QSize origSize = {1200, 850};
+    QRect maxSize = QApplication::desktop()->screenGeometry(); // i.e. 1920x1080
+    float factor = min((float)maxSize.width() / origSize.width(),
+                       (float)maxSize.height() / origSize.height());
+
+    return factor * screenRatio;
+}
+
+void moveWindowToCenter(QMainWindow *mainWindow, int taskBarHeight)
+{
+    auto screenGeometry = QApplication::desktop()->screenGeometry();
+    int x = (screenGeometry.width() - mainWindow->width()) / 2;
+    int y = max(0, (screenGeometry.height() - mainWindow->height()) / 2 - taskBarHeight);
+    mainWindow->move(QPoint(x, y));
+}
+
+void moveDialog(QDialog *dialog, QMainWindow *mainWindow, int position)
 {
     auto mainWindowPos = mainWindow->pos();
     auto mainWindowSize = mainWindow->size();
@@ -14,10 +47,36 @@ void moveDialogToCenter(QDialog *dialog, QMainWindow *mainWindow, const QPoint &
 
     auto dialogSize = dialog->size();
 
-    auto dialogTopLeft = QPoint(mainWindowCenter.x() - dialogSize.width() / 2 + offset.x(),
-                                mainWindowCenter.y() - dialogSize.height() / 2 + offset.y());
+    auto dialogPos = [&]() -> QPoint {
+        auto centerPos = QPoint(mainWindowCenter.x() - dialogSize.width() / 2,
+                                mainWindowCenter.y() - dialogSize.height() / 2);
 
-    dialog->move(dialogTopLeft);
+        switch (position)
+        {
+        case DIALOG_POSITION_CENTER:
+            return centerPos;
+
+        case DIALOG_POSITION_MIDDLE_DLG:
+            return QPoint(centerPos.x(), centerPos.y() - mainWindowSize.height() * 0.1F);
+
+        case DIALOG_POSITION_NEST_DLG:
+            return QPoint(centerPos.x(), centerPos.y() - mainWindowSize.height() * 0.1F);
+
+        case DIALOG_POSITION_TRUMP_DLG:
+            return QPoint(centerPos.x(), centerPos.y() - mainWindowSize.height() * 0.1F);
+
+        case DIALOG_POSITION_PARTNER_DLG:
+            return QPoint(centerPos.x(), centerPos.y() - mainWindowSize.height() * 0.1F);
+
+        case DIALOG_POSITION_CARD_MESSAGE_BOX:
+            return QPoint(centerPos.x() + mainWindowSize.width() * 0.35F, centerPos.y());
+
+        default:
+            return {0, 0};
+        }
+    }();
+
+    dialog->move(QPoint({max(0, dialogPos.x()), max(0, dialogPos.y())}));
 }
 
 void setupMessageBox(MessageBox *msgBox, QString msg, QString title, QSize size)
@@ -49,8 +108,8 @@ string getTeamName(set<int> team)
 {
     string teamName = "???";
 
-    for(auto playerNum : team)
-    { 
+    for (auto playerNum : team)
+    {
         auto playerName = Utils::Ui::getPlayerName(playerNum);
         teamName = (teamName == "???") ? playerName : teamName + " + " + playerName;
     }

@@ -13,7 +13,7 @@
   <property name="windowTitle">
    <string>Bid Dialog</string>
   </property>
-  <widget class="QLabel" name="player1Label">
+  <widget class="ScaledQLabel" name="player1Label" native="true">
    <property name="geometry">
     <rect>
      <x>320</x>
@@ -27,11 +27,11 @@
      <pointsize>12</pointsize>
     </font>
    </property>
-   <property name="text">
+   <property name="text" stdset="0">
     <string>Player 1</string>
    </property>
   </widget>
-  <widget class="QLabel" name="player3Label">
+  <widget class="ScaledQLabel" name="player3Label" native="true">
    <property name="geometry">
     <rect>
      <x>310</x>
@@ -45,11 +45,11 @@
      <pointsize>12</pointsize>
     </font>
    </property>
-   <property name="text">
+   <property name="text" stdset="0">
     <string>Player 3</string>
    </property>
   </widget>
-  <widget class="QLabel" name="player2Label">
+  <widget class="ScaledQLabel" name="player2Label" native="true">
    <property name="geometry">
     <rect>
      <x>70</x>
@@ -63,11 +63,11 @@
      <pointsize>12</pointsize>
     </font>
    </property>
-   <property name="text">
+   <property name="text" stdset="0">
     <string>Player 2</string>
    </property>
   </widget>
-  <widget class="QLabel" name="player4Label">
+  <widget class="ScaledQLabel" name="player4Label" native="true">
    <property name="geometry">
     <rect>
      <x>540</x>
@@ -81,11 +81,11 @@
      <pointsize>12</pointsize>
     </font>
    </property>
-   <property name="text">
+   <property name="text" stdset="0">
     <string>Player 4</string>
    </property>
   </widget>
-  <widget class="QLabel" name="player2BidLabel">
+  <widget class="ScaledQLabel" name="player2BidLabel" native="true">
    <property name="geometry">
     <rect>
      <x>90</x>
@@ -99,11 +99,11 @@
      <pointsize>12</pointsize>
     </font>
    </property>
-   <property name="text">
+   <property name="text" stdset="0">
     <string>0</string>
    </property>
   </widget>
-  <widget class="QLabel" name="player3BidLabel">
+  <widget class="ScaledQLabel" name="player3BidLabel" native="true">
    <property name="geometry">
     <rect>
      <x>330</x>
@@ -117,11 +117,11 @@
      <pointsize>12</pointsize>
     </font>
    </property>
-   <property name="text">
+   <property name="text" stdset="0">
     <string>0</string>
    </property>
   </widget>
-  <widget class="QLabel" name="player4BidLabel">
+  <widget class="ScaledQLabel" name="player4BidLabel" native="true">
    <property name="geometry">
     <rect>
      <x>560</x>
@@ -135,11 +135,11 @@
      <pointsize>12</pointsize>
     </font>
    </property>
-   <property name="text">
+   <property name="text" stdset="0">
     <string>0</string>
    </property>
   </widget>
-  <widget class="QLabel" name="player1BidLabel">
+  <widget class="ScaledQLabel" name="player1BidLabel" native="true">
    <property name="geometry">
     <rect>
      <x>340</x>
@@ -153,11 +153,11 @@
      <pointsize>12</pointsize>
     </font>
    </property>
-   <property name="text">
+   <property name="text" stdset="0">
     <string>0</string>
    </property>
   </widget>
-  <widget class="QPushButton" name="bidButton">
+  <widget class="ScaledQPushButton" name="bidButton" native="true">
    <property name="geometry">
     <rect>
      <x>160</x>
@@ -168,14 +168,14 @@
    </property>
    <property name="font">
     <font>
-     <pointsize>12</pointsize>
+     <pointsize>10</pointsize>
     </font>
    </property>
-   <property name="text">
+   <property name="text" stdset="0">
     <string>Bid</string>
    </property>
   </widget>
-  <widget class="QPushButton" name="passButton">
+  <widget class="ScaledQPushButton" name="passButton" native="true">
    <property name="geometry">
     <rect>
      <x>440</x>
@@ -186,14 +186,14 @@
    </property>
    <property name="font">
     <font>
-     <pointsize>12</pointsize>
+     <pointsize>10</pointsize>
     </font>
    </property>
-   <property name="text">
+   <property name="text" stdset="0">
     <string>Pass</string>
    </property>
   </widget>
-  <widget class="QComboBox" name="bidAmountComboBox">
+  <widget class="ScaledQComboBox" name="bidAmountComboBox">
    <property name="geometry">
     <rect>
      <x>280</x>
@@ -202,8 +202,13 @@
      <height>21</height>
     </rect>
    </property>
+   <property name="font">
+    <font>
+     <pointsize>12</pointsize>
+    </font>
+   </property>
   </widget>
-  <widget class="QLabel" name="bidAmountLabel">
+  <widget class="ScaledQLabel" name="bidAmountLabel" native="true">
    <property name="geometry">
     <rect>
      <x>300</x>
@@ -219,11 +224,28 @@
      <bold>true</bold>
     </font>
    </property>
-   <property name="text">
+   <property name="text" stdset="0">
     <string>Bid Amount</string>
    </property>
   </widget>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>ScaledQLabel</class>
+   <extends>QLabel</extends>
+   <header>common.h</header>
+  </customwidget>
+  <customwidget>
+   <class>ScaledQPushButton</class>
+   <extends>QPushButton</extends>
+   <header>common.h</header>
+  </customwidget>
+  <customwidget>
+   <class>ScaledQComboBox</class>
+   <extends>QComboBox</extends>
+   <header>common.h</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

@@ -4,9 +4,8 @@
 #include <QDialog>
 #include <QMainWindow>
 
-namespace Ui {
-    class BidDialog;
-}
+#include "common.h"
+#include "ui_BidDialog.h"
 
 // forward declarations
 class GameController;
@@ -14,7 +13,7 @@ class GameController;
 // global declarations
 extern GameController gc;
 
-class BidDialog : public QDialog
+class BidDialog : public ScaledQDialog
 {
     QMainWindow *mainWindow;
 
@@ -31,7 +30,7 @@ public:
     void setupComboBox(int minBid, int maxBid, int incr);
 
 private:
-    Ui::BidDialog *ui;
+    Ui::BidDialog ui;
 
     int getNumPassed();
     void showBidResultMsgBox();

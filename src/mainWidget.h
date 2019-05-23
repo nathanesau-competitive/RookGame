@@ -4,6 +4,7 @@
 #include <QMainWindow>
 
 #include "clickableCard.h"
+#include "common.h"
 #include "gameInfoWidget.h"
 
 // forward declarations

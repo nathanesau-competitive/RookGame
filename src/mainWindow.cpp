@@ -17,7 +17,7 @@
 
 using namespace std;
 
-MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
+MainWindow::MainWindow(QWidget *parent) : ScaledQMainWindow(parent),
                                           widget(this)
 {
     widget.setParent(this);
@@ -84,20 +84,13 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
     setWindowTitle("Rook");
     setWindowIcon(QIcon(":rookicon.gif"));
     setMenuBar(&menuBar);
-    setGeometry(0, 0, 1200, 850);
-    setMaximumSize(QSize(1200, 850));
-    setFixedSize(maximumSize());
+    setGeometry(QRect(0, 0, 1200, 850));
 
     QPixmap bkgnd(":background.PNG");
     bkgnd = bkgnd.scaled(size(), Qt::IgnoreAspectRatio);
     QPalette palette;
     palette.setBrush(QPalette::Background, bkgnd);
     setPalette(palette);
-}
-
-void MainWindow::onTrumpClicked(TrumpLabel *trumpLabel)
-{
-    gc.trump = SUIT_BLACK;
 }
 
 void MainWindow::onNewGameAction()
@@ -108,7 +101,7 @@ void MainWindow::onNewGameAction()
     widget.showBottomCards(gc.playerArr[PLAYER_1].cardArr);
 
     BidDialog bidDlg(this);
-    Utils::Ui::moveDialogToCenter(&bidDlg, this);
+    Utils::Ui::moveDialog(&bidDlg, this, DIALOG_POSITION_CENTER);
 
     if (!bidDlg.exec())
     {
@@ -123,7 +116,7 @@ void MainWindow::onNewGameAction()
 
     // todo: only show middle dialog if PLAYER_1 won bid
     MiddleDialog middleDlg(trumpSuitSelected, partnerCardSelected, &widget, this);
-    Utils::Ui::moveDialogToCenter(&middleDlg, this, {0, -50});
+    Utils::Ui::moveDialog(&middleDlg, this, DIALOG_POSITION_MIDDLE_DLG);
 
     if (!middleDlg.exec())
     {
@@ -150,7 +143,7 @@ void MainWindow::onNewGameAction()
 
     MessageBox msgBox;
     Utils::Ui::setupMessageBox(&msgBox, "Trump, partner, points in middle updated.\n\nGame starting.", "Start Game");
-    Utils::Ui::moveDialogToCenter(&msgBox, this);
+    Utils::Ui::moveDialog(&msgBox, this, DIALOG_POSITION_CENTER);
     msgBox.exec();
 }
 

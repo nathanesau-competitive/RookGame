@@ -16,7 +16,7 @@ set(CMAKE_AUTOUIC ON)
 # Auto handling of qrc resource files
 set(CMAKE_AUTORCC ON)
 
-set (CMAKE_PREFIX_PATH "D:/Qt/5.12.3/msvc2017_64")
+set (CMAKE_PREFIX_PATH "C:/Qt/5.12.0/msvc2017_64")
 
 # Find the Qt libraries
 find_package(Qt5Widgets CONFIG REQUIRED)
@@ -33,6 +33,8 @@ set(rook_SRCS
         src/card.h
         src/clickableCard.cpp
         src/clickableCard.h
+        src/common.cpp
+        src/common.h
         src/cpuPlayer.cpp
         src/cpuPlayer.h
         src/gameController.cpp
@@ -52,13 +54,17 @@ set(rook_SRCS
         src/middleDialog.cpp
         src/middleDialog.h
         src/middleDialog.ui
+        src/nestDialog.cpp
+        src/nestDialog.h
         src/player.cpp
         src/player.h
+        src/partnerDialog.cpp
+        src/partnerDialog.h
         src/resources.qrc
         src/roundSummaryDialog.cpp
         src/roundSummaryDialog.h
-        src/trumpLabel.cpp
-        src/trumpLabel.h
+        src/trumpDialog.cpp
+        src/trumpDialog.h
         src/utils.cpp
         src/utils.h
 )

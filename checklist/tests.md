@@ -1,0 +1,1 @@
+1. DPI scaling: OK.

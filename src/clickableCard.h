@@ -9,6 +9,7 @@
 #include <vector>
 
 #include "card.h"
+#include "common.h"
 
 using namespace std;
 
@@ -22,21 +23,19 @@ const int DRAW_POSITION_MIDDLE_DLG_NEST = 5;
 const int DRAW_POSITION_MIDDLE_DLG_PARTNER = 6;
 const int DRAW_POSITION_NEST_DLG_TOP = 7;
 const int DRAW_POSITION_NEST_DLG_BOTTOM = 8;
-const int DRAW_POSITION_PARTNER_DLG_ROW1 = 9;
-const int DRAW_POSITION_PARTNER_DLG_ROW2 = 10;
-const int DRAW_POSITION_PARTNER_DLG_ROW3 = 11;
-const int DRAW_POSITION_GAME_INFO_WIDGET = 12;
-const int DRAW_POSITION_MESSAGE_BOX = 13;
+const int DRAW_POSITION_PARTNER_DLG = 9;
+const int DRAW_POSITION_GAME_INFO_WIDGET = 10;
+const int DRAW_POSITION_MESSAGE_BOX = 111;
 
-const int SIZE_UNDEFINED = -1;
-const int SIZE_NORMAL = 0;
-const int SIZE_SMALL = 1;
-const int SIZE_TINY = 2;
+const QSize SIZE_UNDEFINED = {0, 0};
+const QSize SIZE_NORMAL = {180, 180};
+const QSize SIZE_SMALL = {135, 135};
+const QSize SIZE_TINY = {90, 90};
 
 // forward declarations
 class QDialogWithClickableCardArray;
 
-class ClickableCard : public QLabel
+class ClickableCard : public ScaledQLabel
 {
     Q_OBJECT
 
@@ -49,7 +48,7 @@ public:
 
     // Only difference from QLabel class is setData method
     // and override mousePressEvent
-    void setData(const Card &pData, const int drawPosition, int size = SIZE_NORMAL);
+    void setData(const Card &pData, int drawPosition, QSize size = SIZE_NORMAL);
 
 protected:
     void mousePressEvent(QMouseEvent *event);
@@ -57,24 +56,26 @@ protected:
     void leaveEvent(QEvent *event);
 };
 
-class ClickableCardArray : public QObject
+class ClickableCardArray
 {
+    QDialogWithClickableCardArray *parent;
+
     vector<ClickableCard> clickableCards;
 
     int drawPosition;
-    int size;
+    QSize size;
 
 public:
-    ClickableCardArray(QWidget *parent = nullptr);
+    ClickableCardArray(int pDrawPosition, QSize pSize = SIZE_NORMAL, QDialogWithClickableCardArray *pParent = nullptr);
 
-    void showCards(const vector<Card> &cardArr, const int pDrawPosition, const int pSize = SIZE_NORMAL);
+    void showCards(const vector<Card> &cardArr);
     void hideCards();
 
 private:
-    QPoint getCardPosition(int i, int n, const int drawPosition, const int size);
+    QPoint getCardPosition(int i, int n);
 };
 
-class QDialogWithClickableCardArray : public QDialog
+class QDialogWithClickableCardArray : public ScaledQDialog
 {
 public:
     QDialogWithClickableCardArray(QWidget *parent = nullptr);

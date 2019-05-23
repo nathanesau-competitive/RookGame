@@ -6,15 +6,18 @@
 #include <QMenu>
 #include <string>
 
+#include "common.h"
 #include "mainWidget.h"
-#include "trumpLabel.h"
 
 using namespace std;
+
+// forward declarations
+class GameController;
 
 // global declarations
 extern GameController gc;
 
-class MainWindow : public QMainWindow
+class MainWindow : public ScaledQMainWindow
 {
     MainWidget widget; // central widget
 
@@ -36,8 +39,6 @@ class MainWindow : public QMainWindow
 
 public:
     MainWindow(QWidget *parent = nullptr);
-
-    void onTrumpClicked(TrumpLabel *trumpLabel);
 
     void onNewGameAction();
     void onLoadGameAction();

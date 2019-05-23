@@ -1,10 +1,9 @@
 #ifndef ROUNDSUMMARYDIALOG_H
 #define ROUNDSUMMARYDIALOG_H
 
-#include <QDialog>
-#include <QWidget>
+#include "common.h"
 
-class RoundSummaryDialog : public QDialog
+class RoundSummaryDialog : public ScaledQDialog
 {
 public:
     RoundSummaryDialog(QWidget *parent = nullptr);

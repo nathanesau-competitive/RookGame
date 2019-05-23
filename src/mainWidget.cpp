@@ -8,18 +8,16 @@
 
 MainWidget::MainWidget(QMainWindow *pMainWindow, QWidget *parent) : mainWindow(pMainWindow),
                                                                     infoWidget(pMainWindow),
-                                                                    QDialogWithClickableCardArray(parent)
+                                                                    QDialogWithClickableCardArray(parent),
+                                                                    bottomCards(DRAW_POSITION_MAIN_WIDGET_BOTTOM, SIZE_NORMAL, this),
+                                                                    player1CardPlayed(DRAW_POSITION_MAIN_WIDGET_CENTER_BOTTOM, SIZE_NORMAL, this),
+                                                                    player2CardPlayed(DRAW_POSITION_MAIN_WIDGET_CENTER_LEFT, SIZE_NORMAL, this),
+                                                                    player3CardPlayed(DRAW_POSITION_MAIN_WIDGET_CENTER_TOP, SIZE_NORMAL, this),
+                                                                    player4CardPlayed(DRAW_POSITION_MAIN_WIDGET_CENTER_RIGHT, SIZE_NORMAL, this)
 {
     infoWidget.setParent(this);
     infoWidget.move(QPoint(0, 0));
     infoWidget.resize(1200, 130);
-
-    player1CardPlayed.setParent(this);
-    player2CardPlayed.setParent(this);
-    player3CardPlayed.setParent(this);
-    player4CardPlayed.setParent(this);
-
-    bottomCards.setParent(this);
 }
 
 void MainWidget::onCardClicked(ClickableCard *clickableCard)
@@ -68,9 +66,9 @@ void MainWidget::onCardClicked(ClickableCard *clickableCard)
             string msg = Utils::Ui::getPlayerName(gc.partnerPair.second) + " is the partner. Teams updated.";
 
             MessageBox msgBox;
-            Utils::Ui::setupMessageBox(&msgBox, QString::fromStdString(msg), "Partner card", {250, 250});
-            Utils::Ui::moveDialogToCenter(&msgBox, mainWindow, {400, 0});
             msgBox.showCards({gc.partnerPair.first});
+            Utils::Ui::setupMessageBox(&msgBox, QString::fromStdString(msg), "Partner card", {250, 250});
+            Utils::Ui::moveDialog(&msgBox, mainWindow, DIALOG_POSITION_CARD_MESSAGE_BOX);
             msgBox.exec();
         }
     }
@@ -103,9 +101,9 @@ void MainWidget::onCardClicked(ClickableCard *clickableCard)
     if (!msg.empty())
     {
         MessageBox msgBox;
-        Utils::Ui::setupMessageBox(&msgBox, QString::fromStdString(msg), "Hand result", {325, 250});
-        Utils::Ui::moveDialogToCenter(&msgBox, mainWindow, {400, 0});
         msgBox.showCards({gc.handInfo.getWinningPair().first});
+        Utils::Ui::setupMessageBox(&msgBox, QString::fromStdString(msg), "Hand result", {325, 250});
+        Utils::Ui::moveDialog(&msgBox, mainWindow, DIALOG_POSITION_CARD_MESSAGE_BOX);
         msgBox.exec();
     }
 
@@ -122,12 +120,12 @@ void MainWidget::onCardClicked(ClickableCard *clickableCard)
             " won the nest for " + to_string(gc.pointsMiddle) + " points.";
 
         Utils::Ui::setupMessageBox(&msgBox, QString::fromStdString(msg), "Last hand");
-        Utils::Ui::moveDialogToCenter(&msgBox, mainWindow);
+        Utils::Ui::moveDialog(&msgBox, mainWindow, DIALOG_POSITION_CENTER);
         msgBox.exec();
 
         // show round summary dialog
         auto roundSummaryDlg = RoundSummaryDialog();
-        Utils::Ui::moveDialogToCenter(&roundSummaryDlg, mainWindow);
+        Utils::Ui::moveDialog(&roundSummaryDlg, mainWindow, DIALOG_POSITION_CENTER);
         
         if(!roundSummaryDlg.exec())
         {
@@ -142,16 +140,16 @@ void MainWidget::showCardPlayed(const Card &card, int playerNum, bool sleep)
     switch (playerNum)
     {
     case PLAYER_1:
-        player1CardPlayed.showCards({card}, DRAW_POSITION_MAIN_WIDGET_CENTER_BOTTOM);
+        player1CardPlayed.showCards({card});
         break;
     case PLAYER_2:
-        player2CardPlayed.showCards({card}, DRAW_POSITION_MAIN_WIDGET_CENTER_LEFT);
+        player2CardPlayed.showCards({card});
         break;
     case PLAYER_3:
-        player3CardPlayed.showCards({card}, DRAW_POSITION_MAIN_WIDGET_CENTER_TOP);
+        player3CardPlayed.showCards({card});
         break;
     case PLAYER_4:
-        player4CardPlayed.showCards({card}, DRAW_POSITION_MAIN_WIDGET_CENTER_RIGHT);
+        player4CardPlayed.showCards({card});
         break;
     }
 
@@ -164,5 +162,5 @@ void MainWidget::showCardPlayed(const Card &card, int playerNum, bool sleep)
 
 void MainWidget::showBottomCards(const vector<Card> &cardArr)
 {
-    bottomCards.showCards(cardArr, DRAW_POSITION_MAIN_WIDGET_BOTTOM);
+    bottomCards.showCards(cardArr);
 }

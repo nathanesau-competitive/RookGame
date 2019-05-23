@@ -1,8 +1,12 @@
 #ifndef UTILS_H
 #define UTILS_H
 
+#include <QComboBox>
 #include <QDialog>
+#include <QFont>
+#include <QLabel>
 #include <QMainWindow>
+#include <QPushButton>
 #include <set>
 #include <string>
 
@@ -11,8 +15,17 @@
 
 using namespace std;
 
+// constants
+const int DIALOG_POSITION_CENTER = 0;
+const int DIALOG_POSITION_MIDDLE_DLG = 1;
+const int DIALOG_POSITION_NEST_DLG = 2;
+const int DIALOG_POSITION_TRUMP_DLG = 3;
+const int DIALOG_POSITION_PARTNER_DLG = 4;
+const int DIALOG_POSITION_CARD_MESSAGE_BOX = 5;
+
 // forward declarations
 class GameController;
+class MainWindow;
 
 // global declarations
 extern GameController gc;
@@ -21,13 +34,24 @@ namespace Utils
 {
 namespace Ui
 {
-void moveDialogToCenter(QDialog *dialog, QMainWindow *mainWindow, const QPoint &offset = {0,0});
+float getScaleFactor(float desiredScreenRatio);
+void moveWindowToCenter(QMainWindow *mainWindow, int taskBarHeight);
+
+// use QDialog not ScaledQDialog to ensure dialog is always centered
+// todo: moveDialogToCenter
+// todo: moveDialogToCenterRight
+// todo: moveDialogToCenterLeft
+// todo: moveDialogToCenterTop
+// ...
+void moveDialog(QDialog *dialog, QMainWindow *mainWindow, int position);
 
 void setupMessageBox(MessageBox *msgBox, QString msg, QString title, QSize = {477, 250});
 
 string getPlayerName(int playerNum);
 
 string getTeamName(set<int> team);
+
+// for custom widgets, scale functions declared inside header files
 }
 
 namespace Game

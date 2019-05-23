@@ -7,52 +7,53 @@
 #include "utils.h"
 
 GameInfoWidget::GameInfoWidget(QMainWindow *pMainWindow, QWidget *parent) : mainWindow(pMainWindow),
-                                                                            QDialogWithClickableCardArray(parent)
+                                                                            QDialogWithClickableCardArray(parent),
+                                                                            topLeftCards(DRAW_POSITION_GAME_INFO_WIDGET, SIZE_TINY, this)
 {
-    auto setupCategoryLabel = [this](QLabel *categoryLabel, QString text, QPoint pos) {
+    auto setupCategoryLabel = [this](ScaledQLabel *categoryLabel, QString text, QSize size, QPoint pos) {
         categoryLabel->setParent(this);
         categoryLabel->setText(text);
         categoryLabel->setFont(QFont("Times", 12, QFont::Weight::Bold));
+        categoryLabel->resize(size.width(), size.height());
         categoryLabel->move(pos);
     };
 
-    auto setupLabel = [this](QLabel *label, QString text, QSize size, QPoint pos) {
+    auto setupLabel = [this](ScaledQLabel *label, QString text, QSize size, QPoint pos) {
         label->setParent(this);
         label->setText(text);
         label->setFont(QFont("Times", 10, QFont::Weight::Normal));
-        label->resize(size);
+        label->resize(size.width(), size.height());
         label->move(pos);
     };
 
-    setupCategoryLabel(&bidCategoryLabel, "Bid", {25, 10});
+    setupCategoryLabel(&bidCategoryLabel, "Bid", {100, 20}, {25, 10});
     setupLabel(&bidPlayerLabel, "???", {100, 20}, {35, 35});
     setupLabel(&bidAmountLabel, "???", {100, 20}, {35, 55});
 
-    setupCategoryLabel(&partnerCardCategoryLabel, "Partner", {135, 10});
-    topLeftCards.setParent(this);
+    setupCategoryLabel(&partnerCardCategoryLabel, "Partner", {100, 20}, {135, 10});
 
-    setupCategoryLabel(&trumpCategoryLabel, "Trump", {270, 10});
+    setupCategoryLabel(&trumpCategoryLabel, "Trump", {100, 20}, {270, 10});
     setupLabel(&trumpLabel, "???", {50, 20}, {280, 35});
     trumpLabel.setAlignment(Qt::AlignHCenter);
 
-    setupCategoryLabel(&pointsMiddleCategoryLabel, "Points Middle", {380, 10});
+    setupCategoryLabel(&pointsMiddleCategoryLabel, "Points Middle", {125, 20}, {380, 10});
     setupLabel(&pointsMiddleLabel, "???", {125, 20}, {390, 35});
 
-    setupCategoryLabel(&teamsCategoryLabel, "Teams", {530, 10});
+    setupCategoryLabel(&teamsCategoryLabel, "Teams", {100, 20}, {530, 10});
     setupLabel(&team1Label, "???", {150, 20}, {540, 35});
     setupLabel(&team2Label, "???", {150, 20}, {540, 55});
 
-    setupCategoryLabel(&pointsWonTeamCategoryLabel, "Points (by Team)", {690, 10});
+    setupCategoryLabel(&pointsWonTeamCategoryLabel, "Points (by Team)", {150, 20}, {690, 10});
     setupLabel(&pointsWonTeamLabel1, "???", {150, 20}, {700, 35});
     setupLabel(&pointsWonTeamLabel2, "???", {150, 20}, {700, 55});
 
-    setupCategoryLabel(&pointsWonPlayerCategoryLabel, "Points (by Player)", {890, 10});
+    setupCategoryLabel(&pointsWonPlayerCategoryLabel, "Points (by Player)", {150, 20}, {890, 10});
     setupLabel(&pointsWonPlayerLabel1, "Player 1: 0", {100, 20}, {900, 35});
     setupLabel(&pointsWonPlayerLabel2, "Player 2: 0", {100, 20}, {900, 55});
     setupLabel(&pointsWonPlayerLabel3, "Player 3: 0", {100, 20}, {900, 75});
     setupLabel(&pointsWonPlayerLabel4, "Player 4: 0", {100, 20}, {900, 95});
 
-    setupCategoryLabel(&overallScoresCategoryLabel, "Scores", {1080, 10});
+    setupCategoryLabel(&overallScoresCategoryLabel, "Scores", {100, 20}, {1080, 10});
     setupLabel(&player1OverallScoreLabel, "Player 1: 0", {100, 20}, {1090, 35});
     setupLabel(&player2OverallScoreLabel, "Player 2: 0", {100, 20}, {1090, 55});
     setupLabel(&player3OverallScoreLabel, "Player 3: 0", {100, 20}, {1090, 75});
@@ -115,7 +116,7 @@ void GameInfoWidget::updateBid(int playerNum, int amount, bool showBlankAmount)
 
 void GameInfoWidget::updatePartner(Card partnerCard, int playerNum)
 {
-    topLeftCards.showCards({partnerCard}, DRAW_POSITION_GAME_INFO_WIDGET, SIZE_TINY);
+    topLeftCards.showCards({partnerCard});
 }
 
 void GameInfoWidget::updateTrump(int trumpSuit)
@@ -169,12 +170,12 @@ void GameInfoWidget::updateTeam2(set<int> team2)
 
 void GameInfoWidget::updatePoints(map<int, int> playerScores, map<int, int> teamScores, pair<set<int>, set<int>> teams)
 {
-    auto setupPointsPlayerLabel = [this](QLabel *label, int score, int playerNum) {
+    auto setupPointsPlayerLabel = [this](ScaledQLabel *label, int score, int playerNum) {
         string text = Utils::Ui::getPlayerName(playerNum) + ": " + to_string(score);
         label->setText(QString::fromStdString(text));
     };
 
-    auto setupPointsTeamLabel = [this](QLabel *label, int score, set<int> team) {
+    auto setupPointsTeamLabel = [this](ScaledQLabel *label, int score, set<int> team) {
         if (team.empty()) // teams not known yet
         {
             label->setText("???");
@@ -206,11 +207,11 @@ void GameInfoWidget::updatePoints(map<int, int> playerScores, map<int, int> team
             {
                 return false;
             }
-            else if(score1.second == score2.second)
+            else if (score1.second == score2.second)
             {
                 return score1.first < score2.first;
             }
-            else 
+            else
             {
                 return true;
             }
@@ -264,7 +265,7 @@ void GameInfoWidget::updatePoints(map<int, int> playerScores, map<int, int> team
 
 void GameInfoWidget::updateOverallScores(int player1Score, int player2Score, int player3Score, int player4Score)
 {
-    auto setupLabel = [this](QLabel *label, int score, int playerNum) {
+    auto setupLabel = [this](ScaledQLabel *label, int score, int playerNum) {
         string text = Utils::Ui::getPlayerName(playerNum) + ": " + to_string(score);
         label->setText(QString::fromStdString(text));
     };

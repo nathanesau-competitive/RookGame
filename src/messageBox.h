@@ -7,11 +7,8 @@
 #include <QString>
 
 #include "clickableCard.h"
-
-namespace Ui
-{
-class MessageBox;
-}
+#include "common.h"
+#include "ui_MessageBox.h"
 
 class MessageBox : public QDialogWithClickableCardArray
 {
@@ -22,7 +19,7 @@ public:
     void showCards(const vector<Card> &cardArr);
 
 protected:
-    Ui::MessageBox *ui;
+    Ui::MessageBox ui;
 
     ClickableCardArray messageBoxCards; 
 

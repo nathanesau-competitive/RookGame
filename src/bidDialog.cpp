@@ -5,28 +5,27 @@
 
 #include "bidDialog.h"
 #include "gameController.h"
-#include "ui_BidDialog.h"
 #include "utils.h"
 
 using namespace std;
 
 BidDialog::BidDialog(QMainWindow *pMainWindow, QWidget *parent) : mainWindow(pMainWindow),
-                                                                  QDialog(parent),
-                                                                  ui(new Ui::BidDialog)
+                                                                  ScaledQDialog(parent)
 {
-    ui->setupUi(this);
+    ui.setupUi(this);
 
     setupComboBox(40, 120, 5);
 
-    ui->bidAmountLabel->adjustSize();
-    ui->player1Label->adjustSize();
-    ui->player2Label->adjustSize();
-    ui->player3Label->adjustSize();
-    ui->player4Label->adjustSize();
+    ui.bidAmountLabel->adjustSize();
+    ui.player1Label->adjustSize();
+    ui.player2Label->adjustSize();
+    ui.player3Label->adjustSize();
+    ui.player4Label->adjustSize();
 
-    QObject::connect(ui->bidButton, &QPushButton::pressed, this, &BidDialog::onBidButtonPressed);
-    QObject::connect(ui->passButton, &QPushButton::pressed, this, &BidDialog::onPassButtonPressed);
+    QObject::connect(ui.bidButton, &QPushButton::pressed, this, &BidDialog::onBidButtonPressed);
+    QObject::connect(ui.passButton, &QPushButton::pressed, this, &BidDialog::onPassButtonPressed);
 
+    resize(661, 302);
     setWindowFlags(Qt::WindowTitleHint | Qt::WindowMinimizeButtonHint);
     setWindowIcon(QIcon(":rookicon.gif"));
     setStyleSheet("background-color: white");
@@ -34,31 +33,31 @@ BidDialog::BidDialog(QMainWindow *pMainWindow, QWidget *parent) : mainWindow(pMa
 
 BidDialog::~BidDialog()
 {
-    delete ui;
+    // todo
 }
 
 void BidDialog::resetLabelsAndComboBox()
 {
-    ui->player1BidLabel->setText("");
-    ui->player2BidLabel->setText("");
-    ui->player3BidLabel->setText("");
-    ui->player4BidLabel->setText("");
+    ui.player1BidLabel->setText("");
+    ui.player2BidLabel->setText("");
+    ui.player3BidLabel->setText("");
+    ui.player4BidLabel->setText("");
     setupComboBox(40, 120, 5);
 }
 
 void BidDialog::onBidButtonPressed()
 {
-    gc.bid(ui->bidAmountComboBox->currentText().toInt());
+    gc.bid(ui.bidAmountComboBox->currentText().toInt());
 
-    auto showBid = [](QLabel *label, int bid) {
+    auto showBid = [](ScaledQLabel *label, int bid) {
         QString bidText = (bid == 0) ? "Pass" : QString::number(bid);
         label->setText(bidText);
     };
 
-    showBid(ui->player1BidLabel, gc.playerArr[PLAYER_1].bid);
-    showBid(ui->player2BidLabel, gc.playerArr[PLAYER_2].bid);
-    showBid(ui->player3BidLabel, gc.playerArr[PLAYER_3].bid);
-    showBid(ui->player4BidLabel, gc.playerArr[PLAYER_4].bid);
+    showBid(ui.player1BidLabel, gc.playerArr[PLAYER_1].bid);
+    showBid(ui.player2BidLabel, gc.playerArr[PLAYER_2].bid);
+    showBid(ui.player3BidLabel, gc.playerArr[PLAYER_3].bid);
+    showBid(ui.player4BidLabel, gc.playerArr[PLAYER_4].bid);
 
     if (gc.bidPlayer != PLAYER_UNDEFINED) // bidding round over
     {
@@ -80,15 +79,15 @@ void BidDialog::onPassButtonPressed()
 
 void BidDialog::setupComboBox(int minBid, int maxBid, int incr)
 {
-    ui->bidAmountComboBox->clear();
+    ui.bidAmountComboBox->clear();
 
     for (int bid = minBid; bid <= maxBid; bid += incr)
     {
         QString itemText = QString::number(bid);
-        ui->bidAmountComboBox->addItem(itemText);
+        ui.bidAmountComboBox->addItem(itemText);
     }
 
-    ui->bidAmountComboBox->showNormal();
+    ui.bidAmountComboBox->showNormal();
 }
 
 int BidDialog::getNumPassed()
@@ -113,6 +112,6 @@ void BidDialog::showBidResultMsgBox()
 
     MessageBox msgBox;
     Utils::Ui::setupMessageBox(&msgBox, QString::fromStdString(bidResultMsg), "Bid Result");
-    Utils::Ui::moveDialogToCenter(&msgBox, mainWindow);
+    Utils::Ui::moveDialog(&msgBox, mainWindow, DIALOG_POSITION_CENTER);
     msgBox.exec();
 }
