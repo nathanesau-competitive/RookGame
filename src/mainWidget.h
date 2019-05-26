@@ -1,21 +1,22 @@
 #ifndef MAINWIDGET_H
 #define MAINWIDGET_H
 
-#include <QMainWindow>
-
 #include "clickableCard.h"
 #include "common.h"
 #include "gameInfoWidget.h"
 
 // forward declarations
+class CpuPlayer;
 class GameController;
+class MainWindow;
 
 // global declarations
+extern CpuPlayer cpu;
 extern GameController gc;
 
 class MainWidget : public QDialogWithClickableCardArray
 {
-    QMainWindow *mainWindow;
+    MainWindow *mainWindow;
 
 public:
     GameInfoWidget infoWidget;
@@ -25,11 +26,19 @@ public:
     ClickableCardArray player3CardPlayed;
     ClickableCardArray player4CardPlayed;
 
+    ClickableCardArray centerCards;
     ClickableCardArray bottomCards;
 
-    MainWidget(QMainWindow *pMainWindow, QWidget *parent = nullptr);
+    MainWidget(MainWindow *pMainWindow, QWidget *parent = nullptr);
 
     virtual void onCardClicked(ClickableCard *clickableCard);
+    
+    bool validateCard(ClickableCard *clickableCard); // return true if valid
+
+    void startRound();
+
+    void finishExistingHand(Card player1Card); // intentional copy
+    void startNewHand(int startingPlayerNum);
 
     virtual void onCardHoverEnter(ClickableCard *clickableCard)
     {
@@ -41,8 +50,11 @@ public:
         // do nothing
     }
 
-    void showCardPlayed(const Card &card, int playerNum, bool sleep = false);
-    void showBottomCards(const vector<Card> &cardArr);
+    void showCardPlayed(const Card &card, int playerNum);
+
+    void showPartnerCardIfApplicable();
+    void showHandResult();
+    void showNestResult();
 };
 
 #endif

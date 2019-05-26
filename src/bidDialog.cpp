@@ -47,7 +47,7 @@ void BidDialog::resetLabelsAndComboBox()
 
 void BidDialog::onBidButtonPressed()
 {
-    gc.bid(ui.bidAmountComboBox->currentText().toInt());
+    gc.onBid(ui.bidAmountComboBox->currentText().toInt());
 
     auto showBid = [](ScaledQLabel *label, int bid) {
         QString bidText = (bid == 0) ? "Pass" : QString::number(bid);
@@ -59,21 +59,21 @@ void BidDialog::onBidButtonPressed()
     showBid(ui.player3BidLabel, gc.playerArr[PLAYER_3].bid);
     showBid(ui.player4BidLabel, gc.playerArr[PLAYER_4].bid);
 
-    if (gc.bidPlayer != PLAYER_UNDEFINED) // bidding round over
+    if (gc.roundInfo.bidPlayer != PLAYER_UNDEFINED) // bidding round over
     {
         accept(); // close bid dialog
         showBidResultMsgBox();
     }
     else
     {
-        setupComboBox(gc.bidAmount + 5, 120, 5);
+        setupComboBox(gc.roundInfo.bidAmount + 5, 120, 5);
     }
 }
 
 void BidDialog::onPassButtonPressed()
 {
-    gc.pass();
-    accept(); // close bid dialog
+    gc.onPass();
+    reject(); // close bid dialog
     showBidResultMsgBox();
 }
 
@@ -107,8 +107,8 @@ int BidDialog::getNumPassed()
 
 void BidDialog::showBidResultMsgBox()
 {
-    string bidResultMsg = Utils::Ui::getPlayerName(gc.bidPlayer) + " won the bid for " +
-                          to_string(gc.bidAmount) + ". " + "Bid updated.";
+    string bidResultMsg = gc.playerArr[gc.roundInfo.bidPlayer].getPlayerName() + " won the bid for " +
+                          to_string(gc.roundInfo.bidAmount) + ". " + "Bid updated.";
 
     MessageBox msgBox;
     Utils::Ui::setupMessageBox(&msgBox, QString::fromStdString(bidResultMsg), "Bid Result");

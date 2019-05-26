@@ -2,93 +2,70 @@
 #include "gameController.h"
 #include "utils.h"
 
-GameController::GameController()
+GameController::GameController() : handInfo(roundInfo)
 {
     clear();
 }
 
 void GameController::clear()
 {
+    overallInfo.clear();
+    roundInfo.clear();
+    handInfo.clear();
+
     deck.clear();
-    playerArr.clear();
     nest.clear();
 
-    currentTurn = PLAYER_UNDEFINED;
-    bidAmount = 0;
-    bidPlayer = PLAYER_UNDEFINED;
-    phase = PHASE_UNDEFINED;
-    trump = SUIT_UNDEFINED;
-    pointsMiddle = 0;
-    partnerPair = make_pair(Card(SUIT_UNDEFINED, VALUE_UNDEFINED), PLAYER_UNDEFINED);
-    handInfo.clear();
-    teams.first.clear();
-    teams.second.clear();
-    
-    for(auto playerNum : vector<int>{PLAYER_1, PLAYER_2, PLAYER_3, PLAYER_4})
-    {
-        playerScores[playerNum] = 0;
-    }
-    
-    for(auto teamNum : vector<int>{TEAM_1, TEAM_2})
-    {
-        teamScores[teamNum] = 0;
-    }
+    playerArr = vector<Player>{Player(PLAYER_1), Player(PLAYER_2),
+                               Player(PLAYER_3), Player(PLAYER_4)};
 }
 
-void GameController::newGame()
+void GameController::onNewGame()
 {
     clear();
 
     initializeDeck();
-    initializePlayerArr();
     dealDeck();
-
-    phase = PHASE_BID;
 }
 
-void GameController::bid(int pBidAmount)
+void GameController::onBid(int pBidAmount)
 {
     playerArr[PLAYER_1].bid = pBidAmount;
-    bidAmount = pBidAmount;
+    roundInfo.bidAmount = pBidAmount;
 
-    vector<int> playerNumArr = {PLAYER_2, PLAYER_3, PLAYER_4}; // cpu players
-
-    for (auto playerNum : playerNumArr)
+    for (auto playerNum : vector<int>{PLAYER_2, PLAYER_3, PLAYER_4})
     {
         playerArr[playerNum].bid = cpu.getBid(playerNum);
 
         if (playerArr[playerNum].bid > pBidAmount)
         {
-            bidAmount = playerArr[playerNum].bid;
+            roundInfo.bidAmount = playerArr[playerNum].bid;
         }
     }
 
     if (getNumPassed() == 3)
     {
-        bidPlayer = PLAYER_1;
-        phase = PHASE_MIDDLE;
+        roundInfo.bidPlayer = PLAYER_1;
         return;
     }
 }
 
-void GameController::pass()
+void GameController::onPass()
 {
     playerArr[PLAYER_1].bid = 0;
 
     while (getNumPassed() != 3)
     {
-        vector<int> playerNumArr = {PLAYER_2, PLAYER_3, PLAYER_4}; // cpu players
-
-        for (auto playerNum : playerNumArr)
+        for (auto playerNum : vector<int>{PLAYER_2, PLAYER_3, PLAYER_4})
         {
-            if (playerArr[playerNum].bid == 0 || playerArr[playerNum].bid != bidAmount)
+            if (playerArr[playerNum].bid == 0 || playerArr[playerNum].bid != roundInfo.bidAmount)
             {
                 playerArr[playerNum].bid = cpu.getBid(playerNum);
             }
 
-            if (playerArr[playerNum].bid > bidAmount)
+            if (playerArr[playerNum].bid > roundInfo.bidAmount)
             {
-                bidAmount = playerArr[playerNum].bid;
+                roundInfo.bidAmount = playerArr[playerNum].bid;
             }
         }
     }
@@ -97,58 +74,55 @@ void GameController::pass()
     {
         if (player.bid != 0)
         {
-            bidPlayer = player.playerNum;
-            phase = PHASE_MIDDLE;
-            return;
+            roundInfo.bidPlayer = player.playerNum;
+            break;
         }
     }
+
+    // 1. nest selection
+
+    nest = cpu.getChosenNest(roundInfo.bidPlayer);
+
+    CardVector &cardArr = playerArr[roundInfo.bidPlayer].cardArr;
+
+    CardVector newCardArr;
+    newCardArr.append({&nest, &cardArr});
+    newCardArr.remove(nest);
+
+    cardArr = newCardArr;
+
+    // 2. trump selection
+
+    roundInfo.trump = cpu.getChosenTrump(roundInfo.bidPlayer);
+
+    // 3. partner selection
+
+    roundInfo.partnerCard = cpu.getChosenPartner(roundInfo.bidPlayer);
 }
 
-void GameController::startGame()
+void GameController::onStartGame()
 {
-    phase = PHASE_PLAY;
-
     // todo
 }
 
-void GameController::playHand(Card cardPlayed)
+void GameController::playCard(Card cardPlayed, int playerNum)
 {
-    auto removePlayedCardFromHand = [&](int playerNum) {
-        Card card = handInfo.cardPlayed[playerNum];
+    if (handInfo.startingPlayerNum == PLAYER_UNDEFINED) // first card played
+    {
+        handInfo.startingPlayerNum = playerNum;
+        handInfo.suit = cardPlayed.suit;
+    }
 
-        auto &cardArr = playerArr[playerNum].cardArr;
-        auto cardIt = std::find(cardArr.begin(), cardArr.end(), card);
-        cardArr.erase(cardIt);
-    };
-
-    handInfo.clear();
-
-    handInfo.cardPlayed[PLAYER_1] = cardPlayed;
+    handInfo.cardPlayed[playerNum] = cardPlayed;
     handInfo.points += cardPlayed.getPointValue();
-    handInfo.suit = cardPlayed.suit;
 
-    removePlayedCardFromHand(PLAYER_1);
-
-    vector<int> playerNumArr = {PLAYER_2, PLAYER_3, PLAYER_4}; // cpu players
-
-    for (auto playerNum : playerNumArr)
+    if (cardPlayed == roundInfo.partnerCard) // update partner and teams
     {
-        Card cardToPlay = cpu.getCardToPlay(playerNum);
-
-        handInfo.cardPlayed[playerNum] = cardToPlay;
-        handInfo.points += cardToPlay.getPointValue();
-
-        removePlayedCardFromHand(playerNum);
+        roundInfo.partnerPlayerNum = playerNum;
+        roundInfo.updateTeams();
     }
 
-    pair<Card, int> winningPair = handInfo.getWinningPair();
-
-    playerScores[winningPair.second] += handInfo.points;
-
-    if(playerArr[PLAYER_1].cardArr.empty())
-    {
-        playerScores[winningPair.second] += gc.pointsMiddle;
-    }
+    playerArr[playerNum].cardArr.remove({cardPlayed});
 }
 
 void GameController::initializeDeck()
@@ -179,19 +153,10 @@ void GameController::initializeDeck()
 
     deck.push_back(Card(SUIT_SPECIAL, VALUE_ROOK));
 
-    auto seed = (int)chrono::system_clock::now().time_since_epoch().count();
+    auto seed = 1009;
+    //auto seed = (int)chrono::system_clock::now().time_since_epoch().count();
 
     shuffle(deck.begin(), deck.end(), default_random_engine(seed));
-}
-
-void GameController::initializePlayerArr()
-{
-    vector<int> playerNumArr = {PLAYER_1, PLAYER_2, PLAYER_3, PLAYER_4};
-
-    for (auto playerNum : playerNumArr)
-    {
-        playerArr.push_back(Player(playerNum));
-    }
 }
 
 void GameController::dealDeck()
@@ -204,7 +169,7 @@ void GameController::dealDeck()
         deck.pop_back();
 
         playerArr[playerNum].cardArr.push_back(currentCard);
-        Utils::Game::incrementPlayerNum(playerNum);
+        playerNum = playerArr[playerNum].getNextPlayerNum();
     }
 
     while (deck.size() > 0)
@@ -215,15 +180,15 @@ void GameController::dealDeck()
         nest.push_back(currentCard);
     }
 
-    Utils::Game::sortCardArray(nest);
-    Utils::Game::sortCardArray(playerArr[PLAYER_1].cardArr);
+    nest.sort();
+    playerArr[PLAYER_1].cardArr.sort();
 }
 
 int GameController::getNumPassed()
 {
     int numPassed = 0;
 
-    for (auto &player : gc.playerArr)
+    for (auto &player : playerArr)
     {
         if (player.bid == 0)
         {
@@ -232,4 +197,17 @@ int GameController::getNumPassed()
     }
 
     return numPassed;
+}
+
+bool GameController::isRoundOver()
+{
+    for (auto playerNum : vector<int>{PLAYER_1, PLAYER_2, PLAYER_3, PLAYER_4})
+    {
+        if (!playerArr[playerNum].cardArr.empty())
+        {
+            return false;
+        }
+    }
+
+    return true;
 }

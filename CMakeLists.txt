@@ -56,11 +56,15 @@ set(rook_SRCS
         src/middleDialog.ui
         src/nestDialog.cpp
         src/nestDialog.h
+        src/overallInfo.cpp
+        src/overallInfo.h
         src/player.cpp
         src/player.h
         src/partnerDialog.cpp
         src/partnerDialog.h
         src/resources.qrc
+        src/roundInfo.h
+        src/roundInfo.cpp
         src/roundSummaryDialog.cpp
         src/roundSummaryDialog.h
         src/trumpDialog.cpp

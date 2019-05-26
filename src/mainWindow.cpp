@@ -95,56 +95,14 @@ MainWindow::MainWindow(QWidget *parent) : ScaledQMainWindow(parent),
 
 void MainWindow::onNewGameAction()
 {
-    gc.newGame();
-
-    widget.infoWidget.resetInfoToDefaults();
-    widget.showBottomCards(gc.playerArr[PLAYER_1].cardArr);
-
-    BidDialog bidDlg(this);
-    Utils::Ui::moveDialog(&bidDlg, this, DIALOG_POSITION_CENTER);
-
-    if (!bidDlg.exec())
-    {
-        qFatal("Problem executing big dialog");
-        return;
-    }
-
-    widget.infoWidget.updateBid(gc.bidPlayer, gc.bidAmount);
-
-    int trumpSuitSelected = SUIT_UNDEFINED;
-    Card partnerCardSelected = Card(SUIT_UNDEFINED, VALUE_UNDEFINED);
-
-    // todo: only show middle dialog if PLAYER_1 won bid
-    MiddleDialog middleDlg(trumpSuitSelected, partnerCardSelected, &widget, this);
-    Utils::Ui::moveDialog(&middleDlg, this, DIALOG_POSITION_MIDDLE_DLG);
-
-    if (!middleDlg.exec())
-    {
-        qFatal("Problem executing middle dialog");
-        return;
-    }
-
-    int pointsMiddle = []() {
-        int total = 0;
-        for (auto &card : gc.nest)
-        {
-            total += card.getPointValue();
-        }
-        return total;
-    }();
-
-    widget.infoWidget.updateTrump(trumpSuitSelected);
-    widget.infoWidget.updatePartner(partnerCardSelected);
-    widget.infoWidget.updatePointsMiddle(pointsMiddle);
-
-    gc.pointsMiddle = pointsMiddle;
-    gc.trump = trumpSuitSelected;
-    gc.partnerPair.first = partnerCardSelected;
+    widget.infoWidget.resetOverallInfoToDefaults();
 
     MessageBox msgBox;
-    Utils::Ui::setupMessageBox(&msgBox, "Trump, partner, points in middle updated.\n\nGame starting.", "Start Game");
+    Utils::Ui::setupMessageBox(&msgBox, "Previous scores cleared. Starting new game...", "New game");
     Utils::Ui::moveDialog(&msgBox, this, DIALOG_POSITION_CENTER);
     msgBox.exec();
+
+    startNewRound();
 }
 
 void MainWindow::onLoadGameAction()
@@ -180,4 +138,91 @@ void MainWindow::onCheckUpdatesAction()
 void MainWindow::onAboutAction()
 {
     // todo
+}
+
+void MainWindow::startNewRound()
+{
+    // clear existing info
+    widget.infoWidget.resetRoundInfoToDefaults();
+    widget.player1CardPlayed.hideCards();
+    widget.player2CardPlayed.hideCards();
+    widget.player3CardPlayed.hideCards();
+    widget.player4CardPlayed.hideCards();
+    widget.bottomCards.hideCards();
+    widget.centerCards.hideCards();
+
+    showNewRoundMessage();
+
+    gc.onNewGame();
+
+    widget.bottomCards.showCards(gc.playerArr[PLAYER_1].cardArr);
+
+    BidDialog bidDlg(this);
+    Utils::Ui::moveDialog(&bidDlg, this, DIALOG_POSITION_CENTER);
+    auto player1WonBid = bidDlg.exec();
+
+    widget.infoWidget.updateBid(gc.roundInfo.bidPlayer, gc.roundInfo.bidAmount);
+
+    if (player1WonBid)
+    {
+        int trumpSuitSelected = SUIT_UNDEFINED;
+        Card partnerCardSelected = Card(SUIT_UNDEFINED, VALUE_UNDEFINED);
+
+        MiddleDialog middleDlg(trumpSuitSelected, partnerCardSelected, &widget, this);
+        Utils::Ui::moveDialog(&middleDlg, this, DIALOG_POSITION_MIDDLE_DLG);
+
+        if (!middleDlg.exec())
+        {
+            qFatal("Problem executing middle dialog");
+            return;
+        }
+
+        gc.roundInfo.trump = trumpSuitSelected;
+        gc.roundInfo.partnerCard = partnerCardSelected;
+    }
+
+    // set rook suit to trump suit
+    auto modifyRookSuit = []() {
+        for (auto playerNum : vector<int>{PLAYER_1, PLAYER_2, PLAYER_3, PLAYER_4})
+        {
+            for (auto &card : gc.playerArr[playerNum].cardArr)
+            {
+                if (card.suit == SUIT_SPECIAL)
+                {
+                    card.suit = gc.roundInfo.trump;
+
+                    return playerNum;
+                }
+            }
+        }
+    };
+
+    if (modifyRookSuit() == PLAYER_1) // player 1 has the rook card
+    {
+        // re-sort and redraw bottom cards
+        gc.playerArr[PLAYER_1].cardArr.sort(gc.roundInfo.trump);
+        widget.bottomCards.showCards(gc.playerArr[PLAYER_1].cardArr);
+    }
+
+    gc.roundInfo.pointsMiddle = gc.nest.getNumPoints();
+
+    widget.infoWidget.updateTrump(gc.roundInfo.trump);
+    widget.infoWidget.updatePartner(gc.roundInfo.partnerCard);
+    widget.infoWidget.updatePointsMiddle(gc.roundInfo.pointsMiddle);
+
+    MessageBox msgBox;
+    Utils::Ui::setupMessageBox(&msgBox, "Trump, partner, points in middle updated.\n\nGame starting.", "Start Game");
+    Utils::Ui::moveDialog(&msgBox, this, DIALOG_POSITION_CENTER);
+    msgBox.exec();
+
+    // play first few cards if necessary
+    widget.startNewHand(gc.roundInfo.bidPlayer);
+}
+
+void MainWindow::showNewRoundMessage()
+{
+    MessageBox msgBox;
+    Utils::Ui::setupMessageBox(&msgBox, "A new round is starting...", "New round");
+    Utils::Ui::moveDialog(&msgBox, this, DIALOG_POSITION_CENTER);
+    msgBox.exec();
 }

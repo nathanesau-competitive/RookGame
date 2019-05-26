@@ -1,6 +1,11 @@
 #ifndef CARD_H
 #define CARD_H
 
+#include <string>
+#include <vector>
+
+using namespace std;
+
 // DO NOT MODIFY
 const int SUIT_UNDEFINED = -1;
 const int SUIT_BLACK = 0;
@@ -27,6 +32,9 @@ const int VALUE_12 = 12;
 const int VALUE_13 = 13;
 const int VALUE_14 = 14;
 
+// forward declarations
+class HandInfo;
+
 struct Card
 {
     int suit;
@@ -35,8 +43,44 @@ struct Card
     Card(int pSuit = SUIT_UNDEFINED, int pValue = VALUE_UNDEFINED);
     bool operator==(const Card &p);
     bool operator!=(const Card &p);
+    bool operator<(const Card &p);
 
     int getPointValue();
+    int getSentimentalValue();
+
+    string getSuitAsString() const;
+    string getValueAsString() const;
+    int getCardAsInt() const;
+};
+
+struct CardCompare
+{
+    int pTrump;
+
+    CardCompare(int trump) : pTrump(trump)
+    {
+    }
+
+    inline bool operator()(const Card &card1, const Card &card2)
+    {
+        if (pTrump != SUIT_UNDEFINED && card1.suit == pTrump && card2.suit != pTrump)
+        {
+            return false;
+        }
+        else if (card1.suit < card2.suit)
+        {
+            return true;
+        }
+        else if (card1.suit == card2.suit)
+        {
+            if (card1.value < card2.value)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
 };
 
 struct SuitInfo
@@ -53,6 +97,40 @@ struct SuitInfo
     {
         return p.suit == suit;
     }
+};
+
+struct SuitInfoCompareCount // ascending order
+{
+    inline bool operator()(const SuitInfo &info1, const SuitInfo &info2)
+    {
+        return info1.count > info2.count;
+    }
+};
+
+struct SuitInfoCompareTotalValue // ascending order
+{
+    inline bool operator()(const SuitInfo &info1, const SuitInfo &info2)
+    {
+        return info1.totalValue > info2.totalValue;
+    }
+};
+
+// do not delete objects through base class pointer
+// https://stackoverflow.com/questions/56296536/how-to-derive-from-vector-class
+class CardVector : public vector<Card>
+{
+    using vector<Card>::vector;
+
+public:
+    void sort(int trump = SUIT_UNDEFINED);
+    void remove(const CardVector &cardArr);
+    CardVector removeThisSuit(int suit, int n);
+    void append(const vector<const CardVector *> &cardArrays);
+
+    bool hasSuit(int suit);
+    int getNumPoints();
+    CardVector getPlayableCards(const HandInfo &handInfo);
+    vector<SuitInfo> getSuitInfoArray();
 };
 
 #endif

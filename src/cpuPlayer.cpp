@@ -3,7 +3,6 @@
 #include "utils.h"
 
 #include <map>
-#include <vector>
 
 using namespace std;
 
@@ -13,9 +12,8 @@ CpuPlayer::CpuPlayer()
 
 int CpuPlayer::getBid(int playerNum)
 {
-    vector<Card> &cardArr = gc.playerArr[playerNum].cardArr;
-
-    Utils::Game::sortCardArray(cardArr);
+    CardVector &cardArr = gc.playerArr[playerNum].cardArr;
+    cardArr.sort();
 
     double totalValue = 0.0;
 
@@ -39,18 +37,101 @@ int CpuPlayer::getBid(int playerNum)
     auto It = bidMap.upper_bound(P);
     auto maxBid = It != bidMap.end() ? It->second : 95;
 
-    int bid = maxBid > gc.bidAmount ? gc.bidAmount + 5 : 0;
+    int bid = maxBid > gc.roundInfo.bidAmount ? gc.roundInfo.bidAmount + 5 : 0;
 
     return bid;
 }
 
 Card CpuPlayer::getCardToPlay(int playerNum)
 {
-    vector<Card> &cardArr = gc.playerArr[playerNum].cardArr;
+    CardVector &cardArr = gc.playerArr[playerNum].cardArr;
 
-    vector<Card> playableCards = Utils::Game::getPlayableCards(cardArr);
+    CardVector playableCards = cardArr.getPlayableCards(gc.handInfo);
 
-    Card bestCard = Utils::Game::getBestCard(playableCards);
+    playableCards.sort(gc.roundInfo.trump);
+   
+    auto It = --playableCards.end();
+    return *It;
+}
+
+CardVector CpuPlayer::getChosenNest(int playerNum)
+{
+    CardVector &cardArr = gc.playerArr[playerNum].cardArr;
+    
+    CardVector newNest;
+    CardVector newCardArr;
+    newCardArr.append({&cardArr, &gc.nest});
+
+    auto suitInfoArr = cardArr.getSuitInfoArray();
+
+    int cardsToRemove = 5;
+
+    while (cardsToRemove > 0) // discard worst cards to nest
+    {
+        auto It = --suitInfoArr.end();
+
+        if (It->count > 0)
+        {
+            int n = min(It->count, cardsToRemove);
+            auto cardsRemoved = newCardArr.removeThisSuit(It->suit, n);
+            cardsToRemove -= n;
+
+            for (auto &card : cardsRemoved)
+            {
+                newNest.push_back(card);
+            }
+        }
+
+        suitInfoArr.erase(It);
+    }
+
+    return newNest;
+}
+
+int CpuPlayer::getChosenTrump(int playerNum)
+{
+    CardVector &cardArr = gc.playerArr[playerNum].cardArr;
+
+    vector<SuitInfo> suitInfoArr = cardArr.getSuitInfoArray();
+
+    return suitInfoArr[0].suit != SUIT_SPECIAL ? suitInfoArr[0].suit : suitInfoArr[1].suit;
+}
+
+Card CpuPlayer::getChosenPartner(int playerNum)
+{
+    CardVector &cardArr = gc.playerArr[playerNum].cardArr;
+    vector<const CardVector *> cardArrays = {&gc.nest};
+
+    for(auto thisPlayerNum : vector<int>{PLAYER_1, PLAYER_2, PLAYER_3, PLAYER_4})
+    {
+        if(thisPlayerNum != playerNum)
+        {
+            cardArrays.push_back(&gc.playerArr[thisPlayerNum].cardArr);   
+        }
+    }
+    
+    CardVector aggregateCardArr;
+    aggregateCardArr.append(cardArrays);
+    aggregateCardArr.sort();
+
+    auto suitInfoArr = cardArr.getSuitInfoArray();
+
+    int bestSuit = suitInfoArr[0].suit != SUIT_SPECIAL ? suitInfoArr[0].suit : suitInfoArr[1].suit;
+
+    Card bestCard(bestSuit, VALUE_1);
+
+    for (auto &card : aggregateCardArr) // guaranteed to have at least one card of bestSuit
+    {
+        if (card.suit != bestSuit)
+            continue;
+
+        if (card.value > bestCard.value)
+        {
+            bestCard = card;
+        }
+    }
+
+    assert(bestCard != Card(bestSuit, VALUE_1)); // found appropriate partner card
 
     return bestCard;
 }

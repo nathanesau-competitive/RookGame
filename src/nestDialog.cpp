@@ -2,11 +2,16 @@
 #include "nestDialog.h"
 #include "utils.h"
 
-NestDialog::NestDialog(QMainWindow *pMainWindow, QWidget *parent) : mainWindow(pMainWindow),
-                                                                   QDialogWithClickableCardArray(parent),
-                                                                   centerCards(DRAW_POSITION_NEST_DLG_TOP, SIZE_SMALL, this),
-                                                                   bottomCardsPreview(DRAW_POSITION_NEST_DLG_BOTTOM, SIZE_SMALL, this)
+NestDialog::NestDialog(CardVector pOriginalNest,
+                       QMainWindow *pMainWindow,
+                       QWidget *parent) : originalNest(pOriginalNest),
+                                          mainWindow(pMainWindow),
+                                          QDialogWithClickableCardArray(parent),
+                                          centerCards(DRAW_POSITION_NEST_DLG_TOP, SIZE_SMALL, this),
+                                          bottomCardsPreview(DRAW_POSITION_NEST_DLG_BOTTOM, SIZE_SMALL, this)
 {
+    setOriginalNestStyles("background-color: white; border: 2px solid");
+
     auto setupLabel = [this](ScaledQLabel *label, QString text, QPoint pos) {
         label->setParent(this);
         label->setFont(QFont("Times", 12));
@@ -14,27 +19,40 @@ NestDialog::NestDialog(QMainWindow *pMainWindow, QWidget *parent) : mainWindow(p
         label->move(pos);
     };
 
-    auto setupPushButton = [this](ScaledQPushButton *pushButton, QString text, QPoint pos) {
+    auto setupPushButton = [this](ScaledQPushButton *pushButton, QString text, QSize size, QPoint pos) {
         pushButton->setParent(this);
         pushButton->setText(text);
         pushButton->move(pos);
+        pushButton->resize(size.width(), size.height());
         pushButton->setFont(QFont("Times", 10));
     };
 
     setupLabel(&centerCardsLabel, "Middle cards (click to take)", {300, 10});
-    centerCards.showCards(gc.nest);
+    centerCards.showCards(gc.nest, &originalNestStyles);
 
     setupLabel(&bottomCardsPreviewLabel, "New hand (click to discard)", {300, 235});
-    bottomCardsPreview.showCards(gc.playerArr[PLAYER_1].cardArr);
+    bottomCardsPreview.showCards(gc.playerArr[PLAYER_1].cardArr, &originalNestStyles);
 
-    setupPushButton(&autoChooseNestButton, "Auto choose nest...", {220, 450});
-    setupPushButton(&doneNestButton, "Done nest...", {480, 450});
+    setupPushButton(&autoChooseNestButton, "Auto choose nest...", {125, 25}, {220, 450});
+    setupPushButton(&resetNestButton, "Reset nest...", {125, 25}, {350, 450});
+    setupPushButton(&doneNestButton, "Done nest...", {125, 25}, {480, 450});
 
     QObject::connect(&autoChooseNestButton, &QPushButton::pressed,
                      this, &NestDialog::autoChooseNestButtonPressed);
 
+    QObject::connect(&resetNestButton, &QPushButton::pressed,
+                     this, &NestDialog::resetNestButtonPressed);
+
     QObject::connect(&doneNestButton, &QPushButton::pressed,
                      this, &NestDialog::doneNestButtonPressed);
+
+    highlightCardsCheckBox.setParent(this);
+    highlightCardsCheckBox.setText("Highlight nest cards");
+    highlightCardsCheckBox.move({700, 450});
+    highlightCardsCheckBox.setFont(QFont("Times", 10));
+
+    QObject::connect(&highlightCardsCheckBox, &QCheckBox::pressed,
+                     this, &NestDialog::highlightCardsCheckBoxPressed);
 
     resize(911, 506);
     setWindowTitle("Nest Dialog");
@@ -45,7 +63,14 @@ NestDialog::NestDialog(QMainWindow *pMainWindow, QWidget *parent) : mainWindow(p
 
 NestDialog::~NestDialog()
 {
-    // todo
+}
+
+void NestDialog::setOriginalNestStyles(string style)
+{
+    for (auto card : originalNest)
+    {
+        originalNestStyles[card] = style;
+    }
 }
 
 void NestDialog::onCardClicked(ClickableCard *clickableCard)
@@ -63,59 +88,39 @@ void NestDialog::onCardClicked(ClickableCard *clickableCard)
         nest.erase(nestIt);
 
         hand.push_back(card);
-        Utils::Game::sortCardArray(hand);
+        hand.sort();
     }
     else // handIt != hand.end()
     {
         hand.erase(handIt);
         nest.push_back(card);
-        Utils::Game::sortCardArray(nest);
+        nest.sort();
     }
 
-    centerCards.showCards(gc.nest);
-    bottomCardsPreview.showCards(gc.playerArr[PLAYER_1].cardArr);
+    centerCards.showCards(gc.nest, &originalNestStyles);
+    bottomCardsPreview.showCards(gc.playerArr[PLAYER_1].cardArr, &originalNestStyles);
+}
+
+void NestDialog::onCardHoverEnter(ClickableCard *clickableCard)
+{
+    // do nothing
+}
+
+void NestDialog::onCardHoverLeave(ClickableCard *clickableCard)
+{
+    // do nothing
 }
 
 void NestDialog::autoChooseNest()
 {
-    for (auto card : gc.nest)
-    {
-        gc.playerArr[PLAYER_1].cardArr.push_back(card);
-    }
+    CardVector &nest = gc.nest;
+    CardVector &cardArr = gc.playerArr[PLAYER_1].cardArr;
 
-    gc.nest.clear();
+    CardVector newNest;
+    CardVector newCardArr;
+    newCardArr.append({&cardArr, &nest});
 
-    Utils::Game::sortCardArray(gc.playerArr[PLAYER_1].cardArr);
-
-    // return cards which were removed
-    auto removeCards = [](vector<Card> &cardArr, int suit, int count) {
-        vector<Card> cardsRemoved;
-
-        if (count > 0)
-        {
-            for (auto It = cardArr.begin(); It != cardArr.end();)
-            {
-                if (It->suit == suit)
-                {
-                    cardsRemoved.push_back(*It);
-                    It = cardArr.erase(It);
-                }
-                else
-                {
-                    It++;
-                }
-
-                if (cardsRemoved.size() == count)
-                {
-                    break;
-                }
-            }
-        }
-
-        return cardsRemoved;
-    };
-
-    auto suitInfoArr = Utils::Game::getSuitInfoArray(gc.playerArr[PLAYER_1].cardArr);
+    auto suitInfoArr = newCardArr.getSuitInfoArray();
 
     int cardsToRemove = 5;
 
@@ -125,27 +130,42 @@ void NestDialog::autoChooseNest()
 
         if (It->count > 0)
         {
-            int cardsToRemoveThisSuit = min(It->count, cardsToRemove);
-
-            vector<Card> cardsRemoved = removeCards(gc.playerArr[PLAYER_1].cardArr, It->suit, cardsToRemoveThisSuit);
-            cardsToRemove -= cardsToRemoveThisSuit;
+            int n = min(It->count, cardsToRemove);
+            auto cardsRemoved = newCardArr.removeThisSuit(It->suit, n);
+            cardsToRemove -= n;
 
             for (auto &card : cardsRemoved)
             {
-                gc.nest.push_back(card);
+                newNest.push_back(card);
             }
         }
 
         suitInfoArr.erase(It);
     }
+
+    cardArr = newCardArr;
+    nest = newNest;
 }
 
 void NestDialog::autoChooseNestButtonPressed()
 {
     NestDialog::autoChooseNest();
 
-    centerCards.showCards(gc.nest);
-    bottomCardsPreview.showCards(gc.playerArr[PLAYER_1].cardArr);
+    centerCards.showCards(gc.nest, &originalNestStyles);
+    bottomCardsPreview.showCards(gc.playerArr[PLAYER_1].cardArr, &originalNestStyles);
+}
+
+void NestDialog::resetNestButtonPressed()
+{
+    gc.playerArr[PLAYER_1].cardArr.append({&gc.nest});
+    gc.playerArr[PLAYER_1].cardArr.remove(originalNest);
+    gc.playerArr[PLAYER_1].cardArr.sort();
+
+    gc.nest = originalNest;
+    gc.nest.sort();
+
+    centerCards.showCards(gc.nest, &originalNestStyles);
+    bottomCardsPreview.showCards(gc.playerArr[PLAYER_1].cardArr, &originalNestStyles);
 }
 
 void NestDialog::doneNestButtonPressed()
@@ -161,4 +181,19 @@ void NestDialog::doneNestButtonPressed()
     {
         accept();
     }
+}
+
+void NestDialog::highlightCardsCheckBoxPressed()
+{
+    if (!highlightCardsCheckBox.isChecked())
+    {
+        setOriginalNestStyles("background-color: cyan; border: 2px solid");
+    }
+    else
+    {
+        setOriginalNestStyles("background-color: white; border: 2px solid");
+    }
+
+    centerCards.showCards(gc.nest, &originalNestStyles);
+    bottomCardsPreview.showCards(gc.playerArr[PLAYER_1].cardArr, &originalNestStyles);
 }

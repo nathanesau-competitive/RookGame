@@ -19,6 +19,8 @@ extern GameController gc;
 
 class MiddleDialog : public QDialogWithClickableCardArray
 {
+    CardVector originalNest;
+
     MainWidget *mainWidget;
     QMainWindow *mainWindow;
 

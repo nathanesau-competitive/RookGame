@@ -4,27 +4,36 @@
 #include <map>
 
 #include "card.h"
+#include "player.h"
 
 using namespace std;
 
 // forward declarations
-class GameController;
+class RoundInfo;
 
-// global declarations
-extern GameController gc;
-
-struct HandInfo
+class HandInfo
 {
-    map<int /*PLAYER_NUM*/, Card> cardPlayed;
+    const RoundInfo &roundInfo;
 
-    int suit; // suit for current hand
+    Card winningCard;
+    int winningPlayerNum;
 
+public:
+    int startingPlayerNum;
+
+    map<int /*playerNum*/, Card> cardPlayed;
+    int suit;
     int points;
 
-    HandInfo();
+public:
+    HandInfo(const RoundInfo &pRoundInfo);
     void clear();
 
-    pair<Card, int /*PLAYER_NUM*/> getWinningPair(); // return PLAYER_NUM which won hand
+    int getWinningPlayerNum();
+    Card getWinningCard();
+
+private:
+    void updateWinningCombination();
 };
 
 #endif

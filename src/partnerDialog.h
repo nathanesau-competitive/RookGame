@@ -27,11 +27,11 @@ class PartnerDialog : public QDialogWithClickableCardArray
 {
     Card &cardSelected;
 
-    vector<Card> blackCards;
-    vector<Card> greenCards;
-    vector<Card> redCards;
-    vector<Card> yellowCards;
-    vector<Card> wildCards;
+    CardVector blackCards;
+    CardVector greenCards;
+    CardVector redCards;
+    CardVector yellowCards;
+    CardVector wildCards;
 
     PartnerDialogLabel blackLabel;
     PartnerDialogLabel greenLabel;

@@ -1,3 +1,4 @@
+#include "card.h"
 #include "common.h"
 
 ScaledQLabel::ScaledQLabel(QWidget *parent) : QLabel(parent)
@@ -30,10 +31,14 @@ void ScaledQLabel::move(const QPoint &pos)
     QLabel::move(pos * SCALE_FACTOR);
 }
 
-void ScaledQLabel::setPixmap(const QPixmap &pixmap, QSize size, QTransform transform)
+void ScaledQLabel::setPixmap(const Card &data, QSize size, QTransform transform)
 {
-    QPixmap scaledPixmap = pixmap;  
-    QLabel::setPixmap(scaledPixmap.scaled(size * SCALE_FACTOR, Qt::KeepAspectRatio, Qt::SmoothTransformation).transformed(transform));
+    string fname = ":" + data.getValueAsString() + data.getSuitAsString() + ".gif";
+
+    // todo: use cache
+
+    auto pixmap = QPixmap(QString::fromStdString(fname));
+    QLabel::setPixmap(pixmap.scaled(size * SCALE_FACTOR, Qt::KeepAspectRatio, Qt::SmoothTransformation).transformed(transform));
 }
 
 ScaledQPushButton::ScaledQPushButton(QWidget *parent) : QPushButton(parent)
@@ -58,7 +63,7 @@ void ScaledQPushButton::setGeometry(const QRect &rect)
 
 void ScaledQPushButton::move(const QPoint &pos)
 {
-   QPushButton::move(pos * SCALE_FACTOR);
+    QPushButton::move(pos * SCALE_FACTOR);
 }
 
 void ScaledQPushButton::resize(int w, int h)
@@ -94,6 +99,36 @@ void ScaledQComboBox::resize(int w, int h)
 void ScaledQComboBox::move(const QPoint &pos)
 {
     QComboBox::move(pos * SCALE_FACTOR);
+}
+
+ScaledQCheckBox::ScaledQCheckBox(QWidget *parent) : QCheckBox(parent)
+{
+}
+
+void ScaledQCheckBox::setFont(const QFont &font)
+{
+    auto scaledFont = font;
+    scaledFont.setPointSizeF(font.pointSizeF() * SCALE_FACTOR);
+
+    QCheckBox::setFont(scaledFont);
+}
+
+void ScaledQCheckBox::setGeometry(const QRect &rect)
+{
+    auto scaledRect = QRect(rect.x() * SCALE_FACTOR, rect.y() * SCALE_FACTOR,
+                            rect.width() * SCALE_FACTOR, rect.height() * SCALE_FACTOR);
+
+    QCheckBox::setGeometry(scaledRect);
+}
+
+void ScaledQCheckBox::resize(int w, int h)
+{
+    QCheckBox::resize(w * SCALE_FACTOR, h * SCALE_FACTOR);
+}
+
+void ScaledQCheckBox::move(const QPoint &pos)
+{
+    QCheckBox::move(pos * SCALE_FACTOR);
 }
 
 ScaledQDialog::ScaledQDialog(QWidget *parent) : QDialog(parent)

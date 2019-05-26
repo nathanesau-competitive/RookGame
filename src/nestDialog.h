@@ -4,9 +4,13 @@
 #include <QLabel>
 #include <QMainWindow>
 #include <QPushButton>
+#include <string>
 
+#include "card.h"
 #include "clickableCard.h"
 #include "common.h"
+
+using namespace std;
 
 // forward declarations
 class GameController;
@@ -17,9 +21,13 @@ extern GameController gc;
 // for selecting cards from nest
 class NestDialog : public QDialogWithClickableCardArray
 {
-    QMainWindow *mainWindow;
+    CardVector originalNest;
+    CardStyleMap originalNestStyles;
+
+    QMainWindow *mainWindow; 
 
     ScaledQPushButton autoChooseNestButton;
+    ScaledQPushButton resetNestButton;
     ScaledQPushButton doneNestButton;
 
     ScaledQLabel centerCardsLabel;
@@ -28,26 +36,24 @@ class NestDialog : public QDialogWithClickableCardArray
     ScaledQLabel bottomCardsPreviewLabel;
     ClickableCardArray bottomCardsPreview;
 
+    ScaledQCheckBox highlightCardsCheckBox;
+
 public:
-    NestDialog(QMainWindow *pMainWindow, QWidget *parent = nullptr);
+    NestDialog(CardVector pOriginalNest, QMainWindow *pMainWindow, QWidget *parent = nullptr);
     virtual ~NestDialog();
     
+    void setOriginalNestStyles(string style);
+
     virtual void onCardClicked(ClickableCard *clickableCard);
-
-    virtual void onCardHoverEnter(ClickableCard *clickableCard)
-    {
-        // do nothing
-    }
-
-    virtual void onCardHoverLeave(ClickableCard *clickableCard)
-    {
-        // do nothing
-    }
+    virtual void onCardHoverEnter(ClickableCard *clickableCard);
+    virtual void onCardHoverLeave(ClickableCard *clickableCard);
 
     static void autoChooseNest();
 
     void autoChooseNestButtonPressed();
+    void resetNestButtonPressed();
     void doneNestButtonPressed();
+    void highlightCardsCheckBoxPressed();
 };
 
 #endif

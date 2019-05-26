@@ -1,141 +1,153 @@
 #include <set>
 #include <QThread>
 
+#include "cpuPlayer.h"
 #include "gameController.h"
 #include "mainWidget.h"
+#include "mainWindow.h"
 #include "roundSummaryDialog.h"
 #include "utils.h"
 
-MainWidget::MainWidget(QMainWindow *pMainWindow, QWidget *parent) : mainWindow(pMainWindow),
-                                                                    infoWidget(pMainWindow),
-                                                                    QDialogWithClickableCardArray(parent),
-                                                                    bottomCards(DRAW_POSITION_MAIN_WIDGET_BOTTOM, SIZE_NORMAL, this),
-                                                                    player1CardPlayed(DRAW_POSITION_MAIN_WIDGET_CENTER_BOTTOM, SIZE_NORMAL, this),
-                                                                    player2CardPlayed(DRAW_POSITION_MAIN_WIDGET_CENTER_LEFT, SIZE_NORMAL, this),
-                                                                    player3CardPlayed(DRAW_POSITION_MAIN_WIDGET_CENTER_TOP, SIZE_NORMAL, this),
-                                                                    player4CardPlayed(DRAW_POSITION_MAIN_WIDGET_CENTER_RIGHT, SIZE_NORMAL, this)
+MainWidget::MainWidget(MainWindow *pMainWindow, QWidget *parent) : mainWindow(pMainWindow),
+                                                                   infoWidget(pMainWindow),
+                                                                   QDialogWithClickableCardArray(parent),
+                                                                   player1CardPlayed(DRAW_POSITION_MAIN_WIDGET_CENTER_BOTTOM, SIZE_NORMAL, this),
+                                                                   player2CardPlayed(DRAW_POSITION_MAIN_WIDGET_CENTER_LEFT, SIZE_NORMAL, this),
+                                                                   player3CardPlayed(DRAW_POSITION_MAIN_WIDGET_CENTER_TOP, SIZE_NORMAL, this),
+                                                                   player4CardPlayed(DRAW_POSITION_MAIN_WIDGET_CENTER_RIGHT, SIZE_NORMAL, this),
+                                                                   centerCards(DRAW_POSITION_MAIN_WIDGET_CENTER, SIZE_NORMAL, this),
+                                                                   bottomCards(DRAW_POSITION_MAIN_WIDGET_BOTTOM, SIZE_NORMAL, this)
 {
     infoWidget.setParent(this);
     infoWidget.move(QPoint(0, 0));
     infoWidget.resize(1200, 130);
 }
 
-void MainWidget::onCardClicked(ClickableCard *clickableCard)
+void MainWidget::finishExistingHand(Card player1Card)
 {
-    // todo: MAKE sure it is a card in player 1's hand otherwise don't do anything (i.e. ignore click on played cards)
+    gc.playCard(player1Card, PLAYER_1);
 
-    Card card = clickableCard->data;
+    bottomCards.showCards(gc.playerArr[PLAYER_1].cardArr);
 
-    gc.playHand(card);
+    showCardPlayed(player1Card, PLAYER_1);
 
-    showBottomCards(gc.playerArr[PLAYER_1].cardArr);
-
-    showCardPlayed(card, PLAYER_1, true);
-    showCardPlayed(gc.handInfo.cardPlayed[PLAYER_2], PLAYER_2, true);
-    showCardPlayed(gc.handInfo.cardPlayed[PLAYER_3], PLAYER_3, true);
-    showCardPlayed(gc.handInfo.cardPlayed[PLAYER_4], PLAYER_4, false);
-
-    for (auto it = gc.handInfo.cardPlayed.begin(); it != gc.handInfo.cardPlayed.end(); it++)
+    for (auto playerNum : vector<int>{PLAYER_2, PLAYER_3, PLAYER_4})
     {
-        auto currentCard = (*it).second;
-
-        if (currentCard == gc.partnerPair.first)
+        if (gc.handInfo.cardPlayed[playerNum] == Card(SUIT_UNDEFINED, VALUE_UNDEFINED)) // cpu hasn't played yet
         {
-            gc.partnerPair.second = (*it).first;
-            infoWidget.updatePartner(currentCard, gc.partnerPair.second);
+            gc.playCard(cpu.getCardToPlay(playerNum), playerNum);
 
-            // todo: make determining teams a Utils::Game function
-            auto &team1 = gc.teams.first;
-            team1.insert(gc.bidPlayer);
-            team1.insert(gc.partnerPair.second);
-
-            auto &team2 = gc.teams.second;
-            vector<int> playerNumArr = {PLAYER_1, PLAYER_2, PLAYER_3, PLAYER_4};
-
-            for (auto playerNum : playerNumArr)
-            {
-                if (team1.find(playerNum) == team1.end())
-                {
-                    team2.insert(playerNum);
-                }
-            }
-
-            infoWidget.updateTeam1(team1);
-            infoWidget.updateTeam2(team2);
-
-            string msg = Utils::Ui::getPlayerName(gc.partnerPair.second) + " is the partner. Teams updated.";
-
-            MessageBox msgBox;
-            msgBox.showCards({gc.partnerPair.first});
-            Utils::Ui::setupMessageBox(&msgBox, QString::fromStdString(msg), "Partner card", {250, 250});
-            Utils::Ui::moveDialog(&msgBox, mainWindow, DIALOG_POSITION_CARD_MESSAGE_BOX);
-            msgBox.exec();
+            showCardPlayed(gc.handInfo.cardPlayed[playerNum], playerNum);
         }
     }
 
-    if(!gc.teams.first.empty() && !gc.teams.second.empty()) // teams known
-    {
-        gc.teamScores[TEAM_1] = 0;
-        for(auto It = gc.teams.first.begin(); It != gc.teams.first.end(); It++)
-        {
-            int playerNum = (*It);
-            gc.teamScores[TEAM_1] += gc.playerScores[playerNum];
-        }
+    gc.roundInfo.updateScores(gc.handInfo);
 
-        gc.teamScores[TEAM_2] = 0;
-        for(auto It = gc.teams.second.begin(); It != gc.teams.second.end(); It++)
-        {
-            int playerNum = (*It);
-            gc.teamScores[TEAM_2] += gc.playerScores[playerNum];
-        }
-    }
+    showPartnerCardIfApplicable();
 
-    infoWidget.updatePoints(gc.playerScores, gc.teamScores, gc.teams);
+    infoWidget.updatePoints(gc.roundInfo.playerScores, gc.roundInfo.teamScores, gc.roundInfo.teams);
 
-    auto msg = []() -> string {
-        auto winningPair = gc.handInfo.getWinningPair();
-        return Utils::Ui::getPlayerName(winningPair.second) +
-               " won the hand for " + to_string(gc.handInfo.points) + " points with the";
-    }();
-
-    if (!msg.empty())
-    {
-        MessageBox msgBox;
-        msgBox.showCards({gc.handInfo.getWinningPair().first});
-        Utils::Ui::setupMessageBox(&msgBox, QString::fromStdString(msg), "Hand result", {325, 250});
-        Utils::Ui::moveDialog(&msgBox, mainWindow, DIALOG_POSITION_CARD_MESSAGE_BOX);
-        msgBox.exec();
-    }
+    showHandResult();
 
     player1CardPlayed.hideCards();
     player2CardPlayed.hideCards();
     player3CardPlayed.hideCards();
     player4CardPlayed.hideCards();
+}
 
-    if (gc.playerArr[PLAYER_1].cardArr.empty())
+void MainWidget::startRound()
+{
+    // todo
+}
+
+void MainWidget::startNewHand(int startingPlayerNum)
+{
+    if (startingPlayerNum != PLAYER_1)
+    {
+        // sleep before starting hand
+        repaint();
+        QThread::msleep(500);
+    }
+
+    gc.handInfo.clear();
+
+    int playerNum = startingPlayerNum;
+
+    while (playerNum != PLAYER_1)
+    {
+        gc.playCard(cpu.getCardToPlay(playerNum), playerNum);
+
+        showCardPlayed(gc.handInfo.cardPlayed[playerNum], playerNum);
+
+        playerNum = gc.playerArr[playerNum].getNextPlayerNum();
+    }
+
+    // wait for card click to finish hand
+}
+
+bool MainWidget::validateCard(ClickableCard *clickableCard)
+{
+    CardVector playableCards = gc.playerArr[PLAYER_1].cardArr.getPlayableCards(gc.handInfo);
+
+    if (std::find(playableCards.begin(), playableCards.end(), clickableCard->data) == playableCards.end()) // invalid card
     {
         MessageBox msgBox;
-
-        string msg = Utils::Ui::getPlayerName(gc.handInfo.getWinningPair().second) +
-            " won the nest for " + to_string(gc.pointsMiddle) + " points.";
-
-        Utils::Ui::setupMessageBox(&msgBox, QString::fromStdString(msg), "Last hand");
+        msgBox.showCards({clickableCard->data});
+        Utils::Ui::setupMessageBox(&msgBox, "Invalid card clicked. Must follow suit.", "Invalid card");
         Utils::Ui::moveDialog(&msgBox, mainWindow, DIALOG_POSITION_CENTER);
         msgBox.exec();
 
-        // show round summary dialog
-        auto roundSummaryDlg = RoundSummaryDialog();
-        Utils::Ui::moveDialog(&roundSummaryDlg, mainWindow, DIALOG_POSITION_CENTER);
-        
-        if(!roundSummaryDlg.exec())
+        return false;
+    }
+
+    return true;
+}
+
+void MainWidget::onCardClicked(ClickableCard *clickableCard)
+{
+    if (!validateCard(clickableCard))
+    {
+        return;
+    }
+
+    finishExistingHand(clickableCard->data);
+
+    if (gc.isRoundOver())
+    {
+        gc.roundInfo.addPointsMiddleToScores(gc.handInfo);
+
+        centerCards.showCards(gc.nest);
+
+        infoWidget.updatePoints(gc.roundInfo.playerScores, gc.roundInfo.teamScores, gc.roundInfo.teams);
+
+        showNestResult();
+
+        centerCards.hideCards();
+
+        gc.overallInfo.updatePlayerScores(gc.roundInfo);
+
+        infoWidget.updateOverallScores(gc.overallInfo.playerScores);
+
+        RoundSummaryDialog summaryDlg;
+        summaryDlg.updateScores(gc.roundInfo.getRoundScores());
+        Utils::Ui::moveDialog(&summaryDlg, mainWindow, DIALOG_POSITION_CENTER);
+
+        if (!summaryDlg.exec())
         {
             qFatal("Problem executing round summary dialog");
             return;
         }
+
+        // automatically trigger new round action
+        mainWindow->startNewRound();
+    }
+    else
+    {
+        startNewHand(gc.handInfo.getWinningPlayerNum());
     }
 }
 
-void MainWidget::showCardPlayed(const Card &card, int playerNum, bool sleep)
+void MainWidget::showCardPlayed(const Card &card, int playerNum)
 {
     switch (playerNum)
     {
@@ -153,6 +165,20 @@ void MainWidget::showCardPlayed(const Card &card, int playerNum, bool sleep)
         break;
     }
 
+    bool sleep = []() {
+        auto &cardPlayed = gc.handInfo.cardPlayed;
+
+        for (auto playerNum : vector<int>{PLAYER_1, PLAYER_2, PLAYER_3, PLAYER_4})
+        {
+            if (cardPlayed[playerNum] == Card(SUIT_UNDEFINED, VALUE_UNDEFINED))
+            {
+                return true; // at least one player hasn't played card yet (show timeout)
+            }
+        }
+
+        return false;
+    }();
+
     if (sleep)
     {
         repaint();
@@ -160,7 +186,52 @@ void MainWidget::showCardPlayed(const Card &card, int playerNum, bool sleep)
     }
 }
 
-void MainWidget::showBottomCards(const vector<Card> &cardArr)
+void MainWidget::showPartnerCardIfApplicable()
 {
-    bottomCards.showCards(cardArr);
+    for (auto it = gc.handInfo.cardPlayed.begin(); it != gc.handInfo.cardPlayed.end(); it++)
+    {
+        auto currentCard = (*it).second;
+
+        if (currentCard == gc.roundInfo.partnerCard)
+        {
+            infoWidget.updatePartner(currentCard, gc.roundInfo.partnerPlayerNum);
+            infoWidget.updateTeam1(gc.roundInfo.teams.first);
+            infoWidget.updateTeam2(gc.roundInfo.teams.second);
+
+            string msg = gc.playerArr[gc.roundInfo.partnerPlayerNum].getPlayerName() + " is the partner. Teams updated.";
+
+            MessageBox msgBox;
+            msgBox.showCards({gc.roundInfo.partnerCard});
+            Utils::Ui::setupMessageBox(&msgBox, QString::fromStdString(msg), "Partner card", {325, 250});
+            Utils::Ui::moveDialog(&msgBox, mainWindow, DIALOG_POSITION_CARD_MESSAGE_BOX);
+            msgBox.exec();
+
+            return;
+        }
+    }
+}
+
+void MainWidget::showHandResult()
+{
+    auto msg = []() -> string {
+        return gc.playerArr[gc.handInfo.getWinningPlayerNum()].getPlayerName() +
+               " won the hand for " + to_string(gc.handInfo.points) + " points with the";
+    }();
+
+    MessageBox msgBox;
+    msgBox.showCards({gc.handInfo.getWinningCard()});
+    Utils::Ui::setupMessageBox(&msgBox, QString::fromStdString(msg), "Hand result", {340, 250});
+    Utils::Ui::moveDialog(&msgBox, mainWindow, DIALOG_POSITION_CARD_MESSAGE_BOX);
+    msgBox.exec();
+}
+
+void MainWidget::showNestResult()
+{
+    string msg = gc.playerArr[gc.handInfo.getWinningPlayerNum()].getPlayerName() +
+                 " won the nest. Nest had " + to_string(gc.roundInfo.pointsMiddle) + " points.";
+
+    MessageBox msgBox;
+    Utils::Ui::setupMessageBox(&msgBox, QString::fromStdString(msg), "Last hand");
+    Utils::Ui::moveDialog(&msgBox, mainWindow, DIALOG_POSITION_CARD_MESSAGE_BOX);
+    msgBox.exec();
 }

@@ -48,6 +48,9 @@ public:
     void onViewScoresAction();
     void onCheckUpdatesAction();
     void onAboutAction();
+
+    void startNewRound();
+    void showNewRoundMessage();
 };
 
 #endif

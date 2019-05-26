@@ -17,7 +17,7 @@ PartnerDialog::PartnerDialog(Card &pCardSelected, QWidget *parent) : cardSelecte
                                                                      QDialogWithClickableCardArray(parent),
                                                                      centerCards(DRAW_POSITION_PARTNER_DLG, SIZE_TINY, this)
 {
-    auto splitCardArray = [](vector<vector<Card> *> &suitArrays, vector<Card> &cardArr) {
+    auto splitCardArray = [](vector<CardVector *> &suitArrays, CardVector &cardArr) {
         for (auto card : cardArr)
         {
             if (card.suit == SUIT_BLACK)
@@ -34,12 +34,13 @@ PartnerDialog::PartnerDialog(Card &pCardSelected, QWidget *parent) : cardSelecte
     };
 
     // don't allow user to pick themself as partner
-    vector<const vector<Card> *> cardArrays = {&gc.playerArr[PLAYER_2].cardArr, &gc.playerArr[PLAYER_3].cardArr,
-                                               &gc.playerArr[PLAYER_4].cardArr, &gc.nest};
-    vector<Card> aggregateCardArr = Utils::Game::getAggregateCardArray(cardArrays);
-    Utils::Game::sortCardArray(aggregateCardArr);
+    vector<const CardVector *> cardArrays = {&gc.playerArr[PLAYER_2].cardArr, &gc.playerArr[PLAYER_3].cardArr,
+                                               &gc.playerArr[PLAYER_4].cardArr};
+    CardVector aggregateCardArr;
+    aggregateCardArr.append(cardArrays);
+    aggregateCardArr.sort();
 
-    vector<vector<Card> *> suitArrays = {&blackCards, &greenCards, &redCards, &yellowCards, &wildCards};
+    vector<CardVector *> suitArrays = {&blackCards, &greenCards, &redCards, &yellowCards, &wildCards};
     splitCardArray(suitArrays, aggregateCardArr);
 
     auto setupPartnerLabel = [this](PartnerDialogLabel &label, QString text, QString style, QPoint pos) {
@@ -69,7 +70,7 @@ PartnerDialog::PartnerDialog(Card &pCardSelected, QWidget *parent) : cardSelecte
     setWindowTitle("Click partner card...");
     setWindowFlags(Qt::WindowTitleHint | Qt::WindowMinimizeButtonHint);
     setWindowIcon(QIcon(":rookicon.gif"));
-    setGeometry(QRect(0, 0, 800, 300));
+    setGeometry(QRect(0, 0, 850, 300));
 }
 
 PartnerDialog::~PartnerDialog()

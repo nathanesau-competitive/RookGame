@@ -1,45 +1,69 @@
-#include "gameController.h"
-#include "handInfo.h"
+#include <vector>
 
-HandInfo::HandInfo()
+#include "handInfo.h"
+#include "roundInfo.h"
+
+using namespace std;
+
+HandInfo::HandInfo(const RoundInfo &pRoundInfo) : roundInfo(pRoundInfo)
 {
     clear();
 }
 
 void HandInfo::clear()
 {
+    winningCard = Card(SUIT_UNDEFINED, VALUE_UNDEFINED);
+    winningPlayerNum = PLAYER_UNDEFINED;
+    startingPlayerNum = PLAYER_UNDEFINED;
     cardPlayed.clear();
     points = 0;
     suit = SUIT_UNDEFINED;
 }
 
-pair<Card, int> HandInfo::getWinningPair()
+int HandInfo::getWinningPlayerNum()
 {
-    int trump = gc.trump;
-
-    pair<Card, int> winningPair = make_pair(cardPlayed[PLAYER_1], PLAYER_1);
-
-    vector<int> playerNumArr = {PLAYER_2, PLAYER_3, PLAYER_4}; // cpu players
-
-    for (auto playerNum : playerNumArr)
+    if (winningPlayerNum == PLAYER_UNDEFINED)
     {
-        pair<Card, int> currentPair = make_pair(cardPlayed[playerNum], playerNum);
+        updateWinningCombination();
+    }
 
-        if(currentPair.first.suit == winningPair.first.suit)
+    return winningPlayerNum;
+}
+
+Card HandInfo::getWinningCard()
+{
+    if (winningCard == Card(SUIT_UNDEFINED, VALUE_UNDEFINED))
+    {
+        updateWinningCombination();
+    }
+
+    return winningCard;
+}
+
+void HandInfo::updateWinningCombination()
+{
+    winningPlayerNum = PLAYER_1;
+    winningCard = cardPlayed[PLAYER_1];
+
+    for (auto playerNum : vector<int>{PLAYER_2, PLAYER_3, PLAYER_4})
+    {
+        Card currentCard = cardPlayed[playerNum];
+
+        if (currentCard.suit == winningCard.suit)
         {
-            if(currentPair.first.value > winningPair.first.value)
+            if (currentCard.value > winningCard.value)
             {
-                winningPair = currentPair;
+                winningPlayerNum = playerNum;
+                winningCard = currentCard;
             }
         }
         else // not the same suit
         {
-            if(currentPair.first.suit == trump)
+            if (currentCard.suit == roundInfo.trump)
             {
-                winningPair = currentPair;
+                winningPlayerNum = playerNum;
+                winningCard = currentCard;
             }
         }
     }
-
-    return winningPair;
 }

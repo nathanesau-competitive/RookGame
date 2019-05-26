@@ -16,7 +16,7 @@ void MessageBox::setText(const QString &text)
     ui.msgLabel->setText(text);
 }
 
-void MessageBox::showCards(const vector<Card> &cardArr)
+void MessageBox::showCards(const CardVector &cardArr)
 {
     messageBoxCards.showCards(cardArr);
 }

@@ -1,10 +1,10 @@
 #include <QPushButton>
 #include <QObject>
-#include <QMessageBox>
 #include <string>
 
 #include "gameController.h"
 #include "mainWindow.h"
+#include "messageBox.h"
 #include "middleDialog.h"
 #include "nestDialog.h"
 #include "partnerDialog.h"
@@ -22,6 +22,8 @@ MiddleDialog::MiddleDialog(int &pTrumpSuitSelected, Card &pPartnerCardSelected,
                                                                                                  topRightCards(DRAW_POSITION_MIDDLE_DLG_NEST, SIZE_TINY, this),
                                                                                                  bottomRightCards(DRAW_POSITION_MIDDLE_DLG_PARTNER, SIZE_TINY, this)
 {
+    originalNest = gc.nest;
+
     ui.setupUi(this);
 
     topRightCards.showCards(gc.nest);
@@ -66,7 +68,7 @@ void MiddleDialog::onCardClicked(ClickableCard *clickableCard)
 
 void MiddleDialog::selectNestButtonPressed()
 {
-    NestDialog nestDlg(mainWindow);
+    NestDialog nestDlg(originalNest, mainWindow);
     Utils::Ui::moveDialog(&nestDlg, mainWindow, DIALOG_POSITION_NEST_DLG);
 
     if (!nestDlg.exec())
@@ -76,7 +78,7 @@ void MiddleDialog::selectNestButtonPressed()
     }
 
     topRightCards.showCards(gc.nest);
-    mainWidget->showBottomCards(gc.playerArr[PLAYER_1].cardArr);
+    mainWidget->bottomCards.showCards(gc.playerArr[PLAYER_1].cardArr);
 }
 
 void MiddleDialog::autoSelectNestButtonPressed()
@@ -84,7 +86,7 @@ void MiddleDialog::autoSelectNestButtonPressed()
     NestDialog::autoChooseNest();
 
     topRightCards.showCards(gc.nest);
-    mainWidget->showBottomCards(gc.playerArr[PLAYER_1].cardArr);
+    mainWidget->bottomCards.showCards(gc.playerArr[PLAYER_1].cardArr);
 }
 
 void MiddleDialog::selectTrumpButtonPressed()
@@ -104,7 +106,7 @@ void MiddleDialog::selectTrumpButtonPressed()
 void MiddleDialog::autoSelectTrumpButtonPressed()
 {
     // choose suit which player has most of as trump
-    vector<SuitInfo> suitInfoArr = Utils::Game::getSuitInfoArray(gc.playerArr[PLAYER_1].cardArr);
+    vector<SuitInfo> suitInfoArr = gc.playerArr[PLAYER_1].cardArr.getSuitInfoArray();
 
     trumpSuitSelected = suitInfoArr[0].suit != SUIT_SPECIAL ? suitInfoArr[0].suit
                                                             : suitInfoArr[1].suit;
@@ -130,18 +132,21 @@ void MiddleDialog::autoSelectPartnerButtonPressed()
     // choose highest card NOT in players hand
     //      of suit which player has most of
 
-    vector<const vector<Card> *> cardArrays = {&gc.playerArr[PLAYER_2].cardArr, &gc.playerArr[PLAYER_3].cardArr, &gc.playerArr[PLAYER_4].cardArr, &gc.nest};
-    vector<Card> cardArr = Utils::Game::getAggregateCardArray(cardArrays);
-    Utils::Game::sortCardArray(cardArr);
+    CardVector &cardArr = gc.playerArr[PLAYER_1].cardArr;
 
-    auto suitInfoArr = Utils::Game::getSuitInfoArray(gc.playerArr[PLAYER_1].cardArr);
+    vector<const CardVector *> cardArrays = {&gc.playerArr[PLAYER_2].cardArr, &gc.playerArr[PLAYER_3].cardArr,
+                                               &gc.playerArr[PLAYER_4].cardArr, &gc.nest};
+    CardVector aggregateCardArr;
+    aggregateCardArr.append(cardArrays);
+    aggregateCardArr.sort();
 
-    auto bestSuit = suitInfoArr[0].suit != SUIT_SPECIAL ? suitInfoArr[0].suit
-                                                        : suitInfoArr[1].suit;
+    auto suitInfoArr = cardArr.getSuitInfoArray();
+
+    int bestSuit = suitInfoArr[0].suit != SUIT_SPECIAL ? suitInfoArr[0].suit : suitInfoArr[1].suit;
 
     Card bestCard(bestSuit, VALUE_1);
 
-    for (auto &card : cardArr)
+    for (auto &card : aggregateCardArr) // guaranteed to have at least one card of bestSuit
     {
         if (card.suit != bestSuit)
             continue;
@@ -161,7 +166,17 @@ void MiddleDialog::autoSelectPartnerButtonPressed()
 
 void MiddleDialog::okButtonPressed()
 {
-    accept();
+    if (trumpSuitSelected == SUIT_UNDEFINED || partnerCardSelected == Card())
+    {
+        MessageBox msgBox;
+        Utils::Ui::setupMessageBox(&msgBox, "Trump and partner card must be selected", "Invalid selection");
+        Utils::Ui::moveDialog(&msgBox, mainWindow, DIALOG_POSITION_CENTER);
+        msgBox.exec();
+    }
+    else
+    {
+        accept();
+    }
 }
 
 void MiddleDialog::setupTrumpLabel(int suit)

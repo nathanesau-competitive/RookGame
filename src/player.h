@@ -1,11 +1,15 @@
 #ifndef PLAYER_H
 #define PLAYER_H
 
-#include <vector>
+#include <string>
+#include <set>
 
 #include "card.h"
 
 using namespace std;
+
+// typedef declarations
+typedef set<int> Team;
 
 // DO NOT MODIFY
 const int PLAYER_UNDEFINED = -1;
@@ -21,12 +25,18 @@ const int TEAM_2 = 1;
 
 struct Player
 {
-    const int playerNum;
-    vector<Card> cardArr;
+    int playerNum;
+    int teamNum;
+    CardVector cardArr;
 
     int bid;
 
-    Player(const int pPlayerNum);
+public:
+    Player(int pPlayerNum);
+
+    string getPlayerName();
+
+    int getNextPlayerNum();
 };
 
 #endif

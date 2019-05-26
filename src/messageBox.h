@@ -16,7 +16,7 @@ public:
     MessageBox(QWidget *parent = nullptr);
 
     void setText(const QString &text);
-    void showCards(const vector<Card> &cardArr);
+    void showCards(const CardVector &cardArr);
 
 protected:
     Ui::MessageBox ui;
