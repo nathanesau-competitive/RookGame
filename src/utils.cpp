@@ -110,7 +110,7 @@ void readPreferences()
 {
     QSettings settings("OpenSourceSoftware", "Rook");
     settings.beginGroup("Appearance");
-    SCALE_FACTOR = settings.value("SCALE_FACTOR", SCALE_FACTOR).toFloat();
+    SCALE_FACTOR = settings.value("SCALE_FACTOR", Utils::Ui::getBestScaleFactor()).toFloat();
     settings.endGroup();
 }
 

@@ -1,4 +1,5 @@
 build
 .vscode
 .VSCodeCounter
-# tweak CMakeLists.txt as necessary (for instance, CMAKE_PREFIX_PATH)
+.vs
+# tweak CMakeLists.txt as necessary (for instance, QtPath)

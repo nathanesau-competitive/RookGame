@@ -149,7 +149,9 @@ void MainWindow::onCheckUpdatesAction()
 
 void MainWindow::onAboutAction()
 {
-    // todo
+    MessageBox msgBox(this);
+    msgBox.setText("Hello world");
+    msgBox.exec();
 }
 
 void MainWindow::startNewRound()
