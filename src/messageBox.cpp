@@ -1,6 +1,6 @@
 #include "messageBox.h"
 
-MessageBox::MessageBox(QWidget *parent) : QDialogWithClickableCardArray(parent),
+MessageBox::MessageBox(QWidget *parent) : QDialogWithClickableCardArray(true, parent),
                                           messageBoxCards(DRAW_POSITION_MESSAGE_BOX, SIZE_SMALL, this)
 {
     ui.setupUi(this);

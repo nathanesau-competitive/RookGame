@@ -3,196 +3,269 @@
 
 ScaledQLabel::ScaledQLabel(QWidget *parent) : QLabel(parent)
 {
+    scaleFactor = SCALE_FACTOR;
+    prevScaleFactor = SCALE_FACTOR;
+}
+
+void ScaledQLabel::rescale()
+{
+    float newScaleFactor = SCALE_FACTOR;
+    scaleFactor = newScaleFactor / prevScaleFactor;
+    prevScaleFactor = newScaleFactor;
+
+    setFont(font());
+    setGeometry(geometry());
 }
 
 void ScaledQLabel::setFont(const QFont &font)
 {
     auto scaledFont = font;
-    scaledFont.setPointSizeF(scaledFont.pointSizeF() * SCALE_FACTOR);
+    scaledFont.setPointSizeF(scaledFont.pointSizeF() * scaleFactor);
 
     QLabel::setFont(scaledFont);
 }
 
 void ScaledQLabel::setGeometry(const QRect &rect)
 {
-    auto scaledRect = QRect(rect.x() * SCALE_FACTOR, rect.y() * SCALE_FACTOR,
-                            rect.width() * SCALE_FACTOR, rect.height() * SCALE_FACTOR);
+    auto scaledRect = QRect(rect.x() * scaleFactor, rect.y() * scaleFactor,
+                            rect.width() * scaleFactor, rect.height() * scaleFactor);
 
     QLabel::setGeometry(scaledRect);
 }
 
 void ScaledQLabel::resize(int w, int h)
 {
-    QLabel::resize(w * SCALE_FACTOR, h * SCALE_FACTOR);
+    QLabel::resize(w * scaleFactor, h * scaleFactor);
 }
 
 void ScaledQLabel::move(const QPoint &pos)
 {
-    QLabel::move(pos * SCALE_FACTOR);
-}
-
-void ScaledQLabel::setPixmap(const Card &data, QSize size, QTransform transform)
-{
-    string fname = ":" + data.getValueAsString() + data.getSuitAsString() + ".gif";
-
-    // todo: use cache
-
-    auto pixmap = QPixmap(QString::fromStdString(fname));
-    QLabel::setPixmap(pixmap.scaled(size * SCALE_FACTOR, Qt::KeepAspectRatio, Qt::SmoothTransformation).transformed(transform));
+    QLabel::move(pos * scaleFactor);
 }
 
 ScaledQPushButton::ScaledQPushButton(QWidget *parent) : QPushButton(parent)
 {
+    scaleFactor = SCALE_FACTOR;
+    prevScaleFactor = SCALE_FACTOR;
+}
+
+void ScaledQPushButton::rescale()
+{
+    float newScaleFactor = SCALE_FACTOR;
+    scaleFactor = newScaleFactor / prevScaleFactor;
+    prevScaleFactor = newScaleFactor;
+
+    setFont(font());
+    setGeometry(geometry());
 }
 
 void ScaledQPushButton::setFont(const QFont &font)
 {
     auto scaledFont = font;
-    scaledFont.setPointSizeF(font.pointSizeF() * SCALE_FACTOR);
+    scaledFont.setPointSizeF(font.pointSizeF() * scaleFactor);
 
     QPushButton::setFont(scaledFont);
 }
 
 void ScaledQPushButton::setGeometry(const QRect &rect)
 {
-    auto scaledRect = QRect(rect.x() * SCALE_FACTOR, rect.y() * SCALE_FACTOR,
-                            rect.width() * SCALE_FACTOR, rect.height() * SCALE_FACTOR);
+    auto scaledRect = QRect(rect.x() * scaleFactor, rect.y() * scaleFactor,
+                            rect.width() * scaleFactor, rect.height() * scaleFactor);
 
     QPushButton::setGeometry(scaledRect);
 }
 
 void ScaledQPushButton::move(const QPoint &pos)
 {
-    QPushButton::move(pos * SCALE_FACTOR);
+    QPushButton::move(pos * scaleFactor);
 }
 
 void ScaledQPushButton::resize(int w, int h)
 {
-    QPushButton::resize(w * SCALE_FACTOR, h * SCALE_FACTOR);
+    QPushButton::resize(w * scaleFactor, h * scaleFactor);
 }
 
 ScaledQComboBox::ScaledQComboBox(QWidget *parent) : QComboBox(parent)
 {
+    scaleFactor = SCALE_FACTOR;
+    prevScaleFactor = SCALE_FACTOR;
+}
+
+void ScaledQComboBox::rescale()
+{
+    float newScaleFactor = SCALE_FACTOR;
+    scaleFactor = newScaleFactor / prevScaleFactor;
+    prevScaleFactor = newScaleFactor;
+
+    setFont(font());
+    setGeometry(geometry());
 }
 
 void ScaledQComboBox::setFont(const QFont &font)
 {
     auto scaledFont = font;
-    scaledFont.setPointSizeF(font.pointSizeF() * SCALE_FACTOR);
+    scaledFont.setPointSizeF(font.pointSizeF() * scaleFactor);
 
     QComboBox::setFont(scaledFont);
 }
 
 void ScaledQComboBox::setGeometry(const QRect &rect)
 {
-    auto scaledRect = QRect(rect.x() * SCALE_FACTOR, rect.y() * SCALE_FACTOR,
-                            rect.width() * SCALE_FACTOR, rect.height() * SCALE_FACTOR);
+    auto scaledRect = QRect(rect.x() * scaleFactor, rect.y() * scaleFactor,
+                            rect.width() * scaleFactor, rect.height() * scaleFactor);
 
     QComboBox::setGeometry(scaledRect);
 }
 
 void ScaledQComboBox::resize(int w, int h)
 {
-    QComboBox::resize(w * SCALE_FACTOR, h * SCALE_FACTOR);
+    QComboBox::resize(w * scaleFactor, h * scaleFactor);
 }
 
 void ScaledQComboBox::move(const QPoint &pos)
 {
-    QComboBox::move(pos * SCALE_FACTOR);
+    QComboBox::move(pos * scaleFactor);
 }
 
 ScaledQCheckBox::ScaledQCheckBox(QWidget *parent) : QCheckBox(parent)
 {
+    scaleFactor = SCALE_FACTOR;
+    prevScaleFactor = SCALE_FACTOR;
+}
+
+void ScaledQCheckBox::rescale()
+{
+    float newScaleFactor = SCALE_FACTOR;
+    scaleFactor = newScaleFactor / prevScaleFactor;
+    prevScaleFactor = newScaleFactor;
+
+    setFont(font());
+    setGeometry(geometry());
 }
 
 void ScaledQCheckBox::setFont(const QFont &font)
 {
     auto scaledFont = font;
-    scaledFont.setPointSizeF(font.pointSizeF() * SCALE_FACTOR);
+    scaledFont.setPointSizeF(font.pointSizeF() * scaleFactor);
 
     QCheckBox::setFont(scaledFont);
 }
 
 void ScaledQCheckBox::setGeometry(const QRect &rect)
 {
-    auto scaledRect = QRect(rect.x() * SCALE_FACTOR, rect.y() * SCALE_FACTOR,
-                            rect.width() * SCALE_FACTOR, rect.height() * SCALE_FACTOR);
+    auto scaledRect = QRect(rect.x() * scaleFactor, rect.y() * scaleFactor,
+                            rect.width() * scaleFactor, rect.height() * scaleFactor);
 
     QCheckBox::setGeometry(scaledRect);
 }
 
 void ScaledQCheckBox::resize(int w, int h)
 {
-    QCheckBox::resize(w * SCALE_FACTOR, h * SCALE_FACTOR);
+    QCheckBox::resize(w * scaleFactor, h * scaleFactor);
 }
 
 void ScaledQCheckBox::move(const QPoint &pos)
 {
-    QCheckBox::move(pos * SCALE_FACTOR);
+    QCheckBox::move(pos * scaleFactor);
 }
 
-ScaledQDialog::ScaledQDialog(QWidget *parent) : QDialog(parent)
+ScaledQDialog::ScaledQDialog(bool pFixedSize, QWidget *parent) : QDialog(parent)
 {
+    fixedSize = pFixedSize;
+    scaleFactor = SCALE_FACTOR;
+    prevScaleFactor = SCALE_FACTOR;
+}
+
+void ScaledQDialog::rescale()
+{
+    float newScaleFactor = SCALE_FACTOR;
+    scaleFactor = newScaleFactor / prevScaleFactor;
+    prevScaleFactor = newScaleFactor;
+
+    setGeometry(geometry());
 }
 
 void ScaledQDialog::setGeometry(const QRect &rect)
 {
-    auto scaledRect = QRect(rect.x() * SCALE_FACTOR, rect.y() * SCALE_FACTOR,
-                            rect.width() * SCALE_FACTOR, rect.height() * SCALE_FACTOR);
+    auto scaledRect = QRect(rect.x() * scaleFactor, rect.y() * scaleFactor,
+                            rect.width() * scaleFactor, rect.height() * scaleFactor);
+
+    if (fixedSize)
+    {
+        QDialog::setFixedSize(scaledRect.width(), scaledRect.height());
+        QDialog::setMaximumSize(scaledRect.width(), scaledRect.height());
+    }
 
     QDialog::setGeometry(scaledRect);
-    QDialog::setMaximumSize(size());
-    QDialog::setFixedSize(size());
 }
 
 void ScaledQDialog::resize(int w, int h)
 {
-    QDialog::resize(w * SCALE_FACTOR, h * SCALE_FACTOR);
-    QDialog::setMaximumSize(size());
-    QDialog::setFixedSize(size());
+    if (fixedSize)
+    {
+        QDialog::setFixedSize(w * scaleFactor, h * scaleFactor);
+        QDialog::setMaximumSize(w * scaleFactor, h * scaleFactor);
+    }
+
+    QDialog::resize(w * scaleFactor, h * scaleFactor);
 }
 
 void ScaledQDialog::resize(const QSize &pSize)
 {
-    QDialog::resize(pSize * SCALE_FACTOR);
-    QDialog::setMaximumSize(size());
-    QDialog::setFixedSize(size());
+    if (fixedSize)
+    {
+        QDialog::setFixedSize(pSize * scaleFactor);
+        QDialog::setMaximumSize(pSize * scaleFactor);
+    }
+    
+    QDialog::resize(pSize * scaleFactor);
 }
 
 void ScaledQDialog::move(const QPoint &pos)
 {
-    QDialog::move(pos * SCALE_FACTOR);
+    QDialog::move(pos * scaleFactor);
 }
 
 ScaledQMainWindow::ScaledQMainWindow(QWidget *parent) : QMainWindow(parent)
 {
+    scaleFactor = SCALE_FACTOR;
+    prevScaleFactor = SCALE_FACTOR;
+}
+
+void ScaledQMainWindow::rescale()
+{
+    float newScaleFactor = SCALE_FACTOR;
+    scaleFactor = newScaleFactor / prevScaleFactor;
+    prevScaleFactor = newScaleFactor;
+
+    setGeometry(geometry());
 }
 
 void ScaledQMainWindow::setGeometry(const QRect &rect)
 {
-    auto scaledRect = QRect(rect.x() * SCALE_FACTOR, rect.y() * SCALE_FACTOR,
-                            rect.width() * SCALE_FACTOR, rect.height() * SCALE_FACTOR);
+    auto scaledRect = QRect(rect.x() * scaleFactor, rect.y() * scaleFactor,
+                            rect.width() * scaleFactor, rect.height() * scaleFactor);
 
+    QMainWindow::setFixedSize(scaledRect.width(), scaledRect.height());
+    QMainWindow::setMaximumSize(scaledRect.width(), scaledRect.height());
     QMainWindow::setGeometry(scaledRect);
-    QMainWindow::setMaximumSize(size());
-    QMainWindow::setFixedSize(size());
 }
 
 void ScaledQMainWindow::resize(int w, int h)
 {
-    QMainWindow::resize(w * SCALE_FACTOR, h * SCALE_FACTOR);
-    QMainWindow::setMaximumSize(size());
-    QMainWindow::setFixedSize(size());
+    QMainWindow::setFixedSize(w * scaleFactor, h * scaleFactor);
+    QMainWindow::setMaximumSize(w * scaleFactor, h * scaleFactor);
+    QMainWindow::resize(w * scaleFactor, h * scaleFactor);
 }
 
 void ScaledQMainWindow::resize(const QSize &pSize)
 {
-    QMainWindow::resize(pSize * SCALE_FACTOR);
-    QMainWindow::setMaximumSize(size());
-    QMainWindow::setFixedSize(size());
+    QMainWindow::setFixedSize(pSize * scaleFactor);
+    QMainWindow::setMaximumSize(pSize * scaleFactor);
+    QMainWindow::resize(pSize * scaleFactor);
 }
 
 void ScaledQMainWindow::move(const QPoint &pos)
 {
-    QMainWindow::move(pos * SCALE_FACTOR);
+    QMainWindow::move(pos * scaleFactor);
 }

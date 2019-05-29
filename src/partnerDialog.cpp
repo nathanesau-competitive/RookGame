@@ -14,7 +14,7 @@ void PartnerDialogLabel::mousePressEvent(QMouseEvent *event)
 }
 
 PartnerDialog::PartnerDialog(Card &pCardSelected, QWidget *parent) : cardSelected(pCardSelected),
-                                                                     QDialogWithClickableCardArray(parent),
+                                                                     QDialogWithClickableCardArray(true, parent),
                                                                      centerCards(DRAW_POSITION_PARTNER_DLG, SIZE_TINY, this)
 {
     auto splitCardArray = [](vector<CardVector *> &suitArrays, CardVector &cardArr) {

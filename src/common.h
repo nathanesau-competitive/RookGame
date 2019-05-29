@@ -38,21 +38,30 @@ extern QPixmapCache pixmapCache;
 
 class ScaledQLabel : public QLabel
 {
+    float prevScaleFactor;
+    float scaleFactor;
+
 public:
     ScaledQLabel(QWidget *parent = nullptr);
+
+    void rescale();
 
     // override functions related to size or position
     void setFont(const QFont &font);
     void setGeometry(const QRect &rect);
     void resize(int w, int h);
     void move(const QPoint &pos);
-    void setPixmap(const Card &data, QSize size, QTransform transform);
 };
 
 class ScaledQPushButton : public QPushButton
 {
+    float prevScaleFactor;
+    float scaleFactor;
+
 public:
     ScaledQPushButton(QWidget *parent = nullptr);
+
+    void rescale();
 
     // override functions related to size or position
     virtual void setFont(const QFont &font);
@@ -63,8 +72,13 @@ public:
 
 class ScaledQComboBox : public QComboBox
 {
+    float prevScaleFactor;
+    float scaleFactor;
+
 public:
     ScaledQComboBox(QWidget *parent);
+
+    void rescale();
 
     // override functions related to size or position
     virtual void setFont(const QFont &font);
@@ -75,8 +89,13 @@ public:
 
 class ScaledQCheckBox : public QCheckBox
 {
+    float prevScaleFactor;
+    float scaleFactor;
+
 public:
     ScaledQCheckBox(QWidget *parent = nullptr);
+
+    void rescale();
 
     // override functions related to size or position
     virtual void setFont(const QFont &font);
@@ -87,8 +106,14 @@ public:
 
 class ScaledQDialog : public QDialog
 {
+    bool fixedSize;
+    float prevScaleFactor;
+    float scaleFactor;
+
 public:
-    ScaledQDialog(QWidget *parent = nullptr);
+    ScaledQDialog(bool pFixedSize, QWidget *parent = nullptr);
+
+    void rescale();
 
     // override functions related to size or position
     virtual void setGeometry(const QRect &rect);
@@ -99,8 +124,13 @@ public:
 
 class ScaledQMainWindow : public QMainWindow
 {
+    float prevScaleFactor;
+    float scaleFactor;
+
 public:
     ScaledQMainWindow(QWidget *parent = nullptr);
+
+    void rescale();
 
     // override functions related to size or position
     virtual void setGeometry(const QRect &rect);

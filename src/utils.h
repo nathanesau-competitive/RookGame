@@ -7,6 +7,7 @@
 #include <QLabel>
 #include <QMainWindow>
 #include <QPushButton>
+#include <QSize>
 #include <set>
 #include <string>
 
@@ -32,11 +33,18 @@ namespace Utils
 {
 namespace Ui
 {
-float getScaleFactor(float desiredScreenRatio);
+float getBestScaleFactor();
+QSize getResolution(float scaleFactor);
 void moveWindowToCenter(QMainWindow *mainWindow, int taskBarHeight);
 void moveDialog(QDialog *dialog, QMainWindow *mainWindow, int position);
 void setupMessageBox(MessageBox *msgBox, QString msg, QString title, QSize = {477, 250});
 } // namespace Ui
+
+namespace Db
+{
+void readPreferences();
+void writePreferences();
+} // namespace Db
 
 namespace Stat
 {

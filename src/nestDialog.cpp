@@ -6,7 +6,7 @@ NestDialog::NestDialog(CardVector pOriginalNest,
                        QMainWindow *pMainWindow,
                        QWidget *parent) : originalNest(pOriginalNest),
                                           mainWindow(pMainWindow),
-                                          QDialogWithClickableCardArray(parent),
+                                          QDialogWithClickableCardArray(true, parent),
                                           centerCards(DRAW_POSITION_NEST_DLG_TOP, SIZE_SMALL, this),
                                           bottomCardsPreview(DRAW_POSITION_NEST_DLG_BOTTOM, SIZE_SMALL, this)
 {

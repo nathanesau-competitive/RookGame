@@ -12,7 +12,7 @@ void TrumpDialogLabel::mousePressEvent(QMouseEvent *event)
     parentDialog->onTrumpLabelClicked(this);
 }
 
-TrumpDialog::TrumpDialog(int &pSuitSelected, QWidget *parent) : suitSelected(pSuitSelected), ScaledQDialog(parent)
+TrumpDialog::TrumpDialog(int &pSuitSelected, QWidget *parent) : suitSelected(pSuitSelected), ScaledQDialog(true, parent)
 {
     auto setupTrumpLabel = [this](TrumpDialogLabel &label, QString text, QString style, QPoint pos) {
         label.setFont(QFont("Times", 12));

@@ -1,5 +1,6 @@
 #include <QApplication>
 #include <QDesktopWidget>
+#include <QSettings>
 
 #include "bidDialog.h"
 #include "ui_BidDialog.h"
@@ -19,16 +20,30 @@ namespace Utils
 {
 namespace Ui
 {
-float getScaleFactor(float desiredScreenRatio)
+float getBestScaleFactor()
 {
-    float screenRatio = min(0.925F, desiredScreenRatio);
-
     QSize origSize = {1200, 850};
-    QRect maxSize = QApplication::desktop()->screenGeometry(); // i.e. 1920x1080
+
+    QRect maxSizeRect = QApplication::desktop()->screenGeometry();
+    QSize maxSize = {maxSizeRect.width(), maxSizeRect.height()};
+
     float factor = min((float)maxSize.width() / origSize.width(),
                        (float)maxSize.height() / origSize.height());
 
-    return factor * screenRatio;
+    // DO NOT fill more than 90% of screen
+    float bestScreenRatio = 0.9F;
+    factor = factor * bestScreenRatio;
+    factor = round(factor * 10) / 10.0F;
+
+    return factor;
+}
+
+QSize getResolution(float scaleFactor)
+{
+    int width = 1200 * scaleFactor;
+    int height = 850 * scaleFactor;
+
+    return {width, height};
 }
 
 void moveWindowToCenter(QMainWindow *mainWindow, int taskBarHeight)
@@ -88,6 +103,25 @@ void setupMessageBox(MessageBox *msgBox, QString msg, QString title, QSize size)
     msgBox->setWindowTitle(title);
 }
 } // namespace Ui
+
+namespace Db
+{
+void readPreferences()
+{
+    QSettings settings("OpenSourceSoftware", "Rook");
+    settings.beginGroup("Appearance");
+    SCALE_FACTOR = settings.value("SCALE_FACTOR", SCALE_FACTOR).toFloat();
+    settings.endGroup();
+}
+
+void writePreferences()
+{
+    QSettings settings("OpenSourceSoftware", "Rook");
+    settings.beginGroup("Appearance");
+    settings.setValue("SCALE_FACTOR", SCALE_FACTOR);
+    settings.endGroup();
+}
+} // namespace Db
 
 namespace Stat
 {

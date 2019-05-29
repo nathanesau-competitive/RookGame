@@ -13,6 +13,8 @@
 #include "mainWindow.h"
 #include "messageBox.h"
 #include "middleDialog.h"
+#include "preferencesDialog.h"
+#include "PreferencesDialog.h"
 #include "utils.h"
 
 using namespace std;
@@ -21,7 +23,6 @@ MainWindow::MainWindow(QWidget *parent) : ScaledQMainWindow(parent),
                                           widget(this)
 {
     widget.setParent(this);
-
     widget.infoWidget.updatePartner(Card(SUIT_UNDEFINED, VALUE_UNDEFINED));
 
     newGameAction.setText(QMenu::tr("&New"));
@@ -80,7 +81,6 @@ MainWindow::MainWindow(QWidget *parent) : ScaledQMainWindow(parent),
     menuBar.addMenu(&helpMenu);
 
     setCentralWidget(&widget);
-
     setWindowTitle("Rook");
     setWindowIcon(QIcon(":rookicon.gif"));
     setMenuBar(&menuBar);
@@ -91,6 +91,14 @@ MainWindow::MainWindow(QWidget *parent) : ScaledQMainWindow(parent),
     QPalette palette;
     palette.setBrush(QPalette::Background, bkgnd);
     setPalette(palette);
+}
+
+void MainWindow::rescale()
+{
+    ScaledQMainWindow::rescale();
+    widget.rescale();
+
+    Utils::Ui::moveWindowToCenter(this, 36);
 }
 
 void MainWindow::onNewGameAction()
@@ -112,12 +120,16 @@ void MainWindow::onLoadGameAction()
 
 void MainWindow::onSaveGameAction()
 {
+    // save overall scores to sql
     // todo
 }
 
 void MainWindow::onPreferencesAction()
 {
-    // todo
+    PreferencesDialog preferencesDlg(this);
+    auto result = preferencesDlg.exec();
+
+    Utils::Db::writePreferences();
 }
 
 void MainWindow::onExitAction()
@@ -195,6 +207,8 @@ void MainWindow::startNewRound()
                 }
             }
         }
+
+        return PLAYER_UNDEFINED;
     };
 
     if (modifyRookSuit() == PLAYER_1) // player 1 has the rook card

@@ -26,6 +26,8 @@ get_target_property(QtCore_location Qt5::Core LOCATION)
 
 # Populate a CMake variable with the sources
 set(rook_SRCS
+        src/appearancePage.cpp
+        src/appearancePage.h
         src/bidDialog.cpp
         src/bidDialog.h
         src/bidDialog.ui
@@ -41,6 +43,8 @@ set(rook_SRCS
         src/gameController.h
         src/gameInfoWidget.cpp
         src/gameInfoWidget.h
+        src/gamePage.cpp
+        src/gamePage.h
         src/handInfo.cpp
         src/handInfo.h
         src/main.cpp
@@ -62,6 +66,8 @@ set(rook_SRCS
         src/player.h
         src/partnerDialog.cpp
         src/partnerDialog.h
+        src/preferencesDialog.cpp
+        src/preferencesDialog.h
         src/resources.qrc
         src/roundInfo.h
         src/roundInfo.cpp

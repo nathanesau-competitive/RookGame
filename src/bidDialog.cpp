@@ -10,7 +10,7 @@
 using namespace std;
 
 BidDialog::BidDialog(QMainWindow *pMainWindow, QWidget *parent) : mainWindow(pMainWindow),
-                                                                  ScaledQDialog(parent)
+                                                                  ScaledQDialog(true, parent)
 {
     ui.setupUi(this);
 

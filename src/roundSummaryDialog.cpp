@@ -7,7 +7,7 @@
 
 using namespace std;
 
-RoundSummaryDialog::RoundSummaryDialog(QWidget *parent) : ScaledQDialog(parent)
+RoundSummaryDialog::RoundSummaryDialog(QWidget *parent) : ScaledQDialog(true, parent)
 {
     auto setupLabel = [this](ScaledQLabel *label, QString text, QSize size, QPoint pos) {
         label->setParent(this);

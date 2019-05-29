@@ -126,22 +126,6 @@ string Card::getValueAsString() const
     }
 }
 
-int Card::getCardAsInt() const
-{
-    if(value == VALUE_UNDEFINED)
-    {
-        return 0;
-    }
-    else if(value == VALUE_ROOK)
-    {
-        return 57;
-    }
-    else
-    {
-        return suit * 14 + value;
-    }
-}
-
 void CardVector::sort(int trump)
 {
     std::sort(this->begin(), this->end(), CardCompare(trump));

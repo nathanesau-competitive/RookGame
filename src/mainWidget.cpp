@@ -10,7 +10,7 @@
 
 MainWidget::MainWidget(MainWindow *pMainWindow, QWidget *parent) : mainWindow(pMainWindow),
                                                                    infoWidget(pMainWindow),
-                                                                   QDialogWithClickableCardArray(parent),
+                                                                   QDialogWithClickableCardArray(false, parent),
                                                                    player1CardPlayed(DRAW_POSITION_MAIN_WIDGET_CENTER_BOTTOM, SIZE_NORMAL, this),
                                                                    player2CardPlayed(DRAW_POSITION_MAIN_WIDGET_CENTER_LEFT, SIZE_NORMAL, this),
                                                                    player3CardPlayed(DRAW_POSITION_MAIN_WIDGET_CENTER_TOP, SIZE_NORMAL, this),
@@ -21,6 +21,18 @@ MainWidget::MainWidget(MainWindow *pMainWindow, QWidget *parent) : mainWindow(pM
     infoWidget.setParent(this);
     infoWidget.move(QPoint(0, 0));
     infoWidget.resize(1200, 130);
+}
+
+void MainWidget::rescale()
+{
+    ScaledQDialog::rescale();
+    infoWidget.rescale();
+    player1CardPlayed.rescale();
+    player2CardPlayed.rescale();
+    player3CardPlayed.rescale();
+    player4CardPlayed.rescale();
+    centerCards.rescale();
+    bottomCards.rescale();
 }
 
 void MainWidget::finishExistingHand(Card player1Card)
@@ -53,11 +65,6 @@ void MainWidget::finishExistingHand(Card player1Card)
     player2CardPlayed.hideCards();
     player3CardPlayed.hideCards();
     player4CardPlayed.hideCards();
-}
-
-void MainWidget::startRound()
-{
-    // todo
 }
 
 void MainWidget::startNewHand(int startingPlayerNum)
@@ -145,6 +152,16 @@ void MainWidget::onCardClicked(ClickableCard *clickableCard)
     {
         startNewHand(gc.handInfo.getWinningPlayerNum());
     }
+}
+
+void MainWidget::onCardHoverEnter(ClickableCard *clickableCard)
+{
+    // do nothing
+}
+
+void MainWidget::onCardHoverLeave(ClickableCard *clickableCard)
+{
+    // do nothing
 }
 
 void MainWidget::showCardPlayed(const Card &card, int playerNum)

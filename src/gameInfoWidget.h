@@ -72,15 +72,13 @@ struct GameInfoWidget : public QDialogWithClickableCardArray
 
     GameInfoWidget(QMainWindow *pMainWindow, QWidget *parent = nullptr);
 
+    void rescale();
+
     void resetRoundInfoToDefaults();
     void resetOverallInfoToDefaults();
     void resetInfoToDefaults();
 
-    virtual void onCardClicked(ClickableCard *clickableCard)
-    {
-        // do nothing
-    }
-
+    virtual void onCardClicked(ClickableCard *clickableCard);
     virtual void onCardHoverEnter(ClickableCard *clickableCard);
     virtual void onCardHoverLeave(ClickableCard *clickableCard);
 

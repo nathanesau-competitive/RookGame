@@ -7,7 +7,7 @@
 #include "utils.h"
 
 GameInfoWidget::GameInfoWidget(QMainWindow *pMainWindow, QWidget *parent) : mainWindow(pMainWindow),
-                                                                            QDialogWithClickableCardArray(parent),
+                                                                            QDialogWithClickableCardArray(false, parent),
                                                                             topLeftCards(DRAW_POSITION_GAME_INFO_WIDGET, SIZE_TINY, this)
 {
     auto setupCategoryLabel = [this](ScaledQLabel *categoryLabel, QString text, QSize size, QPoint pos) {
@@ -62,6 +62,36 @@ GameInfoWidget::GameInfoWidget(QMainWindow *pMainWindow, QWidget *parent) : main
     setStyleSheet("background-color: white");
 }
 
+void GameInfoWidget::rescale()
+{
+    ScaledQDialog::rescale();
+    bidCategoryLabel.rescale();
+    bidPlayerLabel.rescale();
+    bidAmountLabel.rescale();
+    partnerCardCategoryLabel.rescale();
+    topLeftCards.rescale();
+    trumpCategoryLabel.rescale();
+    trumpLabel.rescale();
+    pointsMiddleCategoryLabel.rescale();
+    pointsMiddleLabel.rescale();
+    teamsCategoryLabel.rescale();
+    team1Label.rescale();
+    team2Label.rescale();
+    pointsWonPlayerCategoryLabel.rescale();
+    pointsWonPlayerLabel1.rescale();
+    pointsWonPlayerLabel2.rescale();
+    pointsWonPlayerLabel3.rescale();
+    pointsWonPlayerLabel4.rescale();
+    pointsWonTeamCategoryLabel.rescale();
+    pointsWonTeamLabel1.rescale();
+    pointsWonTeamLabel2.rescale();
+    overallScoresCategoryLabel.rescale();
+    player1OverallScoreLabel.rescale();
+    player2OverallScoreLabel.rescale();
+    player3OverallScoreLabel.rescale();
+    player4OverallScoreLabel.rescale();
+}
+
 void GameInfoWidget::resetRoundInfoToDefaults()
 {
     updateBid(PLAYER_UNDEFINED, 0);
@@ -82,6 +112,11 @@ void GameInfoWidget::resetInfoToDefaults()
 {
     resetRoundInfoToDefaults();
     resetOverallInfoToDefaults();
+}
+
+void GameInfoWidget::onCardClicked(ClickableCard *clickableCard)
+{
+    // do nothing
 }
 
 void GameInfoWidget::onCardHoverEnter(ClickableCard *clickableCard)

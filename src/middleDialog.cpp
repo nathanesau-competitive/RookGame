@@ -18,7 +18,7 @@ MiddleDialog::MiddleDialog(int &pTrumpSuitSelected, Card &pPartnerCardSelected,
                                                                                                  partnerCardSelected(pPartnerCardSelected),
                                                                                                  mainWidget(pMainWidget),
                                                                                                  mainWindow(pMainWindow),
-                                                                                                 QDialogWithClickableCardArray(parent),
+                                                                                                 QDialogWithClickableCardArray(true, parent),
                                                                                                  topRightCards(DRAW_POSITION_MIDDLE_DLG_NEST, SIZE_TINY, this),
                                                                                                  bottomRightCards(DRAW_POSITION_MIDDLE_DLG_PARTNER, SIZE_TINY, this)
 {

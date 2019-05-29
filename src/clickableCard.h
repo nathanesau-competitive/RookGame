@@ -115,6 +115,8 @@ class ClickableCardArray
 public:
     ClickableCardArray(int pDrawPosition, QSize pSize = SIZE_NORMAL, QDialogWithClickableCardArray *pParent = nullptr);
 
+    void rescale();
+
     void showCards(const CardVector &cardArr, CardStyleMap *cardStyleMap = nullptr);
     void hideCards();
 
@@ -131,7 +133,7 @@ private:
 class QDialogWithClickableCardArray : public ScaledQDialog
 {
 public:
-    QDialogWithClickableCardArray(QWidget *parent = nullptr);
+    QDialogWithClickableCardArray(bool pFixedSize, QWidget *parent = nullptr);
 
     virtual void onCardClicked(ClickableCard *clickableCard) = 0;
     virtual void onCardHoverEnter(ClickableCard *clickableCard) = 0;

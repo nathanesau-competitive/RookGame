@@ -40,6 +40,8 @@ class MainWindow : public ScaledQMainWindow
 public:
     MainWindow(QWidget *parent = nullptr);
 
+    void rescale();
+
     void onNewGameAction();
     void onLoadGameAction();
     void onSaveGameAction();

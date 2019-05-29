@@ -163,12 +163,24 @@ ClickableCardArray::ClickableCardArray(int pDrawPosition, QSize pSize, QDialogWi
     size = pSize;
 }
 
+void ClickableCardArray::rescale()
+{
+    CardVector cardArr;
+
+    for(auto &clickableCard : clickableCards)
+    {
+        cardArr.push_back(clickableCard.data);
+    }
+
+    showCards(cardArr);
+}
+
 void ClickableCardArray::showCards(const CardVector &cardArr, CardStyleMap *cardStyles)
 {
     int n = (int)cardArr.size();
 
     clickableCards.clear();
-    clickableCards.resize(n);
+    clickableCards.resize(n); // ScaledQLabel::scaleFactor set to SCALE_FACTOR
 
     for (auto i = 0; i < n; i++)
     {
@@ -195,10 +207,7 @@ void ClickableCardArray::showCards(const CardVector &cardArr, CardStyleMap *card
 
 void ClickableCardArray::hideCards()
 {
-    for (auto &card : clickableCards)
-    {
-        card.hide();
-    }
+    clickableCards.clear();
 }
 
 QPoint ClickableCardArray::getCardPosition(int i, int n)
@@ -318,6 +327,6 @@ int ClickableCardArray::getCardGap()
     }
 }
 
-QDialogWithClickableCardArray::QDialogWithClickableCardArray(QWidget *parent) : ScaledQDialog(parent)
+QDialogWithClickableCardArray::QDialogWithClickableCardArray(bool pFixedSize, QWidget *parent) : ScaledQDialog(pFixedSize, parent)
 {
 }

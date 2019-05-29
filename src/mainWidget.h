@@ -31,24 +31,16 @@ public:
 
     MainWidget(MainWindow *pMainWindow, QWidget *parent = nullptr);
 
-    virtual void onCardClicked(ClickableCard *clickableCard);
-    
-    bool validateCard(ClickableCard *clickableCard); // return true if valid
+    void rescale();
 
-    void startRound();
+    virtual void onCardClicked(ClickableCard *clickableCard);
+    virtual void onCardHoverEnter(ClickableCard *clickableCard);
+    virtual void onCardHoverLeave(ClickableCard *clickableCard);
+
+    bool validateCard(ClickableCard *clickableCard); // return true if valid
 
     void finishExistingHand(Card player1Card); // intentional copy
     void startNewHand(int startingPlayerNum);
-
-    virtual void onCardHoverEnter(ClickableCard *clickableCard)
-    {
-        // do nothing
-    }
-
-    virtual void onCardHoverLeave(ClickableCard *clickableCard)
-    {
-        // do nothing
-    }
 
     void showCardPlayed(const Card &card, int playerNum);
 

@@ -50,7 +50,6 @@ struct Card
 
     string getSuitAsString() const;
     string getValueAsString() const;
-    int getCardAsInt() const;
 };
 
 struct CardCompare
