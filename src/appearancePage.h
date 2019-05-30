@@ -8,6 +8,8 @@
 #include <QLabel>
 #include <QPushButton>
 #include <QVBoxLayout>
+#include <QLineEdit>
+#include <QString>
 #include <QWidget>
 #include <vector>
 
@@ -17,31 +19,40 @@ using namespace std;
 class MainWindow;
 
 // global declarations
-extern float SCALE_FACTOR;
+extern float scalefactor;
 
 class AppearancePage : public QWidget
 {
     MainWindow *mainWindow;
 
-    map<float /*SCALE_FACTOR*/, string> resolutionTextMap;
+    map<float /*scalefactor*/, string> resolutionTextMap;
     vector<float> scaleFactorVector;
 
-    // when using a layout, objects must be allocated on the heap
-    QGroupBox *appearanceGroup;
-    QLabel *resolutionLabel;
-    QComboBox *resolutionComboBox;
-    QHBoxLayout *resolutionLayout;
+    QGroupBox resolutionGroup;
+    QHBoxLayout resolutionLayout;
+    QLabel resolutionLabel;
+    QComboBox resolutionComboBox;
 
-    QPushButton *applyButton;
+    QGroupBox namesGroup;
+    QHBoxLayout namesLayout;
+    QLabel player1NameLabel;
+    QLineEdit player1NameEdit;
+    QLabel player2NameLabel;
+    QLineEdit player2NameEdit;
+    QLabel player3NameLabel;
+    QLineEdit player3NameEdit;
+    QLabel player4NameLabel;
+    QLineEdit player4NameEdit;
 
-    QVBoxLayout *appearanceLayout;
-    QVBoxLayout *mainLayout;
+    QPushButton applyButton;
+    
+    QVBoxLayout mainLayout;
 
 public:
     AppearancePage(MainWindow *pMainWindow, QWidget *parent = 0);
     virtual ~AppearancePage();
 
-    void fillResolutionMaps();
+    void setupResolutionComboBox();
 
     void onApply();
 };

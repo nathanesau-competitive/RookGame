@@ -172,7 +172,6 @@ void MainWindow::startNewRound()
     widget.bottomCards.showCards(gc.playerArr[PLAYER_1].cardArr);
 
     BidDialog bidDlg(this);
-    Utils::Ui::moveDialog(&bidDlg, this, DIALOG_POSITION_CENTER);
     auto player1WonBid = bidDlg.exec();
 
     widget.infoWidget.updateBid(gc.roundInfo.bidPlayer, gc.roundInfo.bidAmount);

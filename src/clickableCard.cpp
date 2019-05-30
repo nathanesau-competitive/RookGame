@@ -28,11 +28,11 @@ void ClickableCard::setData(const Card &pData, int drawPosition, QSize size, str
         data = pData;
 
         auto pixmapKey = CardPixmapKey(data,
-                                       size.width() * SCALE_FACTOR,
-                                       size.height() * SCALE_FACTOR,
+                                       size.width() * scalefactor,
+                                       size.height() * scalefactor,
                                        getRotation(drawPosition));
 
-        auto &pixmap = pixmapCache[pixmapKey];
+        auto &pixmap = pixmapcache[pixmapKey];
 
         if (!pixmap)
         {
@@ -180,7 +180,7 @@ void ClickableCardArray::showCards(const CardVector &cardArr, CardStyleMap *card
     int n = (int)cardArr.size();
 
     clickableCards.clear();
-    clickableCards.resize(n); // ScaledQLabel::scaleFactor set to SCALE_FACTOR
+    clickableCards.resize(n); // ScaledQLabel::scaleFactor set to scalefactor
 
     for (auto i = 0; i < n; i++)
     {

@@ -33,8 +33,8 @@ struct CompareCardPixmapKey;
 typedef map<CardPixmapKey, unique_ptr<QPixmap>, CompareCardPixmapKey> QPixmapCache;
 
 // global declarations
-extern float SCALE_FACTOR;
-extern QPixmapCache pixmapCache;
+extern float scalefactor;
+extern QPixmapCache pixmapcache;
 
 class ScaledQLabel : public QLabel
 {

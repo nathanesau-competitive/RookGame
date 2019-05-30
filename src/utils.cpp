@@ -110,7 +110,7 @@ void readPreferences()
 {
     QSettings settings("OpenSourceSoftware", "Rook");
     settings.beginGroup("Appearance");
-    SCALE_FACTOR = settings.value("SCALE_FACTOR", Utils::Ui::getBestScaleFactor()).toFloat();
+    scalefactor = settings.value("scalefactor", Utils::Ui::getBestScaleFactor()).toFloat();
     settings.endGroup();
 }
 
@@ -118,7 +118,7 @@ void writePreferences()
 {
     QSettings settings("OpenSourceSoftware", "Rook");
     settings.beginGroup("Appearance");
-    settings.setValue("SCALE_FACTOR", SCALE_FACTOR);
+    settings.setValue("scalefactor", scalefactor);
     settings.endGroup();
 }
 } // namespace Db

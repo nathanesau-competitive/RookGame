@@ -9,6 +9,7 @@ MessageBox::MessageBox(QWidget *parent) : QDialogWithClickableCardArray(true, pa
     QObject::connect(ui.okButton, &QPushButton::pressed, this, &MessageBox::okButtonPressed);
 
     setWindowIcon(QIcon(":rookicon.gif"));
+    setStyleSheet("background-color: white");
 }
 
 void MessageBox::setText(const QString &text)

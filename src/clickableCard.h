@@ -50,7 +50,7 @@ typedef map<CardKey, string, CompareCardKey> CardStyleMap;
 typedef map<CardPixmapKey, unique_ptr<QPixmap>, CompareCardPixmapKey> QPixmapCache;
 
 // global declarations
-extern QPixmapCache pixmapCache;
+extern QPixmapCache pixmapcache;
 
 class ClickableCard : public ScaledQLabel
 {
