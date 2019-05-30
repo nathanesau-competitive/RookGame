@@ -78,16 +78,24 @@ class GameInfoWidget : public ScalableQDialog
 
 All game widgets and dialogs will automatically be resized according to ``scalefactor`` global. The ``scalefactor`` global can be customized by user (i.e. when they change the game resolution).
 
-The ``rescale`` method is called for widgets shown on screen when ``scalefactor`` is changed. When the widget is created, ``scalefactor`` will be applied in each of the ``Scalable`` classes.
+The ``rescale`` method is called for widgets shown on screen when ``scalefactor`` is changed. When the widget is created, ``scalefactor`` will be applied in each of the Scalable classes.
 
-This approach to scaling is not complicated for programmer. All programmer needs to worry about is 
+This approach to scaling is not complicated for programmer. All programmer needs to worry about is:
 
-* deriving their widget from a scalable widget class
-* deriving their children widgets from a scalable widget class
-* defining a rescale method which calls the rescale method of all of the children classes.
+* Deriving their widget from a scalable widget class
+* Deriving their children widgets from a scalable widget class
+* Defining a ``rescale`` method which calls the ``rescale`` method of all of the children classes.
 
 If the programmer doesn't need a widget to be scalable, they don't need to do any of things mentioned above.
 
-The scaling itself is handled by the ``Scalable`` classes.
+The scaling itself is handled by the Scalable classes.
 
-4. 
+4. Do not use globals unless necessary.
+
+The global used are:
+
+* ``cpu``: used for making computer decisions (i.e. what card to play, what trump to choose, etc.)
+* ``gc``: contains all the game variables
+* ``pixmapcache``: cache pixmaps by suit, color, width, height and transform. Pixmaps are slow to load from disk and faster to keep in memory.
+* ``scalefactor``: used for changing the game resolution
+
