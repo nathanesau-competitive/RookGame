@@ -94,7 +94,7 @@ The scaling itself is handled by the Scalable classes.
 
 The global used are:
 
-* ``cpu``: used for making computer decisions (i.e. what card to play, what trump to choose, etc.)
+<!-- * ``cpu``: used for making computer decisions (i.e. what card to play, what trump to choose, etc.)-->
 * ``gc``: contains all the game variables
 * ``pixmapcache``: cache pixmaps by suit, color, width, height and transform. Pixmaps are slow to load from disk and faster to keep in memory.
 * ``scalefactor``: used for changing the game resolution

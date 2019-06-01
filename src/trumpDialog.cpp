@@ -35,9 +35,13 @@ TrumpDialog::TrumpDialog(int &pSuitSelected, QWidget *parent) : suitSelected(pSu
     setStyleSheet("background-color: white");
 }
 
-TrumpDialog::~TrumpDialog()
+void TrumpDialog::rescale()
 {
-    // todo
+    updateScaleFactor();
+    setGeometry(geometry());
+
+    for(auto label : vector<ScaledQLabel *>{&blackLabel, &greenLabel, &redLabel, &yellowLabel})
+        label->rescale();
 }
 
 void TrumpDialog::onTrumpLabelClicked(TrumpDialogLabel *label)

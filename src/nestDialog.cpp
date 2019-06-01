@@ -61,8 +61,22 @@ NestDialog::NestDialog(CardVector pOriginalNest,
     setStyleSheet("background-color: white");
 }
 
-NestDialog::~NestDialog()
+void NestDialog::rescale()
 {
+    updateScaleFactor();
+    setGeometry(geometry());
+
+    for (auto button : vector<ScaledQPushButton *>{&autoChooseNestButton, &resetNestButton, &doneNestButton})
+        button->rescale();
+
+    for (auto label : vector<ScaledQLabel *>{&centerCardsLabel, &bottomCardsPreviewLabel})
+        label->rescale();
+
+    for (auto clickableCardArray : vector<ClickableCardArray *>{&centerCards, &bottomCardsPreview})
+        clickableCardArray->rescale();
+
+    for (auto checkBox : vector<ScaledQCheckBox *>{&highlightCardsCheckBox})
+        checkBox->rescale();
 }
 
 void NestDialog::setOriginalNestStyles(string style)

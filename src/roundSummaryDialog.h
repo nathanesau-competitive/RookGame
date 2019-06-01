@@ -27,6 +27,7 @@ class RoundSummaryDialog : public ScaledQDialog
 
 public:
     RoundSummaryDialog(QWidget *parent = nullptr);
+    virtual void rescale();
 
     void updateScores(map<int, int> roundScores);
 };

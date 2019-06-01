@@ -56,12 +56,35 @@ MiddleDialog::MiddleDialog(int &pTrumpSuitSelected, Card &pPartnerCardSelected,
     setStyleSheet("background-color: white");
 }
 
-MiddleDialog::~MiddleDialog()
+void MiddleDialog::rescale()
 {
-    // todo
+    updateScaleFactor();
+    setGeometry(geometry());
+
+    for (auto clickableCardArray : vector<ClickableCardArray *>{&topRightCards, &bottomRightCards})
+        clickableCardArray->rescale();
+
+    for (auto label : vector<ScaledQLabel *>{ui.trumpCategoryLabel, ui.partnerCategoryLabel, ui.trumpLabel,
+                                             ui.nestCategoryLabel})
+        label->rescale();
+
+    for (auto button : vector<ScaledQPushButton *>{ui.selectPartnerButton, ui.selectTrumpButton, ui.okButton,
+                                                   ui.autoSelectTrumpButton, ui.autoSelectPartnerButton,
+                                                   ui.autoSelectNestButton})
+        button->rescale();
 }
 
 void MiddleDialog::onCardClicked(ClickableCard *clickableCard)
+{
+    // do nothing
+}
+
+void MiddleDialog::onCardHoverEnter(ClickableCard *clickableCard)
+{
+    // do nothing
+}
+
+void MiddleDialog::onCardHoverLeave(ClickableCard *clickableCard)
 {
     // do nothing
 }
@@ -135,7 +158,7 @@ void MiddleDialog::autoSelectPartnerButtonPressed()
     CardVector &cardArr = gc.playerArr[PLAYER_1].cardArr;
 
     vector<const CardVector *> cardArrays = {&gc.playerArr[PLAYER_2].cardArr, &gc.playerArr[PLAYER_3].cardArr,
-                                               &gc.playerArr[PLAYER_4].cardArr, &gc.nest};
+                                             &gc.playerArr[PLAYER_4].cardArr, &gc.nest};
     CardVector aggregateCardArr;
     aggregateCardArr.append(cardArrays);
     aggregateCardArr.sort();

@@ -64,32 +64,20 @@ GameInfoWidget::GameInfoWidget(QMainWindow *pMainWindow, QWidget *parent) : main
 
 void GameInfoWidget::rescale()
 {
-    ScaledQDialog::rescale();
-    bidCategoryLabel.rescale();
-    bidPlayerLabel.rescale();
-    bidAmountLabel.rescale();
-    partnerCardCategoryLabel.rescale();
-    topLeftCards.rescale();
-    trumpCategoryLabel.rescale();
-    trumpLabel.rescale();
-    pointsMiddleCategoryLabel.rescale();
-    pointsMiddleLabel.rescale();
-    teamsCategoryLabel.rescale();
-    team1Label.rescale();
-    team2Label.rescale();
-    pointsWonPlayerCategoryLabel.rescale();
-    pointsWonPlayerLabel1.rescale();
-    pointsWonPlayerLabel2.rescale();
-    pointsWonPlayerLabel3.rescale();
-    pointsWonPlayerLabel4.rescale();
-    pointsWonTeamCategoryLabel.rescale();
-    pointsWonTeamLabel1.rescale();
-    pointsWonTeamLabel2.rescale();
-    overallScoresCategoryLabel.rescale();
-    player1OverallScoreLabel.rescale();
-    player2OverallScoreLabel.rescale();
-    player3OverallScoreLabel.rescale();
-    player4OverallScoreLabel.rescale();
+    updateScaleFactor();
+    setGeometry(geometry());
+
+    for (auto label : vector<ScaledQLabel *>{&bidCategoryLabel, &bidPlayerLabel, &bidAmountLabel, &partnerCardCategoryLabel,
+                                             &trumpCategoryLabel, &trumpLabel, &pointsMiddleCategoryLabel, &pointsMiddleLabel,
+                                             &teamsCategoryLabel, &team1Label, &team2Label, &pointsWonPlayerCategoryLabel,
+                                             &pointsWonPlayerLabel1, &pointsWonPlayerLabel2, &pointsWonPlayerLabel3,
+                                             &pointsWonPlayerLabel4, &pointsWonTeamCategoryLabel, &pointsWonTeamLabel1,
+                                             &pointsWonTeamLabel2, &overallScoresCategoryLabel, &player1OverallScoreLabel,
+                                             &player2OverallScoreLabel, &player3OverallScoreLabel, &player4OverallScoreLabel})
+        label->rescale();
+
+    for (auto clickableCardArray : vector<ClickableCardArray *>{&topLeftCards})
+        clickableCardArray->rescale();
 }
 
 void GameInfoWidget::resetRoundInfoToDefaults()

@@ -134,6 +134,7 @@ class QDialogWithClickableCardArray : public ScaledQDialog
 {
 public:
     QDialogWithClickableCardArray(bool pFixedSize, QWidget *parent = nullptr);
+    virtual void rescale() = 0;
 
     virtual void onCardClicked(ClickableCard *clickableCard) = 0;
     virtual void onCardHoverEnter(ClickableCard *clickableCard) = 0;

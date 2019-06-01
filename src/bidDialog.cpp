@@ -2,6 +2,7 @@
 #include <QObject>
 #include <QPushButton>
 #include <string>
+#include <vector>
 
 #include "bidDialog.h"
 #include "gameController.h"
@@ -31,9 +32,21 @@ BidDialog::BidDialog(QMainWindow *pMainWindow, QWidget *parent) : mainWindow(pMa
     setStyleSheet("background-color: white");
 }
 
-BidDialog::~BidDialog()
+void BidDialog::rescale()
 {
-    // todo
+    updateScaleFactor();
+    setGeometry(geometry());
+
+    for (auto label : vector<ScaledQLabel *>{ui.player1Label, ui.player2Label, ui.player3Label, ui.player4Label,
+                                             ui.player1BidLabel, ui.player2BidLabel, ui.player3BidLabel, ui.player4BidLabel,
+                                             ui.bidAmountLabel})
+        label->rescale();
+
+    for (auto button : vector<ScaledQPushButton *>{ui.bidButton, ui.passButton})
+        button->rescale();
+
+    for (auto comboBox : vector<ScaledQComboBox *>{ui.bidAmountComboBox})
+        comboBox->rescale();
 }
 
 void BidDialog::resetLabelsAndComboBox()

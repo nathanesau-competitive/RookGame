@@ -30,8 +30,7 @@ public:
     ClickableCardArray bottomCards;
 
     MainWidget(MainWindow *pMainWindow, QWidget *parent = nullptr);
-
-    void rescale();
+    virtual void rescale();
 
     virtual void onCardClicked(ClickableCard *clickableCard);
     virtual void onCardHoverEnter(ClickableCard *clickableCard);

@@ -71,8 +71,7 @@ struct GameInfoWidget : public QDialogWithClickableCardArray
     ScaledQLabel player4OverallScoreLabel;
 
     GameInfoWidget(QMainWindow *pMainWindow, QWidget *parent = nullptr);
-
-    void rescale();
+    virtual void rescale();
 
     void resetRoundInfoToDefaults();
     void resetOverallInfoToDefaults();

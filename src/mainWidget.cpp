@@ -25,14 +25,13 @@ MainWidget::MainWidget(MainWindow *pMainWindow, QWidget *parent) : mainWindow(pM
 
 void MainWidget::rescale()
 {
-    ScaledQDialog::rescale();
-    infoWidget.rescale();
-    player1CardPlayed.rescale();
-    player2CardPlayed.rescale();
-    player3CardPlayed.rescale();
-    player4CardPlayed.rescale();
-    centerCards.rescale();
-    bottomCards.rescale();
+    updateScaleFactor();
+    setGeometry(geometry());
+
+    for (auto clickableCardArray : vector<ClickableCardArray *>{&player1CardPlayed, &player2CardPlayed,
+                                                                &player3CardPlayed, &player4CardPlayed,
+                                                                &centerCards, &bottomCards})
+        clickableCardArray->rescale();
 }
 
 void MainWidget::finishExistingHand(Card player1Card)

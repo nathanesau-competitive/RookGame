@@ -9,10 +9,7 @@ ScaledQLabel::ScaledQLabel(QWidget *parent) : QLabel(parent)
 
 void ScaledQLabel::rescale()
 {
-    float newScaleFactor = scalefactor;
-    scaleFactor = newScaleFactor / prevScaleFactor;
-    prevScaleFactor = newScaleFactor;
-
+    updateScaleFactor();
     setFont(font());
     setGeometry(geometry());
 }
@@ -43,6 +40,13 @@ void ScaledQLabel::move(const QPoint &pos)
     QLabel::move(pos * scaleFactor);
 }
 
+void ScaledQLabel::updateScaleFactor()
+{
+    float newScaleFactor = scalefactor;
+    scaleFactor = newScaleFactor / prevScaleFactor;
+    prevScaleFactor = newScaleFactor;
+}
+
 ScaledQPushButton::ScaledQPushButton(QWidget *parent) : QPushButton(parent)
 {
     scaleFactor = scalefactor;
@@ -51,10 +55,7 @@ ScaledQPushButton::ScaledQPushButton(QWidget *parent) : QPushButton(parent)
 
 void ScaledQPushButton::rescale()
 {
-    float newScaleFactor = scalefactor;
-    scaleFactor = newScaleFactor / prevScaleFactor;
-    prevScaleFactor = newScaleFactor;
-
+    updateScaleFactor();
     setFont(font());
     setGeometry(geometry());
 }
@@ -85,6 +86,13 @@ void ScaledQPushButton::resize(int w, int h)
     QPushButton::resize(w * scaleFactor, h * scaleFactor);
 }
 
+void ScaledQPushButton::updateScaleFactor()
+{
+    float newScaleFactor = scalefactor;
+    scaleFactor = newScaleFactor / prevScaleFactor;
+    prevScaleFactor = newScaleFactor;
+}
+
 ScaledQComboBox::ScaledQComboBox(QWidget *parent) : QComboBox(parent)
 {
     scaleFactor = scalefactor;
@@ -93,10 +101,7 @@ ScaledQComboBox::ScaledQComboBox(QWidget *parent) : QComboBox(parent)
 
 void ScaledQComboBox::rescale()
 {
-    float newScaleFactor = scalefactor;
-    scaleFactor = newScaleFactor / prevScaleFactor;
-    prevScaleFactor = newScaleFactor;
-
+    updateScaleFactor();
     setFont(font());
     setGeometry(geometry());
 }
@@ -127,6 +132,13 @@ void ScaledQComboBox::move(const QPoint &pos)
     QComboBox::move(pos * scaleFactor);
 }
 
+void ScaledQComboBox::updateScaleFactor()
+{
+    float newScaleFactor = scalefactor;
+    scaleFactor = newScaleFactor / prevScaleFactor;
+    prevScaleFactor = newScaleFactor;
+}
+
 ScaledQCheckBox::ScaledQCheckBox(QWidget *parent) : QCheckBox(parent)
 {
     scaleFactor = scalefactor;
@@ -135,10 +147,7 @@ ScaledQCheckBox::ScaledQCheckBox(QWidget *parent) : QCheckBox(parent)
 
 void ScaledQCheckBox::rescale()
 {
-    float newScaleFactor = scalefactor;
-    scaleFactor = newScaleFactor / prevScaleFactor;
-    prevScaleFactor = newScaleFactor;
-
+    updateScaleFactor();
     setFont(font());
     setGeometry(geometry());
 }
@@ -169,20 +178,18 @@ void ScaledQCheckBox::move(const QPoint &pos)
     QCheckBox::move(pos * scaleFactor);
 }
 
+void ScaledQCheckBox::updateScaleFactor()
+{
+    float newScaleFactor = scalefactor;
+    scaleFactor = newScaleFactor / prevScaleFactor;
+    prevScaleFactor = newScaleFactor;
+}
+
 ScaledQDialog::ScaledQDialog(bool pFixedSize, QWidget *parent) : QDialog(parent)
 {
     fixedSize = pFixedSize;
     scaleFactor = scalefactor;
     prevScaleFactor = scalefactor;
-}
-
-void ScaledQDialog::rescale()
-{
-    float newScaleFactor = scalefactor;
-    scaleFactor = newScaleFactor / prevScaleFactor;
-    prevScaleFactor = newScaleFactor;
-
-    setGeometry(geometry());
 }
 
 void ScaledQDialog::setGeometry(const QRect &rect)
@@ -226,19 +233,17 @@ void ScaledQDialog::move(const QPoint &pos)
     QDialog::move(pos * scaleFactor);
 }
 
-ScaledQMainWindow::ScaledQMainWindow(QWidget *parent) : QMainWindow(parent)
-{
-    scaleFactor = scalefactor;
-    prevScaleFactor = scalefactor;
-}
-
-void ScaledQMainWindow::rescale()
+void ScaledQDialog::updateScaleFactor()
 {
     float newScaleFactor = scalefactor;
     scaleFactor = newScaleFactor / prevScaleFactor;
     prevScaleFactor = newScaleFactor;
+}
 
-    setGeometry(geometry());
+ScaledQMainWindow::ScaledQMainWindow(QWidget *parent) : QMainWindow(parent)
+{
+    scaleFactor = scalefactor;
+    prevScaleFactor = scalefactor;
 }
 
 void ScaledQMainWindow::setGeometry(const QRect &rect)
@@ -268,4 +273,11 @@ void ScaledQMainWindow::resize(const QSize &pSize)
 void ScaledQMainWindow::move(const QPoint &pos)
 {
     QMainWindow::move(pos * scaleFactor);
+}
+
+void ScaledQMainWindow::updateScaleFactor()
+{
+    float newScaleFactor = scalefactor;
+    scaleFactor = newScaleFactor / prevScaleFactor;
+    prevScaleFactor = newScaleFactor;
 }

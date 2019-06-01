@@ -33,6 +33,7 @@ class PartnerDialog : public QDialogWithClickableCardArray
     CardVector yellowCards;
     CardVector wildCards;
 
+private:
     PartnerDialogLabel blackLabel;
     PartnerDialogLabel greenLabel;
     PartnerDialogLabel redLabel;
@@ -45,21 +46,13 @@ class PartnerDialog : public QDialogWithClickableCardArray
 
 public:
     PartnerDialog(Card &pCardSelected, QWidget *parent = nullptr);
-    virtual ~PartnerDialog();
+    virtual void rescale();
 
     void onPartnerLabelClicked(PartnerDialogLabel *label);
 
     virtual void onCardClicked(ClickableCard *clickableCard);
-
-    virtual void onCardHoverEnter(ClickableCard *clickableCard)
-    {
-        // do nothing
-    }
-
-    virtual void onCardHoverLeave(ClickableCard *clickableCard)
-    {
-        // do nothing
-    }
+    virtual void onCardHoverEnter(ClickableCard *clickableCard);
+    virtual void onCardHoverLeave(ClickableCard *clickableCard);
 };
 
 #endif

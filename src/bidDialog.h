@@ -20,7 +20,7 @@ class BidDialog : public ScaledQDialog
 public:
 
     BidDialog(QMainWindow *pMainWindow, QWidget *parent = nullptr);
-    virtual ~BidDialog();
+    virtual void rescale();
 
     void resetLabelsAndComboBox();
 

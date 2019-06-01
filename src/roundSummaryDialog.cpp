@@ -47,6 +47,20 @@ RoundSummaryDialog::RoundSummaryDialog(QWidget *parent) : ScaledQDialog(true, pa
     setStyleSheet("background-color: white");
 }
 
+void RoundSummaryDialog::rescale()
+{
+    updateScaleFactor();
+    setGeometry(geometry());
+
+    for (auto label : vector<ScaledQLabel *>{&summaryLabel, &player1ScoreLabel, &player1Score, &player2ScoreLabel,
+                                             &player2Score, &player3ScoreLabel, &player3Score, &player4ScoreLabel,
+                                             &player4Score})
+        label->rescale();
+
+    for (auto button : vector<ScaledQPushButton *>{&okButton})
+        button->rescale();
+}
+
 void RoundSummaryDialog::updateScores(map<int, int> roundScores)
 {
     auto updateLabel = [this](ScaledQLabel *label, int score) {

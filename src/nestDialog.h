@@ -24,6 +24,7 @@ class NestDialog : public QDialogWithClickableCardArray
     CardVector originalNest;
     CardStyleMap originalNestStyles;
 
+private:
     QMainWindow *mainWindow; 
 
     ScaledQPushButton autoChooseNestButton;
@@ -40,7 +41,7 @@ class NestDialog : public QDialogWithClickableCardArray
 
 public:
     NestDialog(CardVector pOriginalNest, QMainWindow *pMainWindow, QWidget *parent = nullptr);
-    virtual ~NestDialog();
+    virtual void rescale();
     
     void setOriginalNestStyles(string style);
 

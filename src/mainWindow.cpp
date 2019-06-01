@@ -95,7 +95,9 @@ MainWindow::MainWindow(QWidget *parent) : ScaledQMainWindow(parent),
 
 void MainWindow::rescale()
 {
-    ScaledQMainWindow::rescale();
+    updateScaleFactor();
+    setGeometry(geometry());
+
     widget.rescale();
 
     Utils::Ui::moveWindowToCenter(this, 36);

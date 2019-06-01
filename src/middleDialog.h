@@ -21,30 +21,23 @@ class MiddleDialog : public QDialogWithClickableCardArray
 {
     CardVector originalNest;
 
-    MainWidget *mainWidget;
-    QMainWindow *mainWindow;
-
     int &trumpSuitSelected;
     Card &partnerCardSelected;
+
+private:
+    MainWidget *mainWidget;
+    QMainWindow *mainWindow;
 
     ClickableCardArray topRightCards;
     ClickableCardArray bottomRightCards;
 
 public:
     MiddleDialog(int &pTrumpSuitSelected, Card &pPartnerCardSelected, MainWidget *pMainWidget, QMainWindow *pMainWindow, QWidget *parent = nullptr);
-    virtual ~MiddleDialog();
+    virtual void rescale();
 
     virtual void onCardClicked(ClickableCard *clickableCard);
-    
-    virtual void onCardHoverEnter(ClickableCard *clickableCard)
-    {
-        // do nothing
-    }
-
-    virtual void onCardHoverLeave(ClickableCard *clickableCard)
-    {
-        // do nothing
-    }
+    virtual void onCardHoverEnter(ClickableCard *clickableCard);
+    virtual void onCardHoverLeave(ClickableCard *clickableCard);
 
 private:
     Ui::MiddleDialog ui;

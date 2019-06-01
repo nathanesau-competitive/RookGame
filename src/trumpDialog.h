@@ -15,7 +15,6 @@ class TrumpDialogLabel : public ScaledQLabel
     Q_OBJECT
 
 public:
-
     TrumpDialogLabel(TrumpDialog *parent = nullptr);
 
 protected:
@@ -34,8 +33,8 @@ class TrumpDialog : public ScaledQDialog
 
 public:
     TrumpDialog(int &pSuitSelected, QWidget *parent = nullptr);
+    virtual void rescale();
 
-    virtual ~TrumpDialog();
     void onTrumpLabelClicked(TrumpDialogLabel *label);
 };
 

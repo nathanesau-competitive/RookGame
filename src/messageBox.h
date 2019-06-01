@@ -14,6 +14,7 @@ class MessageBox : public QDialogWithClickableCardArray
 {
 public:
     MessageBox(QWidget *parent = nullptr);
+    virtual void rescale();
 
     void setText(const QString &text);
     void showCards(const CardVector &cardArr);

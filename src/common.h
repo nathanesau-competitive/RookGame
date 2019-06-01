@@ -43,7 +43,6 @@ class ScaledQLabel : public QLabel
 
 public:
     ScaledQLabel(QWidget *parent = nullptr);
-
     void rescale();
 
     // override functions related to size or position
@@ -51,6 +50,9 @@ public:
     void setGeometry(const QRect &rect);
     void resize(int w, int h);
     void move(const QPoint &pos);
+
+protected:
+    void updateScaleFactor();
 };
 
 class ScaledQPushButton : public QPushButton
@@ -60,7 +62,6 @@ class ScaledQPushButton : public QPushButton
 
 public:
     ScaledQPushButton(QWidget *parent = nullptr);
-
     void rescale();
 
     // override functions related to size or position
@@ -68,6 +69,9 @@ public:
     virtual void setGeometry(const QRect &rect);
     virtual void resize(int w, int h);
     virtual void move(const QPoint &pos);
+
+protected:
+    void updateScaleFactor();
 };
 
 class ScaledQComboBox : public QComboBox
@@ -77,7 +81,6 @@ class ScaledQComboBox : public QComboBox
 
 public:
     ScaledQComboBox(QWidget *parent);
-
     void rescale();
 
     // override functions related to size or position
@@ -85,6 +88,9 @@ public:
     virtual void setGeometry(const QRect &rect);
     virtual void resize(int w, int h);
     virtual void move(const QPoint &pos);
+
+protected:
+    void updateScaleFactor();
 };
 
 class ScaledQCheckBox : public QCheckBox
@@ -94,7 +100,6 @@ class ScaledQCheckBox : public QCheckBox
 
 public:
     ScaledQCheckBox(QWidget *parent = nullptr);
-
     void rescale();
 
     // override functions related to size or position
@@ -102,6 +107,9 @@ public:
     virtual void setGeometry(const QRect &rect);
     virtual void resize(int w, int h);
     virtual void move(const QPoint &pos);
+
+protected:
+    void updateScaleFactor();
 };
 
 class ScaledQDialog : public QDialog
@@ -112,14 +120,16 @@ class ScaledQDialog : public QDialog
 
 public:
     ScaledQDialog(bool pFixedSize, QWidget *parent = nullptr);
-
-    void rescale();
+    virtual void rescale() = 0;
 
     // override functions related to size or position
     virtual void setGeometry(const QRect &rect);
     virtual void resize(int w, int h);
     virtual void resize(const QSize &pSize);
     virtual void move(const QPoint &pos);
+
+protected:
+    void updateScaleFactor();
 };
 
 class ScaledQMainWindow : public QMainWindow
@@ -129,14 +139,16 @@ class ScaledQMainWindow : public QMainWindow
 
 public:
     ScaledQMainWindow(QWidget *parent = nullptr);
-
-    void rescale();
+    virtual void rescale() = 0;
 
     // override functions related to size or position
     virtual void setGeometry(const QRect &rect);
     virtual void resize(int w, int h);
     virtual void resize(const QSize &pSize);
     virtual void move(const QPoint &pos);
+
+protected:
+    void updateScaleFactor();
 };
 
 #endif

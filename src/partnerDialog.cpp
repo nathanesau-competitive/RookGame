@@ -35,7 +35,7 @@ PartnerDialog::PartnerDialog(Card &pCardSelected, QWidget *parent) : cardSelecte
 
     // don't allow user to pick themself as partner
     vector<const CardVector *> cardArrays = {&gc.playerArr[PLAYER_2].cardArr, &gc.playerArr[PLAYER_3].cardArr,
-                                               &gc.playerArr[PLAYER_4].cardArr};
+                                             &gc.playerArr[PLAYER_4].cardArr};
     CardVector aggregateCardArr;
     aggregateCardArr.append(cardArrays);
     aggregateCardArr.sort();
@@ -73,9 +73,19 @@ PartnerDialog::PartnerDialog(Card &pCardSelected, QWidget *parent) : cardSelecte
     setGeometry(QRect(0, 0, 850, 300));
 }
 
-PartnerDialog::~PartnerDialog()
+void PartnerDialog::rescale()
 {
-    // todo
+    updateScaleFactor();
+    setGeometry(geometry());
+
+    for (auto label : vector<PartnerDialogLabel *>{&blackLabel, &greenLabel, &redLabel, &yellowLabel, &wildLabel})
+        label->rescale();
+
+    for (auto button : vector<ScaledQPushButton *>{&cancelButton})
+        button->rescale();
+
+    for (auto clickableCardArray : vector<ClickableCardArray *>{&centerCards})
+        clickableCardArray->rescale();
 }
 
 void PartnerDialog::onPartnerLabelClicked(PartnerDialogLabel *label)
@@ -110,4 +120,14 @@ void PartnerDialog::onCardClicked(ClickableCard *clickableCard)
     cardSelected.value = clickableCard->data.value;
 
     accept();
+}
+
+void PartnerDialog::onCardHoverEnter(ClickableCard *clickableCard)
+{
+    // do nothing
+}
+
+void PartnerDialog::onCardHoverLeave(ClickableCard *clickableCard)
+{
+    // do nothing
 }
