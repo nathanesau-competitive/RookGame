@@ -2,6 +2,7 @@
 #include <QPoint>
 #include <QString>
 
+#include "gameController.h"
 #include "roundSummaryDialog.h"
 #include "player.h"
 
@@ -23,13 +24,13 @@ RoundSummaryDialog::RoundSummaryDialog(QWidget *parent) : ScaledQDialog(true, pa
     summaryLabel.resize(250, 25);
     summaryLabel.move({25, 25});
 
-    setupLabel(&player1ScoreLabel, "Player 1: ", {100, 25}, {25, 75});
+    setupLabel(&player1ScoreLabel, QString::fromStdString(gc.playerArr[PLAYER_1].playerName + ": "), {100, 25}, {25, 75});
     setupLabel(&player1Score, "", {100, 25}, {125, 75});
-    setupLabel(&player2ScoreLabel, "Player 2: ", {100, 25}, {25, 100});
+    setupLabel(&player2ScoreLabel, QString::fromStdString(gc.playerArr[PLAYER_2].playerName + ": "), {100, 25}, {25, 100});
     setupLabel(&player2Score, "", {100, 25}, {125, 100});
-    setupLabel(&player3ScoreLabel, "Player 3: ", {100, 25}, {25, 125});
+    setupLabel(&player3ScoreLabel, QString::fromStdString(gc.playerArr[PLAYER_3].playerName + ": "), {100, 25}, {25, 125});
     setupLabel(&player3Score, "", {100, 25}, {125, 125});
-    setupLabel(&player4ScoreLabel, "Player 4: ", {100, 25}, {25, 150});
+    setupLabel(&player4ScoreLabel, QString::fromStdString(gc.playerArr[PLAYER_4].playerName + ": "), {100, 25}, {25, 150});
     setupLabel(&player4Score, "", {100, 25}, {125, 150});
 
     okButton.setParent(this);

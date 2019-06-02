@@ -233,13 +233,13 @@ QPoint ClickableCardArray::getCardPosition(int i, int n)
         return {(WIN_WIDTH - TOTAL_WIDTH) / 2 + i * CARDGAP + HORIZONTAL_SHIFT,
                 (WIN_HEIGHT) / 2 + VERTICAL_SHIFT};
     case DRAW_POSITION_MAIN_WIDGET_CENTER_BOTTOM:
-        return {500, 375};
+        return {525, 375};
     case DRAW_POSITION_MAIN_WIDGET_CENTER_LEFT:
-        return {300, 300};
+        return {325, 300};
     case DRAW_POSITION_MAIN_WIDGET_CENTER_TOP:
-        return {500, 180};
+        return {525, 180};
     case DRAW_POSITION_MAIN_WIDGET_CENTER_RIGHT:
-        return {630, 300};
+        return {655, 300};
     case DRAW_POSITION_MIDDLE_DLG_PARTNER:
         return {510, 260};
     case DRAW_POSITION_GAME_INFO_WIDGET:

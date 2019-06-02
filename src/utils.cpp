@@ -106,19 +106,73 @@ void setupMessageBox(MessageBox *msgBox, QString msg, QString title, QSize size)
 
 namespace Db
 {
-void readPreferences()
+float readScaleFactorFromDb()
 {
     QSettings settings("OpenSourceSoftware", "Rook");
     settings.beginGroup("Appearance");
-    scalefactor = settings.value("scalefactor", Utils::Ui::getBestScaleFactor()).toFloat();
+    float scaleFactor = settings.value("scalefactor", Utils::Ui::getBestScaleFactor()).toFloat();
+    settings.endGroup();
+
+    return scaleFactor;
+}
+
+void writeScaleFactorToDb(float scaleFactor)
+{
+    QSettings settings("OpenSourceSoftware", "Rook");
+    settings.beginGroup("Appearance");
+    settings.setValue("scalefactor", scaleFactor);
     settings.endGroup();
 }
 
-void writePreferences()
+map<int, string> readPlayerNamesFromDb()
+{
+    map<int, string> playerNames;
+
+    QSettings settings("OpenSourceSoftware", "Rook");
+    settings.beginGroup("Appearance");
+
+    auto readPlayerName = [&](int playerNum, QString key, QString defaultValue)
+    {
+        QString name = settings.value(key, defaultValue).toString();
+        playerNames[playerNum] = name.toStdString();
+    };
+
+    readPlayerName(PLAYER_1, "Player1Name", "Player 1");
+    readPlayerName(PLAYER_2, "Player2Name", "Player 2");
+    readPlayerName(PLAYER_3, "Player3Name", "Player 3");
+    readPlayerName(PLAYER_4, "Player4Name", "Player 4");
+
+    settings.endGroup();
+
+    return playerNames;
+}
+
+void writePlayerNamesToDb(map<int, string> playerNames)
 {
     QSettings settings("OpenSourceSoftware", "Rook");
     settings.beginGroup("Appearance");
-    settings.setValue("scalefactor", scalefactor);
+    settings.setValue("Player1Name", QString::fromStdString(playerNames[PLAYER_1]));
+    settings.setValue("Player2Name", QString::fromStdString(playerNames[PLAYER_2]));
+    settings.setValue("Player3Name", QString::fromStdString(playerNames[PLAYER_3]));
+    settings.setValue("Player4Name", QString::fromStdString(playerNames[PLAYER_4]));
+    settings.endGroup();
+}
+
+bool readShowNameTagsFromDb()
+{
+    QSettings settings("OpenSourceSoftware", "Rook");
+    settings.beginGroup("Appearance");
+    bool showNameTags = settings.value("showNameTags", true).toBool();
+    settings.endGroup();
+
+    return showNameTags;
+}
+
+void writeShowNameTagsToDb(bool showNameTags)
+{
+    QSettings settings("OpenSourceSoftware", "Rook");
+    settings.beginGroup("Appearance");
+    settings.setValue("showNameTags", showNameTags);
     settings.endGroup();
 }
 } // namespace Db

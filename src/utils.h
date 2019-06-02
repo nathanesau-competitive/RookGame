@@ -8,11 +8,13 @@
 #include <QMainWindow>
 #include <QPushButton>
 #include <QSize>
+#include <QString>
 #include <set>
 #include <string>
 
 #include "card.h"
 #include "messageBox.h"
+#include "player.h"
 
 using namespace std;
 
@@ -42,8 +44,14 @@ void setupMessageBox(MessageBox *msgBox, QString msg, QString title, QSize = {47
 
 namespace Db
 {
-void readPreferences();
-void writePreferences();
+float readScaleFactorFromDb();
+void writeScaleFactorToDb(float scaleFactor);
+
+map<int, string> readPlayerNamesFromDb();
+void writePlayerNamesToDb(map<int, string> playerNames);
+
+bool readShowNameTagsFromDb();
+void writeShowNameTagsToDb(bool showNameTags);
 } // namespace Db
 
 namespace Stat

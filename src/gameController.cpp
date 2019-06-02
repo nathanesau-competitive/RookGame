@@ -1,3 +1,5 @@
+#include <QSettings>
+
 #include "cpuPlayer.h"
 #include "gameController.h"
 #include "utils.h"
@@ -16,8 +18,14 @@ void GameController::clear()
     deck.clear();
     nest.clear();
 
-    playerArr = vector<Player>{Player(PLAYER_1), Player(PLAYER_2),
-                               Player(PLAYER_3), Player(PLAYER_4)};
+    playerArr.clear();
+
+    map<int, string> playerNames = Utils::Db::readPlayerNamesFromDb();
+
+    for(auto playerNum : vector<int>{PLAYER_1, PLAYER_2, PLAYER_3, PLAYER_4})
+    {
+        playerArr.push_back(Player(playerNum, playerNames[playerNum]));
+    }
 }
 
 void GameController::onNewGame()

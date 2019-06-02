@@ -1,3 +1,4 @@
+#include <QSettings>
 #include <vector>
 
 #include "AppearancePage.h"
@@ -11,16 +12,55 @@ AppearancePage::AppearancePage(MainWindow *pMainWindow, QWidget *parent) : mainW
 {
     resolutionLabel.setText("Game Resolution");
 
-    setupResolutionComboBox();
+    // resolution
 
-    auto setupLabel = [this](QLabel *label, QString text) {
-        label->setText(text);
+    float minScaleFactor = 0.5F;
+    float currentScaleFactor = scalefactor;
+    float maxScaleFactor = Utils::Ui::getBestScaleFactor();
+
+    for (int i = minScaleFactor * 10; i <= maxScaleFactor * 10; i++) // 0.5F, 0.6F, ...
+    {
+        int index = i - minScaleFactor * 10;
+        float scaleFactor = i / 10.0F;
+        scaleFactorMap[index] = scaleFactor;
+
+        QSize resolution = Utils::Ui::getResolution(scaleFactor);
+        string choice = to_string(resolution.width()) + "x" + to_string(resolution.height());
+        choice += " (" + to_string(i / 10) + "." + to_string(i % 10) + "x)";
+        resolutionTextMap[scaleFactor] = choice;
+    }
+
+    for (auto It = resolutionTextMap.begin(); It != resolutionTextMap.end(); It++)
+    {
+        resolutionComboBox.addItem(QString::fromStdString(It->second));
+    }
+
+    for (auto It = scaleFactorMap.begin(); It != scaleFactorMap.end(); It++)
+    {
+        if (It->second == scalefactor)
+        {
+            resolutionComboBox.setCurrentIndex(It->first);
+            break;
+        }
+    }
+
+    // player names
+
+    player1NameLabel.setText("Player 1");
+    player2NameLabel.setText("Player 2");
+    player3NameLabel.setText("Player 3");
+    player4NameLabel.setText("Player 4");
+
+    auto setupLineEdit = [this](QLineEdit *lineEdit, QString text) {
+        lineEdit->setText(text);
     };
 
-    setupLabel(&player1NameLabel, "Player 1");
-    setupLabel(&player2NameLabel, "Player 2");
-    setupLabel(&player3NameLabel, "Player 3");
-    setupLabel(&player4NameLabel, "Player 4");
+    map<int, string> playerNames = Utils::Db::readPlayerNamesFromDb();
+
+    setupLineEdit(&player1NameEdit, QString::fromStdString(playerNames[PLAYER_1]));
+    setupLineEdit(&player2NameEdit, QString::fromStdString(playerNames[PLAYER_2]));
+    setupLineEdit(&player3NameEdit, QString::fromStdString(playerNames[PLAYER_3]));
+    setupLineEdit(&player4NameEdit, QString::fromStdString(playerNames[PLAYER_4]));
 
     resolutionGroup.setTitle("Resolution");
     resolutionLayout.addWidget(&resolutionLabel);
@@ -38,65 +78,65 @@ AppearancePage::AppearancePage(MainWindow *pMainWindow, QWidget *parent) : mainW
     namesLayout.addWidget(&player4NameEdit);
     namesGroup.setLayout(&namesLayout);
 
+    // name tags
+
+    showNameTagsBox.setText("Show name tags");
+    showNameTagsBox.setChecked(Utils::Db::readShowNameTagsFromDb());
+    
+    tagsGroup.setTitle("Tags");
+    tagsLayout.addWidget(&showNameTagsBox);
+    tagsGroup.setLayout(&tagsLayout);
+
     applyButton.setText("Apply");
     QObject::connect(&applyButton, &QAbstractButton::clicked, this, &AppearancePage::onApply);
 
     mainLayout.addWidget(&resolutionGroup);
     mainLayout.addWidget(&namesGroup);
+    mainLayout.addWidget(&tagsGroup);
     mainLayout.addStretch(1);
     mainLayout.addWidget(&applyButton);
 
     setLayout(&mainLayout);
 }
 
-AppearancePage::~AppearancePage()
-{
-}
-
-void AppearancePage::setupResolutionComboBox()
-{
-    // 1. RESOLUTION TEXT MAP, SCALE FACTOR VECTOR
-    float minScaleFactor = 0.5F;
-    float currentScaleFactor = scalefactor;
-    float maxScaleFactor = Utils::Ui::getBestScaleFactor();
-
-    int scaleFactorIndex = 0;
-
-    for (int i = minScaleFactor * 10; i <= maxScaleFactor * 10; i++) // 0.5F, 0.6F, ...
-    {
-        float scaleFactor = i / 10.0F;
-        QSize resolution = Utils::Ui::getResolution(scaleFactor);
-        string choice = to_string(resolution.width()) + "x" + to_string(resolution.height());
-        choice += " (" + to_string(i / 10) + "." + to_string(i % 10) + "x)";
-        resolutionTextMap[scaleFactor] = choice;
-        scaleFactorVector.push_back(scaleFactor);
-
-        scaleFactorIndex++;
-    }
-
-    // 2. COMBO BOX
-    for (auto It = resolutionTextMap.begin(); It != resolutionTextMap.end(); It++)
-    {
-        resolutionComboBox.addItem(QString::fromStdString(It->second));
-    }
-
-    auto It = std::find(scaleFactorVector.begin(), scaleFactorVector.end(), scalefactor);
-
-    if (It != scaleFactorVector.end())
-    {
-        int index = std::distance(scaleFactorVector.begin(), It);
-        resolutionComboBox.setCurrentIndex(index);
-    }
-}
-
 void AppearancePage::onApply()
 {
-    int index = resolutionComboBox.currentIndex();
-    float factor = scaleFactorVector[index];
+    applyResolution();
+    applyPlayerNames();
+    applyNameTags();
+}
 
-    if (factor != scalefactor)
-    {
-        scalefactor = factor;
-        mainWindow->rescale();
-    }
+void AppearancePage::applyResolution()
+{
+    int index = resolutionComboBox.currentIndex();
+    float factor = scaleFactorMap[index];
+
+    if (factor == scalefactor)
+        return;
+
+    scalefactor = factor;
+    Utils::Db::writeScaleFactorToDb(scalefactor);
+
+    mainWindow->rescale();
+}
+
+void AppearancePage::applyPlayerNames()
+{
+    map<int, string> playerNames;
+
+    playerNames[PLAYER_1] = player1NameEdit.text().toStdString();
+    playerNames[PLAYER_2] = player2NameEdit.text().toStdString();
+    playerNames[PLAYER_3] = player3NameEdit.text().toStdString();
+    playerNames[PLAYER_4] = player4NameEdit.text().toStdString();
+    Utils::Db::writePlayerNamesToDb(playerNames);
+
+    mainWindow->updatePlayerNames(playerNames);
+}
+
+void AppearancePage::applyNameTags()
+{
+    bool showNameTags = showNameTagsBox.isChecked();
+    Utils::Db::writeShowNameTagsToDb(showNameTags);
+
+    mainWindow->updateNameTags(showNameTags);
 }

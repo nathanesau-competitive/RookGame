@@ -17,6 +17,11 @@ BidDialog::BidDialog(QMainWindow *pMainWindow, QWidget *parent) : mainWindow(pMa
 
     setupComboBox(40, 120, 5);
 
+    ui.player1Label->setText(QString::fromStdString(gc.playerArr[PLAYER_1].playerName));
+    ui.player2Label->setText(QString::fromStdString(gc.playerArr[PLAYER_2].playerName));
+    ui.player3Label->setText(QString::fromStdString(gc.playerArr[PLAYER_3].playerName));
+    ui.player4Label->setText(QString::fromStdString(gc.playerArr[PLAYER_4].playerName));
+
     ui.bidAmountLabel->adjustSize();
     ui.player1Label->adjustSize();
     ui.player2Label->adjustSize();
@@ -120,7 +125,7 @@ int BidDialog::getNumPassed()
 
 void BidDialog::showBidResultMsgBox()
 {
-    string bidResultMsg = gc.playerArr[gc.roundInfo.bidPlayer].getPlayerName() + " won the bid for " +
+    string bidResultMsg = gc.playerArr[gc.roundInfo.bidPlayer].playerName + " won the bid for " +
                           to_string(gc.roundInfo.bidAmount) + ". " + "Bid updated.";
 
     MessageBox msgBox;

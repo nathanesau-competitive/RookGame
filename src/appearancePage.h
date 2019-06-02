@@ -2,6 +2,7 @@
 #define APPEARANCEPAGE_H
 
 #include <map>
+#include <QCheckBox>
 #include <QComboBox>
 #include <QGroupBox>
 #include <QHBoxLayout>
@@ -26,7 +27,7 @@ class AppearancePage : public QWidget
     MainWindow *mainWindow;
 
     map<float /*scalefactor*/, string> resolutionTextMap;
-    vector<float> scaleFactorVector;
+    map<int, float /*scalefactor*/> scaleFactorMap;
 
     QGroupBox resolutionGroup;
     QHBoxLayout resolutionLayout;
@@ -34,7 +35,7 @@ class AppearancePage : public QWidget
     QComboBox resolutionComboBox;
 
     QGroupBox namesGroup;
-    QHBoxLayout namesLayout;
+    QVBoxLayout namesLayout;
     QLabel player1NameLabel;
     QLineEdit player1NameEdit;
     QLabel player2NameLabel;
@@ -44,17 +45,23 @@ class AppearancePage : public QWidget
     QLabel player4NameLabel;
     QLineEdit player4NameEdit;
 
+    QGroupBox tagsGroup;
+    QVBoxLayout tagsLayout;
+    QCheckBox showNameTagsBox;
+
     QPushButton applyButton;
     
     QVBoxLayout mainLayout;
 
 public:
     AppearancePage(MainWindow *pMainWindow, QWidget *parent = 0);
-    virtual ~AppearancePage();
 
-    void setupResolutionComboBox();
-
+private:
     void onApply();
+
+    void applyResolution();
+    void applyPlayerNames();
+    void applyNameTags();
 };
 
 #endif

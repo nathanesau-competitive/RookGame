@@ -23,6 +23,7 @@ MainWindow::MainWindow(QWidget *parent) : ScaledQMainWindow(parent),
                                           widget(this)
 {
     widget.setParent(this);
+    widget.infoWidget.updatePlayerNames(Utils::Db::readPlayerNamesFromDb());
     widget.infoWidget.updatePartner(Card(SUIT_UNDEFINED, VALUE_UNDEFINED));
 
     newGameAction.setText(QMenu::tr("&New"));
@@ -93,7 +94,7 @@ MainWindow::MainWindow(QWidget *parent) : ScaledQMainWindow(parent),
     setPalette(palette);
 }
 
-void MainWindow::rescale()
+void MainWindow::rescale() // update resolution
 {
     updateScaleFactor();
     setGeometry(geometry());
@@ -101,6 +102,16 @@ void MainWindow::rescale()
     widget.rescale();
 
     Utils::Ui::moveWindowToCenter(this, 36);
+}
+
+void MainWindow::updatePlayerNames(map<int, string> playerNames)
+{
+    widget.infoWidget.updatePlayerNames(playerNames);
+}
+
+void MainWindow::updateNameTags(bool showNameTags)
+{
+    widget.updateNameTags(showNameTags);    
 }
 
 void MainWindow::onNewGameAction()
@@ -131,7 +142,8 @@ void MainWindow::onPreferencesAction()
     PreferencesDialog preferencesDlg(this);
     auto result = preferencesDlg.exec();
 
-    Utils::Db::writePreferences();
+    // appearance settings written when "Apply clicked"
+    // game settings should be written here
 }
 
 void MainWindow::onExitAction()
@@ -225,7 +237,7 @@ void MainWindow::startNewRound()
 
     widget.infoWidget.updateTrump(gc.roundInfo.trump);
     widget.infoWidget.updatePartner(gc.roundInfo.partnerCard);
-    widget.infoWidget.updatePointsMiddle(gc.roundInfo.pointsMiddle);
+    widget.infoWidget.updatePointsMiddle(gc.roundInfo.pointsMiddle, true);
 
     MessageBox msgBox;
     Utils::Ui::setupMessageBox(&msgBox, "Trump, partner, points in middle updated.\n\nGame starting.", "Start Game");

@@ -21,9 +21,16 @@ class MainWidget : public QDialogWithClickableCardArray
 public:
     GameInfoWidget infoWidget;
 
+    ScaledQLabel player1NameLabel;
     ClickableCardArray player1CardPlayed;
+
+    ScaledQLabel player2NameLabel;
     ClickableCardArray player2CardPlayed;
+
+    ScaledQLabel player3NameLabel;
     ClickableCardArray player3CardPlayed;
+
+    ScaledQLabel player4NameLabel;
     ClickableCardArray player4CardPlayed;
 
     ClickableCardArray centerCards;
@@ -46,6 +53,9 @@ public:
     void showPartnerCardIfApplicable();
     void showHandResult();
     void showNestResult();
+
+    // appearance dialog
+    void updateNameTags(bool showNameTags);
 };
 
 #endif

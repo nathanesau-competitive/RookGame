@@ -26,15 +26,14 @@ const int TEAM_2 = 1;
 struct Player
 {
     int playerNum;
+    string playerName;
     int teamNum;
     CardVector cardArr;
 
     int bid;
 
 public:
-    Player(int pPlayerNum);
-
-    string getPlayerName();
+    Player(int pPlayerNum, string pPlayerName);
 
     int getNextPlayerNum();
 };

@@ -1,7 +1,6 @@
 #include <QToolTip>
 
 #include "card.h"
-#include "gameController.h"
 #include "gameInfoWidget.h"
 #include "player.h"
 #include "utils.h"
@@ -10,6 +9,8 @@ GameInfoWidget::GameInfoWidget(QMainWindow *pMainWindow, QWidget *parent) : main
                                                                             QDialogWithClickableCardArray(false, parent),
                                                                             topLeftCards(DRAW_POSITION_GAME_INFO_WIDGET, SIZE_TINY, this)
 {
+    clearDataVariables();
+
     auto setupCategoryLabel = [this](ScaledQLabel *categoryLabel, QString text, QSize size, QPoint pos) {
         categoryLabel->setParent(this);
         categoryLabel->setText(text);
@@ -48,16 +49,16 @@ GameInfoWidget::GameInfoWidget(QMainWindow *pMainWindow, QWidget *parent) : main
     setupLabel(&pointsWonTeamLabel2, "???", {150, 20}, {700, 55});
 
     setupCategoryLabel(&pointsWonPlayerCategoryLabel, "Points (by Player)", {150, 20}, {890, 10});
-    setupLabel(&pointsWonPlayerLabel1, "Player 1: 0", {100, 20}, {900, 35});
-    setupLabel(&pointsWonPlayerLabel2, "Player 2: 0", {100, 20}, {900, 55});
-    setupLabel(&pointsWonPlayerLabel3, "Player 3: 0", {100, 20}, {900, 75});
-    setupLabel(&pointsWonPlayerLabel4, "Player 4: 0", {100, 20}, {900, 95});
+    setupLabel(&pointsWonPlayerLabel1, "???", {100, 20}, {900, 35});
+    setupLabel(&pointsWonPlayerLabel2, "???", {100, 20}, {900, 55});
+    setupLabel(&pointsWonPlayerLabel3, "???", {100, 20}, {900, 75});
+    setupLabel(&pointsWonPlayerLabel4, "???", {100, 20}, {900, 95});
 
     setupCategoryLabel(&overallScoresCategoryLabel, "Scores", {100, 20}, {1080, 10});
-    setupLabel(&player1OverallScoreLabel, "Player 1: 0", {100, 20}, {1090, 35});
-    setupLabel(&player2OverallScoreLabel, "Player 2: 0", {100, 20}, {1090, 55});
-    setupLabel(&player3OverallScoreLabel, "Player 3: 0", {100, 20}, {1090, 75});
-    setupLabel(&player4OverallScoreLabel, "Player 4: 0", {100, 20}, {1090, 95});
+    setupLabel(&player1OverallScoreLabel, "???", {100, 20}, {1090, 35});
+    setupLabel(&player2OverallScoreLabel, "???", {100, 20}, {1090, 55});
+    setupLabel(&player3OverallScoreLabel, "???", {100, 20}, {1090, 75});
+    setupLabel(&player4OverallScoreLabel, "???", {100, 20}, {1090, 95});
 
     setStyleSheet("background-color: white");
 }
@@ -83,12 +84,14 @@ void GameInfoWidget::rescale()
 void GameInfoWidget::resetRoundInfoToDefaults()
 {
     updateBid(PLAYER_UNDEFINED, 0);
-    updatePoints(map<int, int>(), map<int, int>(), make_pair(Team(), Team()));
     updatePartner(Card());
     updateTrump(SUIT_UNDEFINED);
-    updatePointsMiddle(0, true);
+    updatePointsMiddle(0, false);
     updateTeam1({});
     updateTeam2({});
+    updatePlayerPoints(map<int, int>());
+    updateTeamPoints(map<int, int> ());
+
 }
 
 void GameInfoWidget::resetOverallInfoToDefaults()
@@ -109,21 +112,18 @@ void GameInfoWidget::onCardClicked(ClickableCard *clickableCard)
 
 void GameInfoWidget::onCardHoverEnter(ClickableCard *clickableCard)
 {
-    auto toolTipText = [](int playerNum) -> QString {
+    auto toolTipText = [this](int playerNum) -> QString {
         switch (playerNum)
         {
         case PLAYER_1:
-            return "Player 1";
         case PLAYER_2:
-            return "Player 2";
         case PLAYER_3:
-            return "Player 3";
         case PLAYER_4:
-            return "Player 4";
+            return QString::fromStdString(playerNames[playerNum]);
         default:
             return "???";
         }
-    }(gc.roundInfo.partnerPlayerNum);
+    }(partnerPlayerNum);
 
     QToolTip::showText(mainWindow->pos() + clickableCard->pos(), toolTipText, clickableCard);
 }
@@ -133,22 +133,39 @@ void GameInfoWidget::onCardHoverLeave(ClickableCard *clickableCard)
     // do nothing
 }
 
-void GameInfoWidget::updateBid(int playerNum, int amount)
+void GameInfoWidget::updatePlayerNames(map<int, string> pPlayerNames)
 {
-    if (playerNum == PLAYER_UNDEFINED) // bid round hasn't started yet
+    playerNames = pPlayerNames;
+    
+    updatePlayerPoints(playerScores);
+    updateOverallScores(overallPlayerScores);
+    updateTeam1(teams.first);
+    updateTeam2(teams.second);
+    updateTeamPoints(teamScores);
+}
+
+void GameInfoWidget::updateBid(int pBidPlayerNum, int pBidAmount)
+{
+    bidPlayerNum = pBidPlayerNum;
+    bidAmount = pBidAmount;
+
+    if (bidPlayerNum == PLAYER_UNDEFINED) // bid round hasn't started yet
     {
         bidPlayerLabel.setText("???");
         bidAmountLabel.setText("???");
     }
     else
     {
-        bidPlayerLabel.setText(QString::fromStdString(gc.playerArr[playerNum].getPlayerName()));
-        bidAmountLabel.setText(QString::number(amount));
+        bidPlayerLabel.setText(QString::fromStdString(playerNames[bidPlayerNum]));
+        bidAmountLabel.setText(QString::number(bidAmount));
     }
 }
 
-void GameInfoWidget::updatePartner(Card partnerCard, int playerNum)
+void GameInfoWidget::updatePartner(Card pPartnerCard, int pPartnerPlayerNum)
 {
+    partnerCard = pPartnerCard;
+    partnerPlayerNum = pPartnerPlayerNum;
+
     topLeftCards.showCards({partnerCard});
 }
 
@@ -179,9 +196,12 @@ void GameInfoWidget::updateTrump(int trumpSuit)
     }
 }
 
-void GameInfoWidget::updatePointsMiddle(int pointsMiddle, bool showBlank)
+void GameInfoWidget::updatePointsMiddle(int pPointsMiddle, bool pPointsMiddleKnown)
 {
-    if (showBlank)
+    pointsMiddle = pPointsMiddle;
+    pointsMiddleKnown = pPointsMiddleKnown;
+
+    if (!pointsMiddleKnown)
     {
         pointsMiddleLabel.setText("???");
     }
@@ -193,51 +213,53 @@ void GameInfoWidget::updatePointsMiddle(int pointsMiddle, bool showBlank)
 
 void GameInfoWidget::updateTeam1(Team team1)
 {
-    if (team1.empty())
+    teams.first = team1;
+
+    if (teams.first.empty())
     {
         team1Label.setText("???");
     }
     else
     {
-        team1Label.setText(QString::fromStdString(getTeamName(team1)));
+        team1Label.setText(QString::fromStdString(getTeamName(teams.first)));
     }
 }
 
 void GameInfoWidget::updateTeam2(Team team2)
 {
-    if (team2.empty())
+    teams.second = team2;
+
+    if (teams.second.empty())
     {
         team2Label.setText("???");
     }
     else
     {
-        team2Label.setText(QString::fromStdString(getTeamName(team2)));
+        team2Label.setText(QString::fromStdString(getTeamName(teams.second)));
     }
 }
 
-void GameInfoWidget::updatePoints(map<int, int> playerScores, map<int, int> teamScores, pair<Team, Team> teams)
+void GameInfoWidget::updateOverallScores(map<int, int> pOverallPlayerScores)
 {
-    updatePlayerPoints(playerScores);
-    updateTeamPoints(teamScores, teams);
-}
+    overallPlayerScores = pOverallPlayerScores;
 
-void GameInfoWidget::updateOverallScores(map<int, int> playerScores)
-{
     auto setupLabel = [this](ScaledQLabel *label, int score, int playerNum) {
-        string text = gc.playerArr[playerNum].getPlayerName() + ": " + to_string(score);
+        string text = playerNames[playerNum] + ": " + to_string(score);
         label->setText(QString::fromStdString(text));
     };
 
-    setupLabel(&player1OverallScoreLabel, playerScores[PLAYER_1], PLAYER_1);
-    setupLabel(&player2OverallScoreLabel, playerScores[PLAYER_2], PLAYER_2);
-    setupLabel(&player3OverallScoreLabel, playerScores[PLAYER_3], PLAYER_3);
-    setupLabel(&player4OverallScoreLabel, playerScores[PLAYER_4], PLAYER_4);
+    setupLabel(&player1OverallScoreLabel, overallPlayerScores[PLAYER_1], PLAYER_1);
+    setupLabel(&player2OverallScoreLabel, overallPlayerScores[PLAYER_2], PLAYER_2);
+    setupLabel(&player3OverallScoreLabel, overallPlayerScores[PLAYER_3], PLAYER_3);
+    setupLabel(&player4OverallScoreLabel, overallPlayerScores[PLAYER_4], PLAYER_4);
 }
 
-void GameInfoWidget::updatePlayerPoints(map<int, int> playerScores)
+void GameInfoWidget::updatePlayerPoints(map<int, int> pPlayerScores)
 {
+    playerScores = pPlayerScores;
+
     auto setupPointsPlayerLabel = [this](ScaledQLabel *label, int score, int playerNum) {
-        string text = gc.playerArr[playerNum].getPlayerName() + ": " + to_string(score);
+        string text = playerNames[playerNum] + ": " + to_string(score);
         label->setText(QString::fromStdString(text));
     };
 
@@ -266,8 +288,10 @@ void GameInfoWidget::updatePlayerPoints(map<int, int> playerScores)
     }
 }
 
-void GameInfoWidget::updateTeamPoints(map<int, int> teamScores, pair<Team, Team> teams)
+void GameInfoWidget::updateTeamPoints(map<int, int> pTeamScores)
 {
+    teamScores = pTeamScores;
+
     auto setupPointsTeamLabel = [this](ScaledQLabel *label, int score, Team team) {
         if (team.empty()) // teams not known yet
         {
@@ -287,7 +311,7 @@ void GameInfoWidget::updateTeamPoints(map<int, int> teamScores, pair<Team, Team>
     }
     else
     {
-        auto getTeam = [&teams](int teamNum) {
+        auto getTeam = [this](int teamNum) {
             switch (teamNum)
             {
             case TEAM_1:
@@ -323,10 +347,27 @@ string GameInfoWidget::getTeamName(Team team)
     for (auto playerNum : team)
     {
         if (teamName == "???")
-            teamName = gc.playerArr[playerNum].getPlayerName();
+            teamName = playerNames[playerNum];
         else
-            teamName = teamName + " + " + gc.playerArr[playerNum].getPlayerName();
+            teamName = teamName + " + " + playerNames[playerNum];
     }
 
     return teamName;
+}
+
+void GameInfoWidget::clearDataVariables()
+{
+    playerNames.clear();
+    bidPlayerNum = PLAYER_UNDEFINED;
+    bidAmount = 0;
+    partnerCard = Card(SUIT_UNDEFINED, VALUE_UNDEFINED);
+    partnerPlayerNum = 0;
+    trumpSuit = 0;
+    pointsMiddle = 0;
+    pointsMiddleKnown = false;
+    teams.first.clear();
+    teams.second.clear();
+    playerScores.clear();
+    teamScores.clear();
+    overallPlayerScores.clear();
 }

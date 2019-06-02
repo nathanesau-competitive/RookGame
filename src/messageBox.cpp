@@ -14,6 +14,8 @@ MessageBox::MessageBox(QWidget *parent) : QDialogWithClickableCardArray(true, pa
 
     setWindowIcon(QIcon(":rookicon.gif"));
     setStyleSheet("background-color: white");
+    setWindowOpacity(0.95);
+    showNormal();
 }
 
 void MessageBox::rescale()

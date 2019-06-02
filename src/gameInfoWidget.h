@@ -1,20 +1,18 @@
 #ifndef GAMEINFOWIDGET_H
 #define GAMEINFOWIDGET_H
 
+#include <map>
 #include <QLabel>
 #include <QMainWindow>
 #include <QWidget>
 #include <set>
+#include <string>
 
 #include "clickableCard.h"
 #include "common.h"
 #include "player.h"
 
-// forward declarations
-class GameController;
-
-// global declarations
-extern GameController gc;
+using namespace std;
 
 struct ScoreCompare
 {
@@ -35,6 +33,21 @@ struct ScoreCompare
 
 struct GameInfoWidget : public QDialogWithClickableCardArray
 {
+    // data variables
+    map<int, string> playerNames;
+    int bidPlayerNum;
+    int bidAmount;
+    Card partnerCard;
+    int partnerPlayerNum;
+    int trumpSuit;
+    int pointsMiddle;
+    bool pointsMiddleKnown;
+    pair<Team, Team> teams;
+    map<int, int> playerScores;
+    map<int, int> teamScores;
+    map<int, int> overallPlayerScores;
+
+private:
     QMainWindow *mainWindow;
 
     ScaledQLabel bidCategoryLabel;
@@ -70,6 +83,7 @@ struct GameInfoWidget : public QDialogWithClickableCardArray
     ScaledQLabel player3OverallScoreLabel;
     ScaledQLabel player4OverallScoreLabel;
 
+public:
     GameInfoWidget(QMainWindow *pMainWindow, QWidget *parent = nullptr);
     virtual void rescale();
 
@@ -81,20 +95,21 @@ struct GameInfoWidget : public QDialogWithClickableCardArray
     virtual void onCardHoverEnter(ClickableCard *clickableCard);
     virtual void onCardHoverLeave(ClickableCard *clickableCard);
 
-    void updateBid(int playerNum, int amount);
-    void updatePartner(Card partnerCard, int playerNum = PLAYER_UNDEFINED);
-    void updateTrump(int trumpSuit);
-    void updatePointsMiddle(int pointsMiddle, bool showBlank = false);
-    void updateTeam1(Team team1);
-    void updateTeam2(Team team2);
-    void updatePoints(map<int, int> playerScores, map<int, int> teamScores, pair<Team, Team> teams);
-    void updateOverallScores(map<int, int> playerScores);
+    void updatePlayerNames(map<int, string> pPlayerNames);
+    void updateBid(int pBidPlayerNum, int pBidAmount);
+    void updatePartner(Card pPartnerCard, int pPartnerPlayerNum = PLAYER_UNDEFINED);
+    void updateTrump(int pTrumpSuit);
+    void updatePointsMiddle(int pPointsMiddle, bool pPointsMiddleKnown);
+    void updateTeam1(Team pTeam1);
+    void updateTeam2(Team pTeam2);
+    void updatePlayerPoints(map<int, int> pPlayerScores);
+    void updateTeamPoints(map<int, int> pTeamScores);
+    void updateOverallScores(map<int, int> pOverallPlayerScores);
 
 private:
-    void updatePlayerPoints(map<int, int> playerScores);
-    void updateTeamPoints(map<int, int> teamScores, pair<Team, Team> teams);
-
     string getTeamName(Team team);
+
+    void clearDataVariables();
 };
 
 #endif

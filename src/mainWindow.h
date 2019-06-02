@@ -41,6 +41,10 @@ public:
     MainWindow(QWidget *parent = nullptr);
     void rescale();
 
+    // preferences dialog - appearance page
+    void updatePlayerNames(map<int, string> playerNames);
+    void updateNameTags(bool showNameTags);
+
     void onNewGameAction();
     void onLoadGameAction();
     void onSaveGameAction();

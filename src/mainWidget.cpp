@@ -1,5 +1,6 @@
-#include <set>
 #include <QThread>
+#include <set>
+#include <string>
 
 #include "cpuPlayer.h"
 #include "gameController.h"
@@ -7,6 +8,8 @@
 #include "mainWindow.h"
 #include "roundSummaryDialog.h"
 #include "utils.h"
+
+using namespace std;
 
 MainWidget::MainWidget(MainWindow *pMainWindow, QWidget *parent) : mainWindow(pMainWindow),
                                                                    infoWidget(pMainWindow),
@@ -18,9 +21,31 @@ MainWidget::MainWidget(MainWindow *pMainWindow, QWidget *parent) : mainWindow(pM
                                                                    centerCards(DRAW_POSITION_MAIN_WIDGET_CENTER, SIZE_NORMAL, this),
                                                                    bottomCards(DRAW_POSITION_MAIN_WIDGET_BOTTOM, SIZE_NORMAL, this)
 {
+    auto setupLabel = [this](QLabel *label, QString text, QPoint pos, QSize size)
+    {
+        label->setParent(this);
+        label->setFont(QFont("Times", 11));
+        label->setText(text);
+        label->move(pos);
+        label->resize(size);
+        label->setStyleSheet("background-color: white");
+        label->setAlignment(Qt::AlignCenter);
+    };
+
+    map<int, string> playerNames = Utils::Db::readPlayerNamesFromDb();
+
+    setupLabel(&player1NameLabel, QString::fromStdString(playerNames[PLAYER_1]), {550, 800}, {75, 25});
+    setupLabel(&player2NameLabel, QString::fromStdString(playerNames[PLAYER_2]), {25, 425}, {75, 25});
+    setupLabel(&player3NameLabel, QString::fromStdString(playerNames[PLAYER_3]), {550, 140}, {75, 25});
+    setupLabel(&player4NameLabel, QString::fromStdString(playerNames[PLAYER_4]), {1100, 425}, {75, 25});
+
+    updateNameTags(Utils::Db::readShowNameTagsFromDb());
+
     infoWidget.setParent(this);
     infoWidget.move(QPoint(0, 0));
     infoWidget.resize(1200, 130);
+
+    // no window title, etc.
 }
 
 void MainWidget::rescale()
@@ -32,6 +57,13 @@ void MainWidget::rescale()
                                                                 &player3CardPlayed, &player4CardPlayed,
                                                                 &centerCards, &bottomCards})
         clickableCardArray->rescale();
+
+    for (auto label : vector<ScaledQLabel *>{&player1NameLabel, &player2NameLabel,
+                                             &player3NameLabel, &player4NameLabel})
+        label->rescale();
+
+    for (auto widget : vector<GameInfoWidget *>{&infoWidget})
+        widget->rescale();
 }
 
 void MainWidget::finishExistingHand(Card player1Card)
@@ -56,7 +88,8 @@ void MainWidget::finishExistingHand(Card player1Card)
 
     showPartnerCardIfApplicable();
 
-    infoWidget.updatePoints(gc.roundInfo.playerScores, gc.roundInfo.teamScores, gc.roundInfo.teams);
+    infoWidget.updatePlayerPoints(gc.roundInfo.playerScores);
+    infoWidget.updateTeamPoints(gc.roundInfo.teamScores);
 
     showHandResult();
 
@@ -124,7 +157,8 @@ void MainWidget::onCardClicked(ClickableCard *clickableCard)
 
         centerCards.showCards(gc.nest);
 
-        infoWidget.updatePoints(gc.roundInfo.playerScores, gc.roundInfo.teamScores, gc.roundInfo.teams);
+        infoWidget.updatePlayerPoints(gc.roundInfo.playerScores);
+        infoWidget.updateTeamPoints(gc.roundInfo.teamScores);
 
         showNestResult();
 
@@ -182,17 +216,7 @@ void MainWidget::showCardPlayed(const Card &card, int playerNum)
     }
 
     bool sleep = []() {
-        auto &cardPlayed = gc.handInfo.cardPlayed;
-
-        for (auto playerNum : vector<int>{PLAYER_1, PLAYER_2, PLAYER_3, PLAYER_4})
-        {
-            if (cardPlayed[playerNum] == Card(SUIT_UNDEFINED, VALUE_UNDEFINED))
-            {
-                return true; // at least one player hasn't played card yet (show timeout)
-            }
-        }
-
-        return false;
+        return true; // sleep after any card is played
     }();
 
     if (sleep)
@@ -214,12 +238,12 @@ void MainWidget::showPartnerCardIfApplicable()
             infoWidget.updateTeam1(gc.roundInfo.teams.first);
             infoWidget.updateTeam2(gc.roundInfo.teams.second);
 
-            string msg = gc.playerArr[gc.roundInfo.partnerPlayerNum].getPlayerName() + " is the partner. Teams updated.";
+            string msg = gc.playerArr[gc.roundInfo.partnerPlayerNum].playerName + " is the partner. Teams updated.";
 
             MessageBox msgBox;
             msgBox.showCards({gc.roundInfo.partnerCard});
             Utils::Ui::setupMessageBox(&msgBox, QString::fromStdString(msg), "Partner card", {325, 250});
-            Utils::Ui::moveDialog(&msgBox, mainWindow, DIALOG_POSITION_CARD_MESSAGE_BOX);
+            Utils::Ui::moveDialog(&msgBox, mainWindow, DIALOG_POSITION_CENTER);
             msgBox.exec();
 
             return;
@@ -230,24 +254,42 @@ void MainWidget::showPartnerCardIfApplicable()
 void MainWidget::showHandResult()
 {
     auto msg = []() -> string {
-        return gc.playerArr[gc.handInfo.getWinningPlayerNum()].getPlayerName() +
+        return gc.playerArr[gc.handInfo.getWinningPlayerNum()].playerName +
                " won the hand for " + to_string(gc.handInfo.points) + " points with the";
     }();
 
     MessageBox msgBox;
     msgBox.showCards({gc.handInfo.getWinningCard()});
     Utils::Ui::setupMessageBox(&msgBox, QString::fromStdString(msg), "Hand result", {340, 250});
-    Utils::Ui::moveDialog(&msgBox, mainWindow, DIALOG_POSITION_CARD_MESSAGE_BOX);
+    Utils::Ui::moveDialog(&msgBox, mainWindow, DIALOG_POSITION_CENTER);
     msgBox.exec();
 }
 
 void MainWidget::showNestResult()
 {
-    string msg = gc.playerArr[gc.handInfo.getWinningPlayerNum()].getPlayerName() +
+    string msg = gc.playerArr[gc.handInfo.getWinningPlayerNum()].playerName +
                  " won the nest. Nest had " + to_string(gc.roundInfo.pointsMiddle) + " points.";
 
     MessageBox msgBox;
     Utils::Ui::setupMessageBox(&msgBox, QString::fromStdString(msg), "Last hand");
-    Utils::Ui::moveDialog(&msgBox, mainWindow, DIALOG_POSITION_CARD_MESSAGE_BOX);
+    Utils::Ui::moveDialog(&msgBox, mainWindow, DIALOG_POSITION_CENTER);
     msgBox.exec();
+}
+
+void MainWidget::updateNameTags(bool showNameTags)
+{
+    if (showNameTags)
+    {
+       player1NameLabel.show();
+       player2NameLabel.show();
+       player3NameLabel.show();
+       player4NameLabel.show();
+    }
+    else
+    {
+        player1NameLabel.hide();
+        player2NameLabel.hide();
+        player3NameLabel.hide();
+        player4NameLabel.hide();
+    }
 }

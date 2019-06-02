@@ -28,7 +28,7 @@
     </font>
    </property>
    <property name="text" stdset="0">
-    <string>Player 1</string>
+    <string></string>
    </property>
   </widget>
   <widget class="ScaledQLabel" name="player3Label" native="true">
@@ -46,7 +46,7 @@
     </font>
    </property>
    <property name="text" stdset="0">
-    <string>Player 3</string>
+    <string></string>
    </property>
   </widget>
   <widget class="ScaledQLabel" name="player2Label" native="true">
@@ -64,7 +64,7 @@
     </font>
    </property>
    <property name="text" stdset="0">
-    <string>Player 2</string>
+    <string></string>
    </property>
   </widget>
   <widget class="ScaledQLabel" name="player4Label" native="true">
@@ -82,7 +82,7 @@
     </font>
    </property>
    <property name="text" stdset="0">
-    <string>Player 4</string>
+    <string></string>
    </property>
   </widget>
   <widget class="ScaledQLabel" name="player2BidLabel" native="true">

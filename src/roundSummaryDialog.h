@@ -7,6 +7,12 @@
 
 using namespace std;
 
+// forward declarations
+class GameController;
+
+// global declarations
+extern GameController gc;
+
 class RoundSummaryDialog : public ScaledQDialog
 {
     ScaledQLabel summaryLabel;
