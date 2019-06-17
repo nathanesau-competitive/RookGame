@@ -1,5 +1,5 @@
-FROM ubuntu:latest
-ENTRYPOINT ["/bin/bash"]
+FROM gitpod/workspace-full
+USER root
 RUN \
 apt update && \
 apt -y upgrade && \
