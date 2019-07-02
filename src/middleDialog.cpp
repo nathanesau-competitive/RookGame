@@ -19,15 +19,15 @@ MiddleDialog::MiddleDialog(int &pTrumpSuitSelected, Card &pPartnerCardSelected,
                                                                                                  mainWidget(pMainWidget),
                                                                                                  mainWindow(pMainWindow),
                                                                                                  QDialogWithClickableCardArray(true, parent),
-                                                                                                 topRightCards(DRAW_POSITION_MIDDLE_DLG_NEST, SIZE_TINY, this),
-                                                                                                 bottomRightCards(DRAW_POSITION_MIDDLE_DLG_PARTNER, SIZE_TINY, this)
+                                                                                                 originalNest(gc.nest)
 {
-    originalNest = gc.nest;
-
     ui.setupUi(this);
 
-    topRightCards.showCards(gc.nest);
-    bottomRightCards.showCards({Card(SUIT_UNDEFINED, VALUE_UNDEFINED)});
+    topRightCards = new ClickableCardArray(DRAW_POSITION_MIDDLE_DLG_NEST, SIZE_TINY, this);
+    topRightCards->showCards(gc.nest);
+
+    bottomRightCards = new ClickableCardArray(DRAW_POSITION_MIDDLE_DLG_PARTNER, SIZE_TINY, this);
+    bottomRightCards->showCards({Card(SUIT_UNDEFINED, VALUE_UNDEFINED)});
 
     QObject::connect(ui.selectNestButton, &QPushButton::pressed,
                      this, &MiddleDialog::selectNestButtonPressed);
@@ -61,7 +61,7 @@ void MiddleDialog::rescale()
     updateScaleFactor();
     setGeometry(geometry());
 
-    for (auto clickableCardArray : vector<ClickableCardArray *>{&topRightCards, &bottomRightCards})
+    for (auto clickableCardArray : vector<ClickableCardArray *>{topRightCards, bottomRightCards})
         clickableCardArray->rescale();
 
     for (auto label : vector<ScaledQLabel *>{ui.trumpCategoryLabel, ui.partnerCategoryLabel, ui.trumpLabel,
@@ -100,16 +100,16 @@ void MiddleDialog::selectNestButtonPressed()
         return;
     }
 
-    topRightCards.showCards(gc.nest);
-    mainWidget->bottomCards.showCards(gc.playerArr[PLAYER_1].cardArr);
+    topRightCards->showCards(gc.nest);
+    mainWidget->bottomCards->showCards(gc.playerArr[PLAYER_1].cardArr);
 }
 
 void MiddleDialog::autoSelectNestButtonPressed()
 {
     NestDialog::autoChooseNest();
 
-    topRightCards.showCards(gc.nest);
-    mainWidget->bottomCards.showCards(gc.playerArr[PLAYER_1].cardArr);
+    topRightCards->showCards(gc.nest);
+    mainWidget->bottomCards->showCards(gc.playerArr[PLAYER_1].cardArr);
 }
 
 void MiddleDialog::selectTrumpButtonPressed()
@@ -147,7 +147,7 @@ void MiddleDialog::selectPartnerButtonPressed()
         return;
     }
 
-    bottomRightCards.showCards({partnerCardSelected});
+    bottomRightCards->showCards({partnerCardSelected});
 }
 
 void MiddleDialog::autoSelectPartnerButtonPressed()
@@ -183,7 +183,7 @@ void MiddleDialog::autoSelectPartnerButtonPressed()
     if (bestCard != Card(bestSuit, VALUE_1)) // found a good card
     {
         partnerCardSelected = bestCard;
-        bottomRightCards.showCards({partnerCardSelected});
+        bottomRightCards->showCards({partnerCardSelected});
     }
 }
 

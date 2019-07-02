@@ -15,6 +15,7 @@ class HandInfo
 {
     const RoundInfo &roundInfo;
 
+private:
     Card winningCard;
     int winningPlayerNum;
 

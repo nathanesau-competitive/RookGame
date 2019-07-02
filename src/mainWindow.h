@@ -9,6 +9,8 @@
 #include "common.h"
 #include "mainWidget.h"
 
+#include <memory>
+
 using namespace std;
 
 // forward declarations
@@ -19,27 +21,26 @@ extern GameController gc;
 
 class MainWindow : public ScaledQMainWindow
 {
-    MainWidget widget; // central widget
+    MainWidget *widget; // central widget
 
-    QMenu fileMenu;
-    QAction newGameAction;
-    QAction loadGameAction;
-    QAction quitAction;
+    QMenu *fileMenu;
+    QAction* newGameAction;
+    QAction* loadGameAction;
+    QAction* quitAction;
 
-    QMenu editMenu;
-    QAction preferencesAction;
+    QMenu *editMenu;
+    QAction *preferencesAction;
 
-    QMenu gameMenu;
-    QAction viewScoresAction;
+    QMenu *gameMenu;
+    QAction* viewScoresAction;
 
-    QMenu helpMenu;
-    QAction checkUpdatesAction;
-    QAction aboutAction;
-
-    QMenuBar menuBar;
+    QMenu *helpMenu;
+    QAction *checkUpdatesAction;
+    QAction *aboutAction;
 
 public:
     MainWindow(QWidget *parent = nullptr);
+
     void rescale();
 
     // preferences dialog - appearance page

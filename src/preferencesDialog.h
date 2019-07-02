@@ -13,9 +13,7 @@
 
 class PreferencesDialog : public QDialog
 {
-    Q_OBJECT
-
-    MainWindow *mainWindow;
+    MainWindow *mainWindow; // non-owning
 
     // when using a layout, objects must be allocated on the heap
     QListWidget *contentsWidget;
@@ -36,9 +34,7 @@ class PreferencesDialog : public QDialog
 
 public:
     PreferencesDialog(MainWindow *pMainWindow, QWidget *parent = nullptr);
-    virtual ~PreferencesDialog();
 
-public slots:
     void changePage(QListWidgetItem *current, QListWidgetItem *previous);
 
 private:

@@ -21,15 +21,15 @@ class MiddleDialog : public QDialogWithClickableCardArray
 {
     CardVector originalNest;
 
-    int &trumpSuitSelected;
-    Card &partnerCardSelected;
+    int &trumpSuitSelected; // output of dialog
+    Card &partnerCardSelected; // output of dialog
 
 private:
-    MainWidget *mainWidget;
-    QMainWindow *mainWindow;
+    MainWidget *mainWidget; // non-owning
+    QMainWindow *mainWindow; // non-owning
 
-    ClickableCardArray topRightCards;
-    ClickableCardArray bottomRightCards;
+    ClickableCardArray *topRightCards;
+    ClickableCardArray *bottomRightCards;
 
 public:
     MiddleDialog(int &pTrumpSuitSelected, Card &pPartnerCardSelected, MainWidget *pMainWidget, QMainWindow *pMainWindow, QWidget *parent = nullptr);

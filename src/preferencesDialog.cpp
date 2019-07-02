@@ -57,10 +57,6 @@ PreferencesDialog::PreferencesDialog(MainWindow *pMainWindow, QWidget *parent) :
     setWindowTitle("Preferences Dialog");
 }
 
-PreferencesDialog::~PreferencesDialog()
-{
-}
-
 void PreferencesDialog::changePage(QListWidgetItem *current, QListWidgetItem *previous)
 {
     if (!current)

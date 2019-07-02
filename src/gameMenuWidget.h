@@ -10,12 +10,12 @@ class GameMenuWidget : public ScaledQDialog
 {
     MainWindow *mainWindow;
 
-    ScaledQLabel menuTitleLabel;
-    ScaledQPushButton newGameButton;
-    ScaledQPushButton newRoundButton;
-    ScaledQPushButton saveGameButton;
-    ScaledQPushButton loadGameButton;
-    ScaledQPushButton quitGameButton;
+    ScaledQLabel *menuTitleLabel;
+    ScaledQPushButton *newGameButton;
+    ScaledQPushButton *newRoundButton;
+    ScaledQPushButton *saveGameButton;
+    ScaledQPushButton *loadGameButton;
+    ScaledQPushButton *quitGameButton;
 
 public:
     GameMenuWidget(MainWindow *pMainWindow, QWidget *parent = nullptr);

@@ -157,7 +157,7 @@ bool CompareCardPixmapKey::operator()(const CardPixmapKey &a, const CardPixmapKe
     return false;
 }
 
-ClickableCardArray::ClickableCardArray(int pDrawPosition, QSize pSize, QDialogWithClickableCardArray *pParent) : parent(pParent)
+ClickableCardArray::ClickableCardArray(int pDrawPosition, QSize pSize, QDialogWithClickableCardArray *parent) : QWidget(parent)
 {
     drawPosition = pDrawPosition;
     size = pSize;
@@ -184,7 +184,7 @@ void ClickableCardArray::showCards(const CardVector &cardArr, CardStyleMap *card
 
     for (auto i = 0; i < n; i++)
     {
-        clickableCards[i].setParent(parent);
+        clickableCards[i].setParent(parentWidget());
 
         Card card = cardArr[i];
         string style = "";

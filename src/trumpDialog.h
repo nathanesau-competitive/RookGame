@@ -26,10 +26,10 @@ class TrumpDialog : public ScaledQDialog
 {
     int &suitSelected;
 
-    TrumpDialogLabel blackLabel;
-    TrumpDialogLabel greenLabel;
-    TrumpDialogLabel redLabel;
-    TrumpDialogLabel yellowLabel;
+    TrumpDialogLabel *blackLabel;
+    TrumpDialogLabel *greenLabel;
+    TrumpDialogLabel *redLabel;
+    TrumpDialogLabel *yellowLabel;
 
 public:
     TrumpDialog(int &pSuitSelected, QWidget *parent = nullptr);

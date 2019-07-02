@@ -103,7 +103,7 @@ struct CompareCardPixmapKey
     bool operator()(const CardPixmapKey& a, const CardPixmapKey& b) const;
 };
 
-class ClickableCardArray
+class ClickableCardArray : public QWidget
 {
     QDialogWithClickableCardArray *parent;
 
@@ -113,7 +113,7 @@ class ClickableCardArray
     QSize size;
 
 public:
-    ClickableCardArray(int pDrawPosition, QSize pSize = SIZE_NORMAL, QDialogWithClickableCardArray *pParent = nullptr);
+    ClickableCardArray(int pDrawPosition, QSize pSize = SIZE_NORMAL, QDialogWithClickableCardArray *parent = nullptr);
 
     void rescale();
 

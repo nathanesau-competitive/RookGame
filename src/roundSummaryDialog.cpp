@@ -18,28 +18,45 @@ RoundSummaryDialog::RoundSummaryDialog(QWidget *parent) : ScaledQDialog(true, pa
         label->move(pos);
     };
 
-    summaryLabel.setParent(this);
-    summaryLabel.setText("Scores for this round...");
-    summaryLabel.setFont(QFont("Times", 12, QFont::Weight::Bold));
-    summaryLabel.resize(250, 25);
-    summaryLabel.move({25, 25});
+    summaryLabel = new ScaledQLabel;
+    summaryLabel->setParent(this);
+    summaryLabel->setText("Scores for this round...");
+    summaryLabel->setFont(QFont("Times", 12, QFont::Weight::Bold));
+    summaryLabel->resize(250, 25);
+    summaryLabel->move({25, 25});
 
-    setupLabel(&player1ScoreLabel, QString::fromStdString(gc.playerArr[PLAYER_1].playerName + ": "), {100, 25}, {25, 75});
-    setupLabel(&player1Score, "", {100, 25}, {125, 75});
-    setupLabel(&player2ScoreLabel, QString::fromStdString(gc.playerArr[PLAYER_2].playerName + ": "), {100, 25}, {25, 100});
-    setupLabel(&player2Score, "", {100, 25}, {125, 100});
-    setupLabel(&player3ScoreLabel, QString::fromStdString(gc.playerArr[PLAYER_3].playerName + ": "), {100, 25}, {25, 125});
-    setupLabel(&player3Score, "", {100, 25}, {125, 125});
-    setupLabel(&player4ScoreLabel, QString::fromStdString(gc.playerArr[PLAYER_4].playerName + ": "), {100, 25}, {25, 150});
-    setupLabel(&player4Score, "", {100, 25}, {125, 150});
+    player1ScoreLabel = new ScaledQLabel;
+    setupLabel(player1ScoreLabel, QString::fromStdString(gc.playerArr[PLAYER_1].playerName + ": "), {100, 25}, {25, 75});
 
-    okButton.setParent(this);
-    okButton.setText("OK");
-    okButton.setFont(QFont("Times", 10));
-    okButton.resize(50, 25);
-    okButton.move({400, 200});
+    player1Score = new ScaledQLabel;
+    setupLabel(player1Score, "", {100, 25}, {125, 75});
 
-    QObject::connect(&okButton, &QPushButton::pressed, this, &RoundSummaryDialog::accept);
+    player2ScoreLabel = new ScaledQLabel;
+    setupLabel(player2ScoreLabel, QString::fromStdString(gc.playerArr[PLAYER_2].playerName + ": "), {100, 25}, {25, 100});
+
+    player2Score = new ScaledQLabel;
+    setupLabel(player2Score, "", {100, 25}, {125, 100});
+
+    player3ScoreLabel = new ScaledQLabel;
+    setupLabel(player3ScoreLabel, QString::fromStdString(gc.playerArr[PLAYER_3].playerName + ": "), {100, 25}, {25, 125});
+
+    player3Score = new ScaledQLabel;
+    setupLabel(player3Score, "", {100, 25}, {125, 125});
+
+    player4ScoreLabel = new ScaledQLabel;
+    setupLabel(player4ScoreLabel, QString::fromStdString(gc.playerArr[PLAYER_4].playerName + ": "), {100, 25}, {25, 150});
+
+    player4Score = new ScaledQLabel;
+    setupLabel(player4Score, "", {100, 25}, {125, 150});
+
+    okButton = new ScaledQPushButton;
+    okButton->setParent(this);
+    okButton->setText("OK");
+    okButton->setFont(QFont("Times", 10));
+    okButton->resize(50, 25);
+    okButton->move({400, 200});
+
+    QObject::connect(okButton, &QPushButton::pressed, this, &RoundSummaryDialog::accept);
 
     resize(500, 250);
     setWindowTitle("Round summary");
@@ -53,12 +70,12 @@ void RoundSummaryDialog::rescale()
     updateScaleFactor();
     setGeometry(geometry());
 
-    for (auto label : vector<ScaledQLabel *>{&summaryLabel, &player1ScoreLabel, &player1Score, &player2ScoreLabel,
-                                             &player2Score, &player3ScoreLabel, &player3Score, &player4ScoreLabel,
-                                             &player4Score})
+    for (auto label : vector<ScaledQLabel *>{summaryLabel, player1ScoreLabel, player1Score, player2ScoreLabel,
+                                             player2Score, player3ScoreLabel, player3Score, player4ScoreLabel,
+                                             player4Score})
         label->rescale();
 
-    for (auto button : vector<ScaledQPushButton *>{&okButton})
+    for (auto button : vector<ScaledQPushButton *>{okButton})
         button->rescale();
 }
 
@@ -75,8 +92,8 @@ void RoundSummaryDialog::updateScores(map<int, int> roundScores)
         label->setText(QString::fromStdString(text));
     };
 
-    updateLabel(&player1Score, roundScores[PLAYER_1]);
-    updateLabel(&player2Score, roundScores[PLAYER_2]);
-    updateLabel(&player3Score, roundScores[PLAYER_3]);
-    updateLabel(&player4Score, roundScores[PLAYER_4]);
+    updateLabel(player1Score, roundScores[PLAYER_1]);
+    updateLabel(player2Score, roundScores[PLAYER_2]);
+    updateLabel(player3Score, roundScores[PLAYER_3]);
+    updateLabel(player4Score, roundScores[PLAYER_4]);
 }

@@ -10,9 +10,10 @@ using namespace std;
 AppearancePage::AppearancePage(MainWindow *pMainWindow, QWidget *parent) : mainWindow(pMainWindow),
                                                                            QWidget(parent)
 {
-    resolutionLabel.setText("Game Resolution");
+    resolutionLabel = new QLabel;
+    resolutionLabel->setText("Game Resolution");
 
-    // resolution
+    // setup maps
 
     float minScaleFactor = 0.5F;
     float currentScaleFactor = scalefactor;
@@ -30,26 +31,37 @@ AppearancePage::AppearancePage(MainWindow *pMainWindow, QWidget *parent) : mainW
         resolutionTextMap[scaleFactor] = choice;
     }
 
+    // resolutionComboBox
+
+    resolutionComboBox = new QComboBox;
+
     for (auto It = resolutionTextMap.begin(); It != resolutionTextMap.end(); It++)
     {
-        resolutionComboBox.addItem(QString::fromStdString(It->second));
+        resolutionComboBox->addItem(QString::fromStdString(It->second));
     }
 
     for (auto It = scaleFactorMap.begin(); It != scaleFactorMap.end(); It++)
     {
         if (It->second == scalefactor)
         {
-            resolutionComboBox.setCurrentIndex(It->first);
+            resolutionComboBox->setCurrentIndex(It->first);
             break;
         }
     }
 
     // player names
 
-    player1NameLabel.setText("Player 1");
-    player2NameLabel.setText("Player 2");
-    player3NameLabel.setText("Player 3");
-    player4NameLabel.setText("Player 4");
+    player1NameLabel = new QLabel;
+    player1NameLabel->setText("Player 1");
+
+    player2NameLabel = new QLabel;
+    player2NameLabel->setText("Player 2");
+
+    player3NameLabel = new QLabel;
+    player3NameLabel->setText("Player 3");
+
+    player4NameLabel = new QLabel;
+    player4NameLabel->setText("Player 4");
 
     auto setupLineEdit = [this](QLineEdit *lineEdit, QString text) {
         lineEdit->setText(text);
@@ -57,46 +69,65 @@ AppearancePage::AppearancePage(MainWindow *pMainWindow, QWidget *parent) : mainW
 
     map<int, string> playerNames = Utils::Db::readPlayerNamesFromDb();
 
-    setupLineEdit(&player1NameEdit, QString::fromStdString(playerNames[PLAYER_1]));
-    setupLineEdit(&player2NameEdit, QString::fromStdString(playerNames[PLAYER_2]));
-    setupLineEdit(&player3NameEdit, QString::fromStdString(playerNames[PLAYER_3]));
-    setupLineEdit(&player4NameEdit, QString::fromStdString(playerNames[PLAYER_4]));
+    player1NameEdit = new QLineEdit;
+    setupLineEdit(player1NameEdit, QString::fromStdString(playerNames[PLAYER_1]));
 
-    resolutionGroup.setTitle("Resolution");
-    resolutionLayout.addWidget(&resolutionLabel);
-    resolutionLayout.addWidget(&resolutionComboBox);
-    resolutionGroup.setLayout(&resolutionLayout);
+    player2NameEdit = new QLineEdit;
+    setupLineEdit(player2NameEdit, QString::fromStdString(playerNames[PLAYER_2]));
 
-    namesGroup.setTitle("Names");
-    namesLayout.addWidget(&player1NameLabel);
-    namesLayout.addWidget(&player1NameEdit);
-    namesLayout.addWidget(&player2NameLabel);
-    namesLayout.addWidget(&player2NameEdit);
-    namesLayout.addWidget(&player3NameLabel);
-    namesLayout.addWidget(&player3NameEdit);
-    namesLayout.addWidget(&player4NameLabel);
-    namesLayout.addWidget(&player4NameEdit);
-    namesGroup.setLayout(&namesLayout);
+    player3NameEdit = new QLineEdit;
+    setupLineEdit(player3NameEdit, QString::fromStdString(playerNames[PLAYER_3]));
+
+    player4NameEdit = new QLineEdit;
+    setupLineEdit(player4NameEdit, QString::fromStdString(playerNames[PLAYER_4]));
+
+    resolutionGroup = new QGroupBox;
+    resolutionGroup->setTitle("Resolution");
+
+    resolutionLayout = new QHBoxLayout;
+    resolutionLayout->addWidget(resolutionLabel);
+    resolutionLayout->addWidget(resolutionComboBox);
+    resolutionGroup->setLayout(resolutionLayout);
+
+    namesGroup = new QGroupBox;
+    namesGroup->setTitle("Names");
+
+    namesLayout = new QVBoxLayout;
+    namesLayout->addWidget(player1NameLabel);
+    namesLayout->addWidget(player1NameEdit);
+    namesLayout->addWidget(player2NameLabel);
+    namesLayout->addWidget(player2NameEdit);
+    namesLayout->addWidget(player3NameLabel);
+    namesLayout->addWidget(player3NameEdit);
+    namesLayout->addWidget(player4NameLabel);
+    namesLayout->addWidget(player4NameEdit);
+    namesGroup->setLayout(namesLayout);
 
     // name tags
 
-    showNameTagsBox.setText("Show name tags");
-    showNameTagsBox.setChecked(Utils::Db::readShowNameTagsFromDb());
+    showNameTagsBox = new QCheckBox;
+    showNameTagsBox->setText("Show name tags");
+    showNameTagsBox->setChecked(Utils::Db::readShowNameTagsFromDb());
     
-    tagsGroup.setTitle("Tags");
-    tagsLayout.addWidget(&showNameTagsBox);
-    tagsGroup.setLayout(&tagsLayout);
+    tagsGroup = new QGroupBox;
+    tagsGroup->setTitle("Tags");
 
-    applyButton.setText("Apply");
-    QObject::connect(&applyButton, &QAbstractButton::clicked, this, &AppearancePage::onApply);
+    tagsLayout = new QVBoxLayout;
+    tagsLayout->addWidget(showNameTagsBox);
+    tagsGroup->setLayout(tagsLayout);
 
-    mainLayout.addWidget(&resolutionGroup);
-    mainLayout.addWidget(&namesGroup);
-    mainLayout.addWidget(&tagsGroup);
-    mainLayout.addStretch(1);
-    mainLayout.addWidget(&applyButton);
+    applyButton = new QPushButton;
+    applyButton->setText("Apply");
+    QObject::connect(applyButton, &QAbstractButton::clicked, this, &AppearancePage::onApply);
 
-    setLayout(&mainLayout);
+    mainLayout = new QVBoxLayout;
+    mainLayout->addWidget(resolutionGroup);
+    mainLayout->addWidget(namesGroup);
+    mainLayout->addWidget(tagsGroup);
+    mainLayout->addStretch(1);
+    mainLayout->addWidget(applyButton);
+
+    setLayout(mainLayout);
 }
 
 void AppearancePage::onApply()
@@ -108,7 +139,7 @@ void AppearancePage::onApply()
 
 void AppearancePage::applyResolution()
 {
-    int index = resolutionComboBox.currentIndex();
+    int index = resolutionComboBox->currentIndex();
     float factor = scaleFactorMap[index];
 
     if (factor == scalefactor)
@@ -124,10 +155,10 @@ void AppearancePage::applyPlayerNames()
 {
     map<int, string> playerNames;
 
-    playerNames[PLAYER_1] = player1NameEdit.text().toStdString();
-    playerNames[PLAYER_2] = player2NameEdit.text().toStdString();
-    playerNames[PLAYER_3] = player3NameEdit.text().toStdString();
-    playerNames[PLAYER_4] = player4NameEdit.text().toStdString();
+    playerNames[PLAYER_1] = player1NameEdit->text().toStdString();
+    playerNames[PLAYER_2] = player2NameEdit->text().toStdString();
+    playerNames[PLAYER_3] = player3NameEdit->text().toStdString();
+    playerNames[PLAYER_4] = player4NameEdit->text().toStdString();
     Utils::Db::writePlayerNamesToDb(playerNames);
 
     mainWindow->updatePlayerNames(playerNames);
@@ -135,7 +166,7 @@ void AppearancePage::applyPlayerNames()
 
 void AppearancePage::applyNameTags()
 {
-    bool showNameTags = showNameTagsBox.isChecked();
+    bool showNameTags = showNameTagsBox->isChecked();
     Utils::Db::writeShowNameTagsToDb(showNameTags);
 
     mainWindow->updateNameTags(showNameTags);

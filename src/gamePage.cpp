@@ -8,34 +8,54 @@
 
 GamePage::GamePage(QWidget *parent) : QWidget(parent)
 {
-    systemCheckBox.setText("Update system");
-    appsCheckBox.setText("Update applications");
-    docsCheckBox.setText("Update documentation");
+    systemCheckBox = new QCheckBox;
+    systemCheckBox->setText("Update system");
 
-    updateGroup.setTitle("Package selection");
-    updateLayout.addWidget(&systemCheckBox);
-    updateLayout.addWidget(&appsCheckBox);
-    updateLayout.addWidget(&docsCheckBox);
-    updateGroup.setLayout(&updateLayout);
+    appsCheckBox = new QCheckBox;
+    appsCheckBox->setText("Update applications");
 
-    qtItem.setText("Qt");
-    qsaItem.setText("QSA");
-    teamBuilderItem.setText("Teambuilder");
+    docsCheckBox = new QCheckBox;
+    docsCheckBox->setText("Update documentation");
 
-    packageGroup.setTitle("Existing packages");
-    packageList.addItem(&qtItem);
-    packageList.addItem(&qsaItem);
-    packageList.addItem(&teamBuilderItem);
-    packageLayout.addWidget(&packageList);
-    packageGroup.setLayout(&packageLayout);
+    updateGroup = new QGroupBox;
+    updateGroup->setTitle("Package selection");
 
-    applyButton.setText("Apply");
+    updateLayout = new QVBoxLayout;
+    updateLayout->addWidget(systemCheckBox);
+    updateLayout->addWidget(appsCheckBox);
+    updateLayout->addWidget(docsCheckBox);
+    updateGroup->setLayout(updateLayout);
 
-    mainLayout.addWidget(&updateGroup);
-    mainLayout.addWidget(&packageGroup);
-    mainLayout.addSpacing(12);
-    mainLayout.addWidget(&applyButton);
-    mainLayout.addStretch(1);
+    qtItem = new QListWidgetItem;
+    qtItem->setText("Qt");
+
+    qsaItem = new QListWidgetItem;
+    qsaItem->setText("QSA");
+
+    teamBuilderItem = new QListWidgetItem;
+    teamBuilderItem->setText("Teambuilder");
+
+    packageList = new QListWidget;
+    packageList->addItem(qtItem);
+    packageList->addItem(qsaItem);
+    packageList->addItem(teamBuilderItem);
+
+    packageLayout = new QVBoxLayout;
+    packageLayout->addWidget(packageList);
+
+    packageGroup = new QGroupBox;
+    packageGroup->setTitle("Existing packages");
+    packageGroup->setLayout(packageLayout);
+
+    applyButton = new QPushButton;
+    applyButton->setText("Apply");
+
+    mainLayout = new QVBoxLayout;
+    mainLayout->addWidget(updateGroup);
+    mainLayout->addWidget(packageGroup);
+    mainLayout->addSpacing(12);
+    mainLayout->addWidget(applyButton);
+    mainLayout->addStretch(1);
     
-    setLayout(&mainLayout);
+    setLayout(mainLayout);
 }

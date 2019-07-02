@@ -25,19 +25,19 @@ class NestDialog : public QDialogWithClickableCardArray
     CardStyleMap originalNestStyles;
 
 private:
-    QMainWindow *mainWindow; 
+    QMainWindow *mainWindow; // non-owning
 
-    ScaledQPushButton autoChooseNestButton;
-    ScaledQPushButton resetNestButton;
-    ScaledQPushButton doneNestButton;
+    ScaledQPushButton *autoChooseNestButton;
+    ScaledQPushButton *resetNestButton;
+    ScaledQPushButton *doneNestButton;
 
-    ScaledQLabel centerCardsLabel;
-    ClickableCardArray centerCards;
+    ScaledQLabel *centerCardsLabel;
+    ClickableCardArray *centerCards;
 
-    ScaledQLabel bottomCardsPreviewLabel;
-    ClickableCardArray bottomCardsPreview;
+    ScaledQLabel *bottomCardsPreviewLabel;
+    ClickableCardArray *bottomCardsPreview;
 
-    ScaledQCheckBox highlightCardsCheckBox;
+    ScaledQCheckBox *highlightCardsCheckBox;
 
 public:
     NestDialog(CardVector pOriginalNest, QMainWindow *pMainWindow, QWidget *parent = nullptr);

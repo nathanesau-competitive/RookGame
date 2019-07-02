@@ -12,18 +12,9 @@
 using namespace std;
 
 MainWidget::MainWidget(MainWindow *pMainWindow, QWidget *parent) : mainWindow(pMainWindow),
-                                                                   infoWidget(pMainWindow),
-                                                                   menuWidget(pMainWindow),
-                                                                   QDialogWithClickableCardArray(false, parent),
-                                                                   player1CardPlayed(DRAW_POSITION_MAIN_WIDGET_CENTER_BOTTOM, SIZE_NORMAL, this),
-                                                                   player2CardPlayed(DRAW_POSITION_MAIN_WIDGET_CENTER_LEFT, SIZE_NORMAL, this),
-                                                                   player3CardPlayed(DRAW_POSITION_MAIN_WIDGET_CENTER_TOP, SIZE_NORMAL, this),
-                                                                   player4CardPlayed(DRAW_POSITION_MAIN_WIDGET_CENTER_RIGHT, SIZE_NORMAL, this),
-                                                                   centerCards(DRAW_POSITION_MAIN_WIDGET_CENTER, SIZE_NORMAL, this),
-                                                                   bottomCards(DRAW_POSITION_MAIN_WIDGET_BOTTOM, SIZE_NORMAL, this)
+                                                                   QDialogWithClickableCardArray(false, parent)
 {
-    auto setupLabel = [this](QLabel *label, QString text, QPoint pos, QSize size)
-    {
+    auto setupLabel = [this](QLabel *label, QString text, QPoint pos, QSize size) {
         label->setParent(this);
         label->setFont(QFont("Times", 11));
         label->setText(text);
@@ -33,22 +24,39 @@ MainWidget::MainWidget(MainWindow *pMainWindow, QWidget *parent) : mainWindow(pM
         label->setAlignment(Qt::AlignCenter);
     };
 
+    centerCards = new ClickableCardArray(DRAW_POSITION_MAIN_WIDGET_CENTER, SIZE_NORMAL, this);
+    bottomCards = new ClickableCardArray(DRAW_POSITION_MAIN_WIDGET_BOTTOM, SIZE_NORMAL, this);
+    
+    player1CardPlayed = new ClickableCardArray(DRAW_POSITION_MAIN_WIDGET_CENTER_BOTTOM, SIZE_NORMAL, this);
+    player2CardPlayed = new ClickableCardArray(DRAW_POSITION_MAIN_WIDGET_CENTER_LEFT, SIZE_NORMAL, this);
+    player3CardPlayed = new ClickableCardArray(DRAW_POSITION_MAIN_WIDGET_CENTER_TOP, SIZE_NORMAL, this);
+    player4CardPlayed = new ClickableCardArray(DRAW_POSITION_MAIN_WIDGET_CENTER_RIGHT, SIZE_NORMAL, this);
+
     map<int, string> playerNames = Utils::Db::readPlayerNamesFromDb();
 
-    setupLabel(&player1NameLabel, QString::fromStdString(playerNames[PLAYER_1]), {550, 800}, {75, 25});
-    setupLabel(&player2NameLabel, QString::fromStdString(playerNames[PLAYER_2]), {25, 425}, {75, 25});
-    setupLabel(&player3NameLabel, QString::fromStdString(playerNames[PLAYER_3]), {550, 140}, {75, 25});
-    setupLabel(&player4NameLabel, QString::fromStdString(playerNames[PLAYER_4]), {1100, 425}, {75, 25});
+    player1NameLabel = new ScaledQLabel;
+    setupLabel(player1NameLabel, QString::fromStdString(playerNames[PLAYER_1]), {550, 800}, {75, 25});
+
+    player2NameLabel = new ScaledQLabel;
+    setupLabel(player2NameLabel, QString::fromStdString(playerNames[PLAYER_2]), {25, 425}, {75, 25});
+
+    player3NameLabel = new ScaledQLabel;
+    setupLabel(player3NameLabel, QString::fromStdString(playerNames[PLAYER_3]), {550, 140}, {75, 25});
+
+    player4NameLabel = new ScaledQLabel;
+    setupLabel(player4NameLabel, QString::fromStdString(playerNames[PLAYER_4]), {1100, 425}, {75, 25});
 
     updateNameTags(Utils::Db::readShowNameTagsFromDb());
 
-    infoWidget.setParent(this);
-    infoWidget.move(QPoint(0, 0));
-    infoWidget.resize(1200, 130);
+    infoWidget = new GameInfoWidget(pMainWindow);
+    infoWidget->setParent(this);
+    infoWidget->move(QPoint(0, 0));
+    infoWidget->resize(1200, 130);
 
-    menuWidget.setParent(this);
-    menuWidget.move(QPoint(400, 300));
-    menuWidget.resize(400, 300);
+    menuWidget = new GameMenuWidget(pMainWindow);
+    menuWidget->setParent(this);
+    menuWidget->move(QPoint(400, 300));
+    menuWidget->resize(400, 300);
 
     // no window title, etc.
 }
@@ -58,19 +66,19 @@ void MainWidget::rescale()
     updateScaleFactor();
     setGeometry(geometry());
 
-    for (auto clickableCardArray : vector<ClickableCardArray *>{&player1CardPlayed, &player2CardPlayed,
-                                                                &player3CardPlayed, &player4CardPlayed,
-                                                                &centerCards, &bottomCards})
+    for (auto clickableCardArray : vector<ClickableCardArray *>{player1CardPlayed, player2CardPlayed,
+                                                                player3CardPlayed, player4CardPlayed,
+                                                                centerCards, bottomCards})
         clickableCardArray->rescale();
 
-    for (auto label : vector<ScaledQLabel *>{&player1NameLabel, &player2NameLabel,
-                                             &player3NameLabel, &player4NameLabel})
+    for (auto label : vector<ScaledQLabel *>{player1NameLabel, player2NameLabel,
+                                             player3NameLabel, player4NameLabel})
         label->rescale();
 
-    for (auto widget : vector<GameInfoWidget *>{&infoWidget})
+    for (auto widget : vector<GameInfoWidget *>{infoWidget})
         widget->rescale();
 
-    for (auto widget : vector<GameMenuWidget *>{&menuWidget})
+    for (auto widget : vector<GameMenuWidget *>{menuWidget})
         widget->rescale();
 }
 
@@ -78,7 +86,7 @@ void MainWidget::finishExistingHand(Card player1Card)
 {
     gc.playCard(player1Card, PLAYER_1);
 
-    bottomCards.showCards(gc.playerArr[PLAYER_1].cardArr);
+    bottomCards->showCards(gc.playerArr[PLAYER_1].cardArr);
 
     showCardPlayed(player1Card, PLAYER_1);
 
@@ -96,15 +104,15 @@ void MainWidget::finishExistingHand(Card player1Card)
 
     showPartnerCardIfApplicable();
 
-    infoWidget.updatePlayerPoints(gc.roundInfo.playerScores);
-    infoWidget.updateTeamPoints(gc.roundInfo.teamScores);
+    infoWidget->updatePlayerPoints(gc.roundInfo.playerScores);
+    infoWidget->updateTeamPoints(gc.roundInfo.teamScores);
 
     showHandResult();
 
-    player1CardPlayed.hideCards();
-    player2CardPlayed.hideCards();
-    player3CardPlayed.hideCards();
-    player4CardPlayed.hideCards();
+    player1CardPlayed->hideCards();
+    player2CardPlayed->hideCards();
+    player3CardPlayed->hideCards();
+    player4CardPlayed->hideCards();
 }
 
 void MainWidget::startNewHand(int startingPlayerNum)
@@ -163,18 +171,18 @@ void MainWidget::onCardClicked(ClickableCard *clickableCard)
     {
         gc.roundInfo.addPointsMiddleToScores(gc.handInfo);
 
-        centerCards.showCards(gc.nest);
+        centerCards->showCards(gc.nest);
 
-        infoWidget.updatePlayerPoints(gc.roundInfo.playerScores);
-        infoWidget.updateTeamPoints(gc.roundInfo.teamScores);
+        infoWidget->updatePlayerPoints(gc.roundInfo.playerScores);
+        infoWidget->updateTeamPoints(gc.roundInfo.teamScores);
 
         showNestResult();
 
-        centerCards.hideCards();
+        centerCards->hideCards();
 
         gc.overallInfo.updatePlayerScores(gc.roundInfo);
 
-        infoWidget.updateOverallScores(gc.overallInfo.playerScores);
+        infoWidget->updateOverallScores(gc.overallInfo.playerScores);
 
         RoundSummaryDialog summaryDlg;
         summaryDlg.updateScores(gc.roundInfo.getRoundScores());
@@ -187,7 +195,7 @@ void MainWidget::onCardClicked(ClickableCard *clickableCard)
         }
 
         // show game menu
-        menuWidget.show();
+        menuWidget->show();
     }
     else
     {
@@ -210,16 +218,16 @@ void MainWidget::showCardPlayed(const Card &card, int playerNum)
     switch (playerNum)
     {
     case PLAYER_1:
-        player1CardPlayed.showCards({card});
+        player1CardPlayed->showCards({card});
         break;
     case PLAYER_2:
-        player2CardPlayed.showCards({card});
+        player2CardPlayed->showCards({card});
         break;
     case PLAYER_3:
-        player3CardPlayed.showCards({card});
+        player3CardPlayed->showCards({card});
         break;
     case PLAYER_4:
-        player4CardPlayed.showCards({card});
+        player4CardPlayed->showCards({card});
         break;
     }
 
@@ -242,9 +250,9 @@ void MainWidget::showPartnerCardIfApplicable()
 
         if (currentCard == gc.roundInfo.partnerCard)
         {
-            infoWidget.updatePartner(currentCard, gc.roundInfo.partnerPlayerNum);
-            infoWidget.updateTeam1(gc.roundInfo.teams.first);
-            infoWidget.updateTeam2(gc.roundInfo.teams.second);
+            infoWidget->updatePartner(currentCard, gc.roundInfo.partnerPlayerNum);
+            infoWidget->updateTeam1(gc.roundInfo.teams.first);
+            infoWidget->updateTeam2(gc.roundInfo.teams.second);
 
             string msg = gc.playerArr[gc.roundInfo.partnerPlayerNum].playerName + " is the partner. Teams updated.";
 
@@ -288,16 +296,16 @@ void MainWidget::updateNameTags(bool showNameTags)
 {
     if (showNameTags)
     {
-       player1NameLabel.show();
-       player2NameLabel.show();
-       player3NameLabel.show();
-       player4NameLabel.show();
+        player1NameLabel->show();
+        player2NameLabel->show();
+        player3NameLabel->show();
+        player4NameLabel->show();
     }
     else
     {
-        player1NameLabel.hide();
-        player2NameLabel.hide();
-        player3NameLabel.hide();
-        player4NameLabel.hide();
+        player1NameLabel->hide();
+        player2NameLabel->hide();
+        player3NameLabel->hide();
+        player4NameLabel->hide();
     }
 }

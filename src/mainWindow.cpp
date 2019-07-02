@@ -19,69 +19,63 @@
 
 using namespace std;
 
-MainWindow::MainWindow(QWidget *parent) : ScaledQMainWindow(parent),
-                                          widget(this)
+MainWindow::MainWindow(QWidget *parent) : ScaledQMainWindow(parent)
 {
-    widget.setParent(this);
-    widget.infoWidget.updatePlayerNames(Utils::Db::readPlayerNamesFromDb());
-    widget.infoWidget.updatePartner(Card(SUIT_UNDEFINED, VALUE_UNDEFINED));
+    widget = new MainWidget(this);
+    widget->setParent(this);
+    widget->infoWidget->updatePlayerNames(Utils::Db::readPlayerNamesFromDb());
+    widget->infoWidget->updatePartner(Card(SUIT_UNDEFINED, VALUE_UNDEFINED));
 
-    newGameAction.setText(QMenu::tr("&New Game"));
-    newGameAction.setShortcuts(QKeySequence::New);
-    newGameAction.setStatusTip("Start a new game");
-    QObject::connect(&newGameAction, &QAction::triggered, this, &MainWindow::onNewGameAction);
+    newGameAction = new QAction(QMenu::tr("&New Game"), this);
+    newGameAction->setShortcuts(QKeySequence::New);
+    newGameAction->setStatusTip("Start a new game");
+    QObject::connect(newGameAction, &QAction::triggered, this, &MainWindow::onNewGameAction);
 
-    loadGameAction.setText(QMenu::tr("&Load Game"));
-    loadGameAction.setShortcuts(QKeySequence::Open);
-    loadGameAction.setStatusTip("Load an existing game");
-    QObject::connect(&loadGameAction, &QAction::triggered, this, &MainWindow::onLoadGameAction);
+    loadGameAction = new QAction(QMenu::tr("&Load Game"), this);
+    loadGameAction->setShortcuts(QKeySequence::Open);
+    loadGameAction->setStatusTip("Load an existing game");
+    QObject::connect(loadGameAction, &QAction::triggered, this, &MainWindow::onLoadGameAction);
 
-    quitAction.setText(QMenu::tr("&Quit Game"));
-    quitAction.setShortcuts(QKeySequence::Quit);
-    quitAction.setStatusTip("Quit the game");
-    QObject::connect(&quitAction, &QAction::triggered, this, &MainWindow::onQuitAction);
+    quitAction = new QAction(QMenu::tr("&Quit Game"), this);
+    quitAction->setShortcuts(QKeySequence::Quit);
+    quitAction->setStatusTip("Quit the game");
+    QObject::connect(quitAction, &QAction::triggered, this, &MainWindow::onQuitAction);
 
-    fileMenu.setTitle(QMenu::tr("&File"));
-    fileMenu.addAction(&newGameAction);
-    fileMenu.addAction(&loadGameAction);
-    fileMenu.addAction(&quitAction);
+    fileMenu = menuBar()->addMenu(QMenu::tr("&File"));
+    fileMenu->addAction(newGameAction);
+    fileMenu->addAction(loadGameAction);
+    fileMenu->addAction(quitAction);
 
-    preferencesAction.setText(QMenu::tr("&Preferences"));
-    preferencesAction.setShortcuts(QKeySequence::Preferences);
-    preferencesAction.setStatusTip("Edit the preferences");
-    QObject::connect(&preferencesAction, &QAction::triggered, this, &MainWindow::onPreferencesAction);
+    preferencesAction = new QAction(QMenu::tr("&Preferences"), this);
+    preferencesAction->setShortcuts(QKeySequence::Preferences);
+    preferencesAction->setStatusTip("Edit the preferences");
+    QObject::connect(preferencesAction, &QAction::triggered, this, &MainWindow::onPreferencesAction);
 
-    editMenu.setTitle(QMenu::tr("&Edit"));
-    editMenu.addAction(&preferencesAction);
+    editMenu = menuBar()->addMenu(QMenu::tr("&Edit"));
+    editMenu->addAction(preferencesAction);
 
-    viewScoresAction.setText(QMenu::tr("View scores"));
-    viewScoresAction.setStatusTip("View scores for current game");
-    QObject::connect(&viewScoresAction, &QAction::triggered, this, &MainWindow::onViewScoresAction);
+    viewScoresAction = new QAction(QMenu::tr("View scores"), this);
+    viewScoresAction->setStatusTip("View scores for current game");
+    QObject::connect(viewScoresAction, &QAction::triggered, this, &MainWindow::onViewScoresAction);
 
-    gameMenu.setTitle(QMenu::tr("&Game"));
-    gameMenu.addAction(&viewScoresAction);
+    gameMenu = menuBar()->addMenu(QMenu::tr("&Game"));
+    gameMenu->addAction(viewScoresAction);
 
-    checkUpdatesAction.setText(QMenu::tr("Check for Updates"));
-    checkUpdatesAction.setStatusTip("Check for game updates");
-    QObject::connect(&checkUpdatesAction, &QAction::triggered, this, &MainWindow::onCheckUpdatesAction);
+    checkUpdatesAction = new QAction(QMenu::tr("Check for Updates"), this);
+    checkUpdatesAction->setStatusTip("Check for game updates");
+    QObject::connect(checkUpdatesAction, &QAction::triggered, this, &MainWindow::onCheckUpdatesAction);
 
-    aboutAction.setText(QMenu::tr("About"));
-    aboutAction.setStatusTip("Info about the game");
-    QObject::connect(&aboutAction, &QAction::triggered, this, &MainWindow::onAboutAction);
+    aboutAction = new QAction(QMenu::tr("About"), this);
+    aboutAction->setStatusTip("Info about the game");
+    QObject::connect(aboutAction, &QAction::triggered, this, &MainWindow::onAboutAction);
 
-    helpMenu.setTitle(QMenu::tr("&Help"));
-    helpMenu.addAction(&checkUpdatesAction);
-    helpMenu.addAction(&aboutAction);
+    helpMenu = menuBar()->addMenu(QMenu::tr("&Help"));
+    helpMenu->addAction(checkUpdatesAction);
+    helpMenu->addAction(aboutAction);
 
-    menuBar.addMenu(&fileMenu);
-    menuBar.addMenu(&editMenu);
-    menuBar.addMenu(&gameMenu);
-    menuBar.addMenu(&helpMenu);
-
-    setCentralWidget(&widget);
+    setCentralWidget(widget);
     setWindowTitle("Rook");
     setWindowIcon(QIcon(":rookicon.gif"));
-    setMenuBar(&menuBar);
     setGeometry(QRect(0, 0, 1200, 850));
 
     QPixmap bkgnd(":background.PNG");
@@ -96,24 +90,24 @@ void MainWindow::rescale() // update resolution
     updateScaleFactor();
     setGeometry(geometry());
 
-    widget.rescale();
+    widget->rescale();
 
     Utils::Ui::moveWindowToCenter(this, 36);
 }
 
 void MainWindow::updatePlayerNames(map<int, string> playerNames)
 {
-    widget.infoWidget.updatePlayerNames(playerNames);
+    widget->infoWidget->updatePlayerNames(playerNames);
 }
 
 void MainWindow::updateNameTags(bool showNameTags)
 {
-    widget.updateNameTags(showNameTags);    
+    widget->updateNameTags(showNameTags);    
 }
 
 void MainWindow::onNewGameAction()
 {
-    widget.infoWidget.resetOverallInfoToDefaults();
+    widget->infoWidget->resetOverallInfoToDefaults();
 
     MessageBox msgBox;
     Utils::Ui::setupMessageBox(&msgBox, "Previous scores cleared. Starting new game...", "New game");
@@ -167,34 +161,34 @@ void MainWindow::onAboutAction()
 
 void MainWindow::startNewRound()
 {
-    widget.menuWidget.hide();
+    widget->menuWidget->hide();
 
     // clear existing info
-    widget.infoWidget.resetRoundInfoToDefaults();
-    widget.player1CardPlayed.hideCards();
-    widget.player2CardPlayed.hideCards();
-    widget.player3CardPlayed.hideCards();
-    widget.player4CardPlayed.hideCards();
-    widget.bottomCards.hideCards();
-    widget.centerCards.hideCards();
+    widget->infoWidget->resetRoundInfoToDefaults();
+    widget->player1CardPlayed->hideCards();
+    widget->player2CardPlayed->hideCards();
+    widget->player3CardPlayed->hideCards();
+    widget->player4CardPlayed->hideCards();
+    widget->bottomCards->hideCards();
+    widget->centerCards->hideCards();
 
     showNewRoundMessage();
 
     gc.onNewGame();
 
-    widget.bottomCards.showCards(gc.playerArr[PLAYER_1].cardArr);
+    widget->bottomCards->showCards(gc.playerArr[PLAYER_1].cardArr);
 
     BidDialog bidDlg(this);
     auto player1WonBid = bidDlg.exec();
 
-    widget.infoWidget.updateBid(gc.roundInfo.bidPlayer, gc.roundInfo.bidAmount);
+    widget->infoWidget->updateBid(gc.roundInfo.bidPlayer, gc.roundInfo.bidAmount);
 
     if (player1WonBid)
     {
         int trumpSuitSelected = SUIT_UNDEFINED;
         Card partnerCardSelected = Card(SUIT_UNDEFINED, VALUE_UNDEFINED);
 
-        MiddleDialog middleDlg(trumpSuitSelected, partnerCardSelected, &widget, this);
+        MiddleDialog middleDlg(trumpSuitSelected, partnerCardSelected, widget, this);
         Utils::Ui::moveDialog(&middleDlg, this, DIALOG_POSITION_MIDDLE_DLG);
 
         if (!middleDlg.exec())
@@ -229,14 +223,14 @@ void MainWindow::startNewRound()
     {
         // re-sort and redraw bottom cards
         gc.playerArr[PLAYER_1].cardArr.sort(gc.roundInfo.trump);
-        widget.bottomCards.showCards(gc.playerArr[PLAYER_1].cardArr);
+        widget->bottomCards->showCards(gc.playerArr[PLAYER_1].cardArr);
     }
 
     gc.roundInfo.pointsMiddle = gc.nest.getNumPoints();
 
-    widget.infoWidget.updateTrump(gc.roundInfo.trump);
-    widget.infoWidget.updatePartner(gc.roundInfo.partnerCard);
-    widget.infoWidget.updatePointsMiddle(gc.roundInfo.pointsMiddle, true);
+    widget->infoWidget->updateTrump(gc.roundInfo.trump);
+    widget->infoWidget->updatePartner(gc.roundInfo.partnerCard);
+    widget->infoWidget->updatePointsMiddle(gc.roundInfo.pointsMiddle, true);
 
     MessageBox msgBox;
     Utils::Ui::setupMessageBox(&msgBox, "Trump, partner, points in middle updated.\n\nGame starting.", "Start Game");
@@ -244,7 +238,7 @@ void MainWindow::startNewRound()
     msgBox.exec();
 
     // play first few cards if necessary
-    widget.startNewHand(gc.roundInfo.bidPlayer);
+    widget->startNewHand(gc.roundInfo.bidPlayer);
 }
 
 void MainWindow::showNewRoundMessage()

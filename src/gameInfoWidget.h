@@ -50,38 +50,38 @@ struct GameInfoWidget : public QDialogWithClickableCardArray
 private:
     QMainWindow *mainWindow;
 
-    ScaledQLabel bidCategoryLabel;
-    ScaledQLabel bidPlayerLabel;
-    ScaledQLabel bidAmountLabel;
+    ScaledQLabel *bidCategoryLabel;
+    ScaledQLabel *bidPlayerLabel;
+    ScaledQLabel *bidAmountLabel;
 
-    ScaledQLabel partnerCardCategoryLabel;
-    ClickableCardArray topLeftCards;
+    ScaledQLabel *partnerCardCategoryLabel;
+    ClickableCardArray *topLeftCards;
 
-    ScaledQLabel trumpCategoryLabel;
-    ScaledQLabel trumpLabel;
+    ScaledQLabel *trumpCategoryLabel;
+    ScaledQLabel *trumpLabel;
 
-    ScaledQLabel pointsMiddleCategoryLabel;
-    ScaledQLabel pointsMiddleLabel;
+    ScaledQLabel *pointsMiddleCategoryLabel;
+    ScaledQLabel *pointsMiddleLabel;
 
-    ScaledQLabel teamsCategoryLabel;
-    ScaledQLabel team1Label;
-    ScaledQLabel team2Label;
+    ScaledQLabel *teamsCategoryLabel;
+    ScaledQLabel *team1Label;
+    ScaledQLabel *team2Label;
 
-    ScaledQLabel pointsWonPlayerCategoryLabel;
-    ScaledQLabel pointsWonPlayerLabel1;
-    ScaledQLabel pointsWonPlayerLabel2;
-    ScaledQLabel pointsWonPlayerLabel3;
-    ScaledQLabel pointsWonPlayerLabel4;
+    ScaledQLabel *pointsWonPlayerCategoryLabel;
+    ScaledQLabel *pointsWonPlayerLabel1;
+    ScaledQLabel *pointsWonPlayerLabel2;
+    ScaledQLabel *pointsWonPlayerLabel3;
+    ScaledQLabel *pointsWonPlayerLabel4;
 
-    ScaledQLabel pointsWonTeamCategoryLabel;
-    ScaledQLabel pointsWonTeamLabel1;
-    ScaledQLabel pointsWonTeamLabel2;
+    ScaledQLabel *pointsWonTeamCategoryLabel;
+    ScaledQLabel *pointsWonTeamLabel1;
+    ScaledQLabel *pointsWonTeamLabel2;
 
-    ScaledQLabel overallScoresCategoryLabel;
-    ScaledQLabel player1OverallScoreLabel;
-    ScaledQLabel player2OverallScoreLabel;
-    ScaledQLabel player3OverallScoreLabel;
-    ScaledQLabel player4OverallScoreLabel;
+    ScaledQLabel *overallScoresCategoryLabel;
+    ScaledQLabel *player1OverallScoreLabel;
+    ScaledQLabel *player2OverallScoreLabel;
+    ScaledQLabel *player3OverallScoreLabel;
+    ScaledQLabel *player4OverallScoreLabel;
 
 public:
     GameInfoWidget(QMainWindow *pMainWindow, QWidget *parent = nullptr);

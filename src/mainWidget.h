@@ -17,26 +17,26 @@ extern GameController gc;
 
 class MainWidget : public QDialogWithClickableCardArray
 {
-    MainWindow *mainWindow;
+    MainWindow *mainWindow; // non-owning
 
 public:
-    GameInfoWidget infoWidget;
-    GameMenuWidget menuWidget;
+    GameInfoWidget *infoWidget;
+    GameMenuWidget *menuWidget;
 
-    ScaledQLabel player1NameLabel;
-    ClickableCardArray player1CardPlayed;
+    ScaledQLabel *player1NameLabel;
+    ClickableCardArray *player1CardPlayed;
 
-    ScaledQLabel player2NameLabel;
-    ClickableCardArray player2CardPlayed;
+    ScaledQLabel *player2NameLabel;
+    ClickableCardArray *player2CardPlayed;
 
-    ScaledQLabel player3NameLabel;
-    ClickableCardArray player3CardPlayed;
+    ScaledQLabel *player3NameLabel;
+    ClickableCardArray *player3CardPlayed;
 
-    ScaledQLabel player4NameLabel;
-    ClickableCardArray player4CardPlayed;
+    ScaledQLabel *player4NameLabel;
+    ClickableCardArray *player4CardPlayed;
 
-    ClickableCardArray centerCards;
-    ClickableCardArray bottomCards;
+    ClickableCardArray *centerCards;
+    ClickableCardArray *bottomCards;
 
     MainWidget(MainWindow *pMainWindow, QWidget *parent = nullptr);
     virtual void rescale();

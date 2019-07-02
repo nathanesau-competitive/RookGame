@@ -6,10 +6,11 @@
 #include "utils.h"
 
 GameInfoWidget::GameInfoWidget(QMainWindow *pMainWindow, QWidget *parent) : mainWindow(pMainWindow),
-                                                                            QDialogWithClickableCardArray(false, parent),
-                                                                            topLeftCards(DRAW_POSITION_GAME_INFO_WIDGET, SIZE_TINY, this)
+                                                                            QDialogWithClickableCardArray(false, parent)
 {
     clearDataVariables();
+
+    topLeftCards = new ClickableCardArray (DRAW_POSITION_GAME_INFO_WIDGET, SIZE_TINY, this);
 
     auto setupCategoryLabel = [this](ScaledQLabel *categoryLabel, QString text, QSize size, QPoint pos) {
         categoryLabel->setParent(this);
@@ -27,38 +28,78 @@ GameInfoWidget::GameInfoWidget(QMainWindow *pMainWindow, QWidget *parent) : main
         label->move(pos);
     };
 
-    setupCategoryLabel(&bidCategoryLabel, "Bid", {100, 20}, {25, 10});
-    setupLabel(&bidPlayerLabel, "???", {100, 20}, {35, 35});
-    setupLabel(&bidAmountLabel, "???", {100, 20}, {35, 55});
+    bidCategoryLabel = new ScaledQLabel;
+    setupCategoryLabel(bidCategoryLabel, "Bid", {100, 20}, {25, 10});
 
-    setupCategoryLabel(&partnerCardCategoryLabel, "Partner", {100, 20}, {135, 10});
+    bidPlayerLabel = new ScaledQLabel;
+    setupLabel(bidPlayerLabel, "???", {100, 20}, {35, 35});
 
-    setupCategoryLabel(&trumpCategoryLabel, "Trump", {100, 20}, {270, 10});
-    setupLabel(&trumpLabel, "???", {50, 20}, {280, 35});
-    trumpLabel.setAlignment(Qt::AlignHCenter);
+    bidAmountLabel = new ScaledQLabel;
+    setupLabel(bidAmountLabel, "???", {100, 20}, {35, 55});
 
-    setupCategoryLabel(&pointsMiddleCategoryLabel, "Points Middle", {125, 20}, {380, 10});
-    setupLabel(&pointsMiddleLabel, "???", {125, 20}, {390, 35});
+    partnerCardCategoryLabel = new ScaledQLabel;
+    setupCategoryLabel(partnerCardCategoryLabel, "Partner", {100, 20}, {135, 10});
 
-    setupCategoryLabel(&teamsCategoryLabel, "Teams", {100, 20}, {530, 10});
-    setupLabel(&team1Label, "???", {150, 20}, {540, 35});
-    setupLabel(&team2Label, "???", {150, 20}, {540, 55});
+    trumpCategoryLabel = new ScaledQLabel;
+    setupCategoryLabel(trumpCategoryLabel, "Trump", {100, 20}, {270, 10});
 
-    setupCategoryLabel(&pointsWonTeamCategoryLabel, "Points (by Team)", {150, 20}, {690, 10});
-    setupLabel(&pointsWonTeamLabel1, "???", {150, 20}, {700, 35});
-    setupLabel(&pointsWonTeamLabel2, "???", {150, 20}, {700, 55});
+    trumpLabel = new ScaledQLabel;
+    setupLabel(trumpLabel, "???", {50, 20}, {280, 35});
+    trumpLabel->setAlignment(Qt::AlignHCenter);
 
-    setupCategoryLabel(&pointsWonPlayerCategoryLabel, "Points (by Player)", {150, 20}, {890, 10});
-    setupLabel(&pointsWonPlayerLabel1, "???", {100, 20}, {900, 35});
-    setupLabel(&pointsWonPlayerLabel2, "???", {100, 20}, {900, 55});
-    setupLabel(&pointsWonPlayerLabel3, "???", {100, 20}, {900, 75});
-    setupLabel(&pointsWonPlayerLabel4, "???", {100, 20}, {900, 95});
+    pointsMiddleCategoryLabel = new ScaledQLabel;
+    setupCategoryLabel(pointsMiddleCategoryLabel, "Points Middle", {125, 20}, {380, 10});
 
-    setupCategoryLabel(&overallScoresCategoryLabel, "Scores", {100, 20}, {1080, 10});
-    setupLabel(&player1OverallScoreLabel, "???", {100, 20}, {1090, 35});
-    setupLabel(&player2OverallScoreLabel, "???", {100, 20}, {1090, 55});
-    setupLabel(&player3OverallScoreLabel, "???", {100, 20}, {1090, 75});
-    setupLabel(&player4OverallScoreLabel, "???", {100, 20}, {1090, 95});
+    pointsMiddleLabel = new ScaledQLabel;
+    setupLabel(pointsMiddleLabel, "???", {125, 20}, {390, 35});
+
+    teamsCategoryLabel = new ScaledQLabel;
+    setupCategoryLabel(teamsCategoryLabel, "Teams", {100, 20}, {530, 10});
+
+    team1Label = new ScaledQLabel;
+    setupLabel(team1Label, "???", {150, 20}, {540, 35});
+
+    team2Label = new ScaledQLabel;
+    setupLabel(team2Label, "???", {150, 20}, {540, 55});
+
+    pointsWonTeamCategoryLabel = new ScaledQLabel;
+    setupCategoryLabel(pointsWonTeamCategoryLabel, "Points (by Team)", {150, 20}, {690, 10});
+
+    pointsWonTeamLabel1 = new ScaledQLabel;
+    setupLabel(pointsWonTeamLabel1, "???", {150, 20}, {700, 35});
+
+    pointsWonTeamLabel2 = new ScaledQLabel;
+    setupLabel(pointsWonTeamLabel2, "???", {150, 20}, {700, 55});
+
+    pointsWonPlayerCategoryLabel = new ScaledQLabel;
+    setupCategoryLabel(pointsWonPlayerCategoryLabel, "Points (by Player)", {150, 20}, {890, 10});
+
+    pointsWonPlayerLabel1 = new ScaledQLabel;
+    setupLabel(pointsWonPlayerLabel1, "???", {100, 20}, {900, 35});
+
+    pointsWonPlayerLabel2 = new ScaledQLabel;
+    setupLabel(pointsWonPlayerLabel2, "???", {100, 20}, {900, 55});
+
+    pointsWonPlayerLabel3 = new ScaledQLabel;
+    setupLabel(pointsWonPlayerLabel3, "???", {100, 20}, {900, 75});
+
+    pointsWonPlayerLabel4 = new ScaledQLabel;
+    setupLabel(pointsWonPlayerLabel4, "???", {100, 20}, {900, 95});
+
+    overallScoresCategoryLabel = new ScaledQLabel;
+    setupCategoryLabel(overallScoresCategoryLabel, "Scores", {100, 20}, {1080, 10});
+
+    player1OverallScoreLabel = new ScaledQLabel;
+    setupLabel(player1OverallScoreLabel, "???", {100, 20}, {1090, 35});
+
+    player2OverallScoreLabel = new ScaledQLabel;
+    setupLabel(player2OverallScoreLabel, "???", {100, 20}, {1090, 55});
+
+    player3OverallScoreLabel = new ScaledQLabel;    
+    setupLabel(player3OverallScoreLabel, "???", {100, 20}, {1090, 75});
+
+    player4OverallScoreLabel = new ScaledQLabel;
+    setupLabel(player4OverallScoreLabel, "???", {100, 20}, {1090, 95});
 
     setStyleSheet("background-color: white");
 }
@@ -68,16 +109,16 @@ void GameInfoWidget::rescale()
     updateScaleFactor();
     setGeometry(geometry());
 
-    for (auto label : vector<ScaledQLabel *>{&bidCategoryLabel, &bidPlayerLabel, &bidAmountLabel, &partnerCardCategoryLabel,
-                                             &trumpCategoryLabel, &trumpLabel, &pointsMiddleCategoryLabel, &pointsMiddleLabel,
-                                             &teamsCategoryLabel, &team1Label, &team2Label, &pointsWonPlayerCategoryLabel,
-                                             &pointsWonPlayerLabel1, &pointsWonPlayerLabel2, &pointsWonPlayerLabel3,
-                                             &pointsWonPlayerLabel4, &pointsWonTeamCategoryLabel, &pointsWonTeamLabel1,
-                                             &pointsWonTeamLabel2, &overallScoresCategoryLabel, &player1OverallScoreLabel,
-                                             &player2OverallScoreLabel, &player3OverallScoreLabel, &player4OverallScoreLabel})
+    for (auto label : vector<ScaledQLabel *>{bidCategoryLabel, bidPlayerLabel, bidAmountLabel, partnerCardCategoryLabel,
+                                             trumpCategoryLabel, trumpLabel, pointsMiddleCategoryLabel, pointsMiddleLabel,
+                                             teamsCategoryLabel, team1Label, team2Label, pointsWonPlayerCategoryLabel,
+                                             pointsWonPlayerLabel1, pointsWonPlayerLabel2, pointsWonPlayerLabel3,
+                                             pointsWonPlayerLabel4, pointsWonTeamCategoryLabel, pointsWonTeamLabel1,
+                                             pointsWonTeamLabel2, overallScoresCategoryLabel, player1OverallScoreLabel,
+                                             player2OverallScoreLabel, player3OverallScoreLabel, player4OverallScoreLabel})
         label->rescale();
 
-    for (auto clickableCardArray : vector<ClickableCardArray *>{&topLeftCards})
+    for (auto clickableCardArray : vector<ClickableCardArray *>{topLeftCards})
         clickableCardArray->rescale();
 }
 
@@ -151,13 +192,13 @@ void GameInfoWidget::updateBid(int pBidPlayerNum, int pBidAmount)
 
     if (bidPlayerNum == PLAYER_UNDEFINED) // bid round hasn't started yet
     {
-        bidPlayerLabel.setText("???");
-        bidAmountLabel.setText("???");
+        bidPlayerLabel->setText("???");
+        bidAmountLabel->setText("???");
     }
     else
     {
-        bidPlayerLabel.setText(QString::fromStdString(playerNames[bidPlayerNum]));
-        bidAmountLabel.setText(QString::number(bidAmount));
+        bidPlayerLabel->setText(QString::fromStdString(playerNames[bidPlayerNum]));
+        bidAmountLabel->setText(QString::number(bidAmount));
     }
 }
 
@@ -166,7 +207,7 @@ void GameInfoWidget::updatePartner(Card pPartnerCard, int pPartnerPlayerNum)
     partnerCard = pPartnerCard;
     partnerPlayerNum = pPartnerPlayerNum;
 
-    topLeftCards.showCards({partnerCard});
+    topLeftCards->showCards({partnerCard});
 }
 
 void GameInfoWidget::updateTrump(int trumpSuit)
@@ -174,24 +215,24 @@ void GameInfoWidget::updateTrump(int trumpSuit)
     switch (trumpSuit)
     {
     case SUIT_BLACK:
-        trumpLabel.setStyleSheet("background-color: black; color: white");
-        trumpLabel.setText("Black");
+        trumpLabel->setStyleSheet("background-color: black; color: white");
+        trumpLabel->setText("Black");
         break;
     case SUIT_GREEN:
-        trumpLabel.setStyleSheet("background-color: green");
-        trumpLabel.setText("Green");
+        trumpLabel->setStyleSheet("background-color: green");
+        trumpLabel->setText("Green");
         break;
     case SUIT_RED:
-        trumpLabel.setStyleSheet("background-color: red");
-        trumpLabel.setText("Red");
+        trumpLabel->setStyleSheet("background-color: red");
+        trumpLabel->setText("Red");
         break;
     case SUIT_YELLOW:
-        trumpLabel.setStyleSheet("background-color: yellow");
-        trumpLabel.setText("Yellow");
+        trumpLabel->setStyleSheet("background-color: yellow");
+        trumpLabel->setText("Yellow");
         break;
     default:
-        trumpLabel.setStyleSheet("");
-        trumpLabel.setText("???");
+        trumpLabel->setStyleSheet("");
+        trumpLabel->setText("???");
         break;
     }
 }
@@ -203,11 +244,11 @@ void GameInfoWidget::updatePointsMiddle(int pPointsMiddle, bool pPointsMiddleKno
 
     if (!pointsMiddleKnown)
     {
-        pointsMiddleLabel.setText("???");
+        pointsMiddleLabel->setText("???");
     }
     else
     {
-        pointsMiddleLabel.setText(QString::number(pointsMiddle));
+        pointsMiddleLabel->setText(QString::number(pointsMiddle));
     }
 }
 
@@ -217,11 +258,11 @@ void GameInfoWidget::updateTeam1(Team team1)
 
     if (teams.first.empty())
     {
-        team1Label.setText("???");
+        team1Label->setText("???");
     }
     else
     {
-        team1Label.setText(QString::fromStdString(getTeamName(teams.first)));
+        team1Label->setText(QString::fromStdString(getTeamName(teams.first)));
     }
 }
 
@@ -231,11 +272,11 @@ void GameInfoWidget::updateTeam2(Team team2)
 
     if (teams.second.empty())
     {
-        team2Label.setText("???");
+        team2Label->setText("???");
     }
     else
     {
-        team2Label.setText(QString::fromStdString(getTeamName(teams.second)));
+        team2Label->setText(QString::fromStdString(getTeamName(teams.second)));
     }
 }
 
@@ -248,10 +289,10 @@ void GameInfoWidget::updateOverallScores(map<int, int> pOverallPlayerScores)
         label->setText(QString::fromStdString(text));
     };
 
-    setupLabel(&player1OverallScoreLabel, overallPlayerScores[PLAYER_1], PLAYER_1);
-    setupLabel(&player2OverallScoreLabel, overallPlayerScores[PLAYER_2], PLAYER_2);
-    setupLabel(&player3OverallScoreLabel, overallPlayerScores[PLAYER_3], PLAYER_3);
-    setupLabel(&player4OverallScoreLabel, overallPlayerScores[PLAYER_4], PLAYER_4);
+    setupLabel(player1OverallScoreLabel, overallPlayerScores[PLAYER_1], PLAYER_1);
+    setupLabel(player2OverallScoreLabel, overallPlayerScores[PLAYER_2], PLAYER_2);
+    setupLabel(player3OverallScoreLabel, overallPlayerScores[PLAYER_3], PLAYER_3);
+    setupLabel(player4OverallScoreLabel, overallPlayerScores[PLAYER_4], PLAYER_4);
 }
 
 void GameInfoWidget::updatePlayerPoints(map<int, int> pPlayerScores)
@@ -265,10 +306,10 @@ void GameInfoWidget::updatePlayerPoints(map<int, int> pPlayerScores)
 
     if (playerScores.empty())
     {
-        setupPointsPlayerLabel(&pointsWonPlayerLabel1, 0, PLAYER_1);
-        setupPointsPlayerLabel(&pointsWonPlayerLabel2, 0, PLAYER_2);
-        setupPointsPlayerLabel(&pointsWonPlayerLabel3, 0, PLAYER_3);
-        setupPointsPlayerLabel(&pointsWonPlayerLabel4, 0, PLAYER_4);
+        setupPointsPlayerLabel(pointsWonPlayerLabel1, 0, PLAYER_1);
+        setupPointsPlayerLabel(pointsWonPlayerLabel2, 0, PLAYER_2);
+        setupPointsPlayerLabel(pointsWonPlayerLabel3, 0, PLAYER_3);
+        setupPointsPlayerLabel(pointsWonPlayerLabel4, 0, PLAYER_4);
     }
     else
     {
@@ -281,10 +322,10 @@ void GameInfoWidget::updatePlayerPoints(map<int, int> pPlayerScores)
 
         sort(sortedPlayerScores.begin(), sortedPlayerScores.end(), ScoreCompare());
 
-        setupPointsPlayerLabel(&pointsWonPlayerLabel1, sortedPlayerScores[0].second, sortedPlayerScores[0].first);
-        setupPointsPlayerLabel(&pointsWonPlayerLabel2, sortedPlayerScores[1].second, sortedPlayerScores[1].first);
-        setupPointsPlayerLabel(&pointsWonPlayerLabel3, sortedPlayerScores[2].second, sortedPlayerScores[2].first);
-        setupPointsPlayerLabel(&pointsWonPlayerLabel4, sortedPlayerScores[3].second, sortedPlayerScores[3].first);
+        setupPointsPlayerLabel(pointsWonPlayerLabel1, sortedPlayerScores[0].second, sortedPlayerScores[0].first);
+        setupPointsPlayerLabel(pointsWonPlayerLabel2, sortedPlayerScores[1].second, sortedPlayerScores[1].first);
+        setupPointsPlayerLabel(pointsWonPlayerLabel3, sortedPlayerScores[2].second, sortedPlayerScores[2].first);
+        setupPointsPlayerLabel(pointsWonPlayerLabel4, sortedPlayerScores[3].second, sortedPlayerScores[3].first);
     }
 }
 
@@ -306,8 +347,8 @@ void GameInfoWidget::updateTeamPoints(map<int, int> pTeamScores)
 
     if (teamScores.empty() || teams.first.empty() || teams.second.empty())
     {
-        setupPointsTeamLabel(&pointsWonTeamLabel1, 0, Team());
-        setupPointsTeamLabel(&pointsWonTeamLabel2, 0, Team());
+        setupPointsTeamLabel(pointsWonTeamLabel1, 0, Team());
+        setupPointsTeamLabel(pointsWonTeamLabel2, 0, Team());
     }
     else
     {
@@ -332,8 +373,8 @@ void GameInfoWidget::updateTeamPoints(map<int, int> pTeamScores)
 
         sort(sortedTeamScores.begin(), sortedTeamScores.end(), ScoreCompare());
 
-        setupPointsTeamLabel(&pointsWonTeamLabel1, sortedTeamScores[0].second, getTeam(sortedTeamScores[0].first));
-        setupPointsTeamLabel(&pointsWonTeamLabel2, sortedTeamScores[1].second, getTeam(sortedTeamScores[1].first));
+        setupPointsTeamLabel(pointsWonTeamLabel1, sortedTeamScores[0].second, getTeam(sortedTeamScores[0].first));
+        setupPointsTeamLabel(pointsWonTeamLabel2, sortedTeamScores[1].second, getTeam(sortedTeamScores[1].first));
     }
 }
 

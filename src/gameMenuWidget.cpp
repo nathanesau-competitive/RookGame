@@ -16,23 +16,33 @@ GameMenuWidget::GameMenuWidget(MainWindow *pMainWindow, QWidget *parent) : mainW
         button->resize(size.width(), size.height());
     };
 
-    menuTitleLabel.setParent(this);
-    menuTitleLabel.setText("Game Menu");
-    menuTitleLabel.setFont(QFont("Times", 12));
-    menuTitleLabel.move({25, 25});
-    menuTitleLabel.resize(100, 25);
+    menuTitleLabel = new ScaledQLabel;
+    menuTitleLabel->setParent(this);
+    menuTitleLabel->setText("Game Menu");
+    menuTitleLabel->setFont(QFont("Times", 12));
+    menuTitleLabel->move({25, 25});
+    menuTitleLabel->resize(100, 25);
 
-    setupButton(&newGameButton, "New Game", {125, 75}, {100, 25});
-    setupButton(&newRoundButton, "New Round", {125, 120}, {100, 25});
-    setupButton(&saveGameButton, "Save Game", {125, 165}, {100, 25});
-    setupButton(&loadGameButton, "Load Game", {125, 210}, {100, 25});
-    setupButton(&quitGameButton, "Quit Game", {125, 255}, {100, 25});
+    newGameButton = new ScaledQPushButton;
+    setupButton(newGameButton, "New Game", {125, 75}, {100, 25});
 
-    QObject::connect(&newGameButton, &QPushButton::pressed, this, &GameMenuWidget::onNewGameButtonPressed);
-    QObject::connect(&newRoundButton, &QPushButton::pressed, this, &GameMenuWidget::onNewRoundButtonPressed);
-    QObject::connect(&saveGameButton, &QPushButton::pressed, this, &GameMenuWidget::onSaveGameButtonPressed);
-    QObject::connect(&loadGameButton, &QPushButton::pressed, this, &GameMenuWidget::onLoadGameButtonPressed);
-    QObject::connect(&quitGameButton, &QPushButton::pressed, this, &GameMenuWidget::onQuitGameButtonPressed);
+    newRoundButton = new ScaledQPushButton;
+    setupButton(newRoundButton, "New Round", {125, 120}, {100, 25});
+
+    saveGameButton = new ScaledQPushButton;
+    setupButton(saveGameButton, "Save Game", {125, 165}, {100, 25});
+
+    loadGameButton = new ScaledQPushButton;
+    setupButton(loadGameButton, "Load Game", {125, 210}, {100, 25});
+
+    quitGameButton = new ScaledQPushButton;
+    setupButton(quitGameButton, "Quit Game", {125, 255}, {100, 25});
+
+    QObject::connect(newGameButton, &QPushButton::pressed, this, &GameMenuWidget::onNewGameButtonPressed);
+    QObject::connect(newRoundButton, &QPushButton::pressed, this, &GameMenuWidget::onNewRoundButtonPressed);
+    QObject::connect(saveGameButton, &QPushButton::pressed, this, &GameMenuWidget::onSaveGameButtonPressed);
+    QObject::connect(loadGameButton, &QPushButton::pressed, this, &GameMenuWidget::onLoadGameButtonPressed);
+    QObject::connect(quitGameButton, &QPushButton::pressed, this, &GameMenuWidget::onQuitGameButtonPressed);
 
     setStyleSheet("background-color: white");
 }
@@ -42,11 +52,11 @@ void GameMenuWidget::rescale()
     updateScaleFactor();
     setGeometry(geometry());
 
-    for (auto label : vector<ScaledQLabel *>{&menuTitleLabel})
+    for (auto label : vector<ScaledQLabel *>{menuTitleLabel})
         label->rescale();
 
-    for (auto button : vector<ScaledQPushButton *>{&newGameButton, &newRoundButton, &saveGameButton,
-                                                   &loadGameButton, &quitGameButton})
+    for (auto button : vector<ScaledQPushButton *>{newGameButton, newRoundButton, saveGameButton,
+                                                   loadGameButton, quitGameButton})
         button->rescale();
 }
 

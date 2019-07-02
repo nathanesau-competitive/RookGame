@@ -2,13 +2,9 @@
 #include "nestDialog.h"
 #include "utils.h"
 
-NestDialog::NestDialog(CardVector pOriginalNest,
-                       QMainWindow *pMainWindow,
-                       QWidget *parent) : originalNest(pOriginalNest),
-                                          mainWindow(pMainWindow),
-                                          QDialogWithClickableCardArray(true, parent),
-                                          centerCards(DRAW_POSITION_NEST_DLG_TOP, SIZE_SMALL, this),
-                                          bottomCardsPreview(DRAW_POSITION_NEST_DLG_BOTTOM, SIZE_SMALL, this)
+NestDialog::NestDialog(CardVector pOriginalNest, QMainWindow *pMainWindow, QWidget *parent) : originalNest(pOriginalNest),
+                                                                                              mainWindow(pMainWindow),
+                                                                                              QDialogWithClickableCardArray(true, parent)
 {
     setOriginalNestStyles("background-color: white; border: 2px solid");
 
@@ -27,31 +23,38 @@ NestDialog::NestDialog(CardVector pOriginalNest,
         pushButton->setFont(QFont("Times", 10));
     };
 
-    setupLabel(&centerCardsLabel, "Middle cards (click to take)", {300, 10});
-    centerCards.showCards(gc.nest, &originalNestStyles);
+    centerCardsLabel = new ScaledQLabel;
+    setupLabel(centerCardsLabel, "Middle cards (click to take)", {300, 10});
 
-    setupLabel(&bottomCardsPreviewLabel, "New hand (click to discard)", {300, 235});
-    bottomCardsPreview.showCards(gc.playerArr[PLAYER_1].cardArr, &originalNestStyles);
+    centerCards = new ClickableCardArray(DRAW_POSITION_NEST_DLG_TOP, SIZE_SMALL, this);
+    centerCards->showCards(gc.nest, &originalNestStyles);
 
-    setupPushButton(&autoChooseNestButton, "Auto choose nest...", {125, 25}, {220, 450});
-    setupPushButton(&resetNestButton, "Reset nest...", {125, 25}, {350, 450});
-    setupPushButton(&doneNestButton, "Done nest...", {125, 25}, {480, 450});
+    bottomCardsPreviewLabel = new ScaledQLabel;
+    setupLabel(bottomCardsPreviewLabel, "New hand (click to discard)", {300, 235});
 
-    QObject::connect(&autoChooseNestButton, &QPushButton::pressed,
-                     this, &NestDialog::autoChooseNestButtonPressed);
+    bottomCardsPreview = new ClickableCardArray(DRAW_POSITION_NEST_DLG_BOTTOM, SIZE_SMALL, this);
+    bottomCardsPreview->showCards(gc.playerArr[PLAYER_1].cardArr, &originalNestStyles);
 
-    QObject::connect(&resetNestButton, &QPushButton::pressed,
-                     this, &NestDialog::resetNestButtonPressed);
+    autoChooseNestButton = new ScaledQPushButton;
+    setupPushButton(autoChooseNestButton, "Auto choose nest...", {125, 25}, {220, 450});
 
-    QObject::connect(&doneNestButton, &QPushButton::pressed,
-                     this, &NestDialog::doneNestButtonPressed);
+    resetNestButton = new ScaledQPushButton;
+    setupPushButton(resetNestButton, "Reset nest...", {125, 25}, {350, 450});
 
-    highlightCardsCheckBox.setParent(this);
-    highlightCardsCheckBox.setText("Highlight nest cards");
-    highlightCardsCheckBox.move({700, 450});
-    highlightCardsCheckBox.setFont(QFont("Times", 10));
+    doneNestButton = new ScaledQPushButton;
+    setupPushButton(doneNestButton, "Done nest...", {125, 25}, {480, 450});
 
-    QObject::connect(&highlightCardsCheckBox, &QCheckBox::pressed,
+    QObject::connect(autoChooseNestButton, &QPushButton::pressed, this, &NestDialog::autoChooseNestButtonPressed);
+    QObject::connect(resetNestButton, &QPushButton::pressed, this, &NestDialog::resetNestButtonPressed);
+    QObject::connect(doneNestButton, &QPushButton::pressed, this, &NestDialog::doneNestButtonPressed);
+
+    highlightCardsCheckBox = new ScaledQCheckBox;
+    highlightCardsCheckBox->setParent(this);
+    highlightCardsCheckBox->setText("Highlight nest cards");
+    highlightCardsCheckBox->move({700, 450});
+    highlightCardsCheckBox->setFont(QFont("Times", 10));
+
+    QObject::connect(highlightCardsCheckBox, &QCheckBox::pressed,
                      this, &NestDialog::highlightCardsCheckBoxPressed);
 
     resize(911, 506);
@@ -66,16 +69,16 @@ void NestDialog::rescale()
     updateScaleFactor();
     setGeometry(geometry());
 
-    for (auto button : vector<ScaledQPushButton *>{&autoChooseNestButton, &resetNestButton, &doneNestButton})
+    for (auto button : vector<ScaledQPushButton *>{autoChooseNestButton, resetNestButton, doneNestButton})
         button->rescale();
 
-    for (auto label : vector<ScaledQLabel *>{&centerCardsLabel, &bottomCardsPreviewLabel})
+    for (auto label : vector<ScaledQLabel *>{centerCardsLabel, bottomCardsPreviewLabel})
         label->rescale();
 
-    for (auto clickableCardArray : vector<ClickableCardArray *>{&centerCards, &bottomCardsPreview})
+    for (auto clickableCardArray : vector<ClickableCardArray *>{centerCards, bottomCardsPreview})
         clickableCardArray->rescale();
 
-    for (auto checkBox : vector<ScaledQCheckBox *>{&highlightCardsCheckBox})
+    for (auto checkBox : vector<ScaledQCheckBox *>{highlightCardsCheckBox})
         checkBox->rescale();
 }
 
@@ -111,8 +114,8 @@ void NestDialog::onCardClicked(ClickableCard *clickableCard)
         nest.sort();
     }
 
-    centerCards.showCards(gc.nest, &originalNestStyles);
-    bottomCardsPreview.showCards(gc.playerArr[PLAYER_1].cardArr, &originalNestStyles);
+    centerCards->showCards(gc.nest, &originalNestStyles);
+    bottomCardsPreview->showCards(gc.playerArr[PLAYER_1].cardArr, &originalNestStyles);
 }
 
 void NestDialog::onCardHoverEnter(ClickableCard *clickableCard)
@@ -165,8 +168,8 @@ void NestDialog::autoChooseNestButtonPressed()
 {
     NestDialog::autoChooseNest();
 
-    centerCards.showCards(gc.nest, &originalNestStyles);
-    bottomCardsPreview.showCards(gc.playerArr[PLAYER_1].cardArr, &originalNestStyles);
+    centerCards->showCards(gc.nest, &originalNestStyles);
+    bottomCardsPreview->showCards(gc.playerArr[PLAYER_1].cardArr, &originalNestStyles);
 }
 
 void NestDialog::resetNestButtonPressed()
@@ -178,8 +181,8 @@ void NestDialog::resetNestButtonPressed()
     gc.nest = originalNest;
     gc.nest.sort();
 
-    centerCards.showCards(gc.nest, &originalNestStyles);
-    bottomCardsPreview.showCards(gc.playerArr[PLAYER_1].cardArr, &originalNestStyles);
+    centerCards->showCards(gc.nest, &originalNestStyles);
+    bottomCardsPreview->showCards(gc.playerArr[PLAYER_1].cardArr, &originalNestStyles);
 }
 
 void NestDialog::doneNestButtonPressed()
@@ -199,7 +202,7 @@ void NestDialog::doneNestButtonPressed()
 
 void NestDialog::highlightCardsCheckBoxPressed()
 {
-    if (!highlightCardsCheckBox.isChecked())
+    if (!highlightCardsCheckBox->isChecked())
     {
         setOriginalNestStyles("background-color: cyan; border: 2px solid");
     }
@@ -208,6 +211,6 @@ void NestDialog::highlightCardsCheckBoxPressed()
         setOriginalNestStyles("background-color: white; border: 2px solid");
     }
 
-    centerCards.showCards(gc.nest, &originalNestStyles);
-    bottomCardsPreview.showCards(gc.playerArr[PLAYER_1].cardArr, &originalNestStyles);
+    centerCards->showCards(gc.nest, &originalNestStyles);
+    bottomCardsPreview->showCards(gc.playerArr[PLAYER_1].cardArr, &originalNestStyles);
 }

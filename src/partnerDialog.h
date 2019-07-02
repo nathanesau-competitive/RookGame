@@ -25,7 +25,7 @@ protected:
 // for selecting a partner card from available cards
 class PartnerDialog : public QDialogWithClickableCardArray
 {
-    Card &cardSelected;
+    Card &cardSelected; // output of dialog
 
     CardVector blackCards;
     CardVector greenCards;
@@ -34,15 +34,15 @@ class PartnerDialog : public QDialogWithClickableCardArray
     CardVector wildCards;
 
 private:
-    PartnerDialogLabel blackLabel;
-    PartnerDialogLabel greenLabel;
-    PartnerDialogLabel redLabel;
-    PartnerDialogLabel yellowLabel;
-    PartnerDialogLabel wildLabel;
+    PartnerDialogLabel *blackLabel;
+    PartnerDialogLabel *greenLabel;
+    PartnerDialogLabel *redLabel;
+    PartnerDialogLabel *yellowLabel;
+    PartnerDialogLabel *wildLabel;
 
-    ScaledQPushButton cancelButton;
+    ScaledQPushButton *cancelButton;
 
-    ClickableCardArray centerCards;
+    ClickableCardArray *centerCards;
 
 public:
     PartnerDialog(Card &pCardSelected, QWidget *parent = nullptr);
@@ -53,6 +53,8 @@ public:
     virtual void onCardClicked(ClickableCard *clickableCard);
     virtual void onCardHoverEnter(ClickableCard *clickableCard);
     virtual void onCardHoverLeave(ClickableCard *clickableCard);
+
+    void setupCardArrays();
 };
 
 #endif

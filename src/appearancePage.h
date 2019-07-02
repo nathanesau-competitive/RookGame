@@ -29,29 +29,29 @@ class AppearancePage : public QWidget
     map<float /*scalefactor*/, string> resolutionTextMap;
     map<int, float /*scalefactor*/> scaleFactorMap;
 
-    QGroupBox resolutionGroup;
-    QHBoxLayout resolutionLayout;
-    QLabel resolutionLabel;
-    QComboBox resolutionComboBox;
+    QGroupBox *resolutionGroup;
+    QHBoxLayout *resolutionLayout;
+    QLabel *resolutionLabel;
+    QComboBox *resolutionComboBox;
 
-    QGroupBox namesGroup;
-    QVBoxLayout namesLayout;
-    QLabel player1NameLabel;
-    QLineEdit player1NameEdit;
-    QLabel player2NameLabel;
-    QLineEdit player2NameEdit;
-    QLabel player3NameLabel;
-    QLineEdit player3NameEdit;
-    QLabel player4NameLabel;
-    QLineEdit player4NameEdit;
+    QGroupBox *namesGroup;
+    QVBoxLayout *namesLayout;
+    QLabel *player1NameLabel;
+    QLineEdit *player1NameEdit;
+    QLabel *player2NameLabel;
+    QLineEdit *player2NameEdit;
+    QLabel *player3NameLabel;
+    QLineEdit *player3NameEdit;
+    QLabel *player4NameLabel;
+    QLineEdit *player4NameEdit;
 
-    QGroupBox tagsGroup;
-    QVBoxLayout tagsLayout;
-    QCheckBox showNameTagsBox;
+    QGroupBox *tagsGroup;
+    QVBoxLayout *tagsLayout;
+    QCheckBox *showNameTagsBox;
 
-    QPushButton applyButton;
+    QPushButton *applyButton;
     
-    QVBoxLayout mainLayout;
+    QVBoxLayout *mainLayout;
 
 public:
     AppearancePage(MainWindow *pMainWindow, QWidget *parent = 0);

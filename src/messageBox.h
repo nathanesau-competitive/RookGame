@@ -22,9 +22,7 @@ public:
 protected:
     Ui::MessageBox ui;
 
-    ClickableCardArray messageBoxCards; 
-
-    void setupUi();
+    ClickableCardArray *messageBoxCards;
 
     void okButtonPressed();
 

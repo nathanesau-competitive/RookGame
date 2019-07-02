@@ -15,21 +15,21 @@ extern GameController gc;
 
 class RoundSummaryDialog : public ScaledQDialog
 {
-    ScaledQLabel summaryLabel;
+    ScaledQLabel *summaryLabel;
 
-    ScaledQLabel player1ScoreLabel;
-    ScaledQLabel player1Score;
+    ScaledQLabel *player1ScoreLabel;
+    ScaledQLabel *player1Score;
 
-    ScaledQLabel player2ScoreLabel;
-    ScaledQLabel player2Score;
+    ScaledQLabel *player2ScoreLabel;
+    ScaledQLabel *player2Score;
 
-    ScaledQLabel player3ScoreLabel;
-    ScaledQLabel player3Score;
+    ScaledQLabel *player3ScoreLabel;
+    ScaledQLabel *player3Score;
 
-    ScaledQLabel player4ScoreLabel;
-    ScaledQLabel player4Score;
+    ScaledQLabel *player4ScoreLabel;
+    ScaledQLabel *player4Score;
 
-    ScaledQPushButton okButton;
+    ScaledQPushButton *okButton;
 
 public:
     RoundSummaryDialog(QWidget *parent = nullptr);
