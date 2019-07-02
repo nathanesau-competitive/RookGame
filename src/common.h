@@ -120,6 +120,8 @@ class ScaledQDialog : public QDialog
 
 public:
     ScaledQDialog(bool pFixedSize, QWidget *parent = nullptr);
+
+    // should call updateScaleFactor() and setGeometry(geometry())
     virtual void rescale() = 0;
 
     // override functions related to size or position

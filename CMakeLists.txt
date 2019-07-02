@@ -45,6 +45,8 @@ set(rook_SRCS
         src/gameController.h
         src/gameInfoWidget.cpp
         src/gameInfoWidget.h
+        src/gameMenuWidget.cpp
+        src/gameMenuWidget.h
         src/gamePage.cpp
         src/gamePage.h
         src/handInfo.cpp

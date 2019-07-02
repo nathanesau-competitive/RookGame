@@ -13,6 +13,7 @@ using namespace std;
 
 MainWidget::MainWidget(MainWindow *pMainWindow, QWidget *parent) : mainWindow(pMainWindow),
                                                                    infoWidget(pMainWindow),
+                                                                   menuWidget(pMainWindow),
                                                                    QDialogWithClickableCardArray(false, parent),
                                                                    player1CardPlayed(DRAW_POSITION_MAIN_WIDGET_CENTER_BOTTOM, SIZE_NORMAL, this),
                                                                    player2CardPlayed(DRAW_POSITION_MAIN_WIDGET_CENTER_LEFT, SIZE_NORMAL, this),
@@ -45,6 +46,10 @@ MainWidget::MainWidget(MainWindow *pMainWindow, QWidget *parent) : mainWindow(pM
     infoWidget.move(QPoint(0, 0));
     infoWidget.resize(1200, 130);
 
+    menuWidget.setParent(this);
+    menuWidget.move(QPoint(400, 300));
+    menuWidget.resize(400, 300);
+
     // no window title, etc.
 }
 
@@ -63,6 +68,9 @@ void MainWidget::rescale()
         label->rescale();
 
     for (auto widget : vector<GameInfoWidget *>{&infoWidget})
+        widget->rescale();
+
+    for (auto widget : vector<GameMenuWidget *>{&menuWidget})
         widget->rescale();
 }
 
@@ -178,8 +186,8 @@ void MainWidget::onCardClicked(ClickableCard *clickableCard)
             return;
         }
 
-        // automatically trigger new round action
-        mainWindow->startNewRound();
+        // show game menu
+        menuWidget.show();
     }
     else
     {

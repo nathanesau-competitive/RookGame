@@ -1,61 +1,41 @@
 #include "GamePage.h"
 
+// Preferences
+//
+// - display partner card on hover
+// - pick self as partner
+// - screen timeout
+
 GamePage::GamePage(QWidget *parent) : QWidget(parent)
 {
-    updateGroup = new QGroupBox;
-    updateGroup->setTitle("Package selection");
+    systemCheckBox.setText("Update system");
+    appsCheckBox.setText("Update applications");
+    docsCheckBox.setText("Update documentation");
 
-    systemCheckBox = new QCheckBox;
-    systemCheckBox->setText("Update system");
+    updateGroup.setTitle("Package selection");
+    updateLayout.addWidget(&systemCheckBox);
+    updateLayout.addWidget(&appsCheckBox);
+    updateLayout.addWidget(&docsCheckBox);
+    updateGroup.setLayout(&updateLayout);
 
-    appsCheckBox = new QCheckBox;
-    appsCheckBox->setText("Update applications");
+    qtItem.setText("Qt");
+    qsaItem.setText("QSA");
+    teamBuilderItem.setText("Teambuilder");
 
-    docsCheckBox = new QCheckBox;
-    docsCheckBox->setText("Update documentation");
+    packageGroup.setTitle("Existing packages");
+    packageList.addItem(&qtItem);
+    packageList.addItem(&qsaItem);
+    packageList.addItem(&teamBuilderItem);
+    packageLayout.addWidget(&packageList);
+    packageGroup.setLayout(&packageLayout);
 
-    packageGroup = new QGroupBox;
-    packageGroup->setTitle("Existing packages");
+    applyButton.setText("Apply");
+
+    mainLayout.addWidget(&updateGroup);
+    mainLayout.addWidget(&packageGroup);
+    mainLayout.addSpacing(12);
+    mainLayout.addWidget(&applyButton);
+    mainLayout.addStretch(1);
     
-    auto setupListWidgetItem = [this](QListWidgetItem *item, QString text)
-    {
-        item = new QListWidgetItem;
-        item->setText(text);
-
-        packageList->addItem(item);
-    };
-
-    packageList = new QListWidget;
-    setupListWidgetItem(qtItem, "Qt");
-    setupListWidgetItem(qsaItem, "QSA");
-    setupListWidgetItem(teamBuilderItem, "Teambuilder");
-
-    startUpdateButton = new QPushButton;
-    startUpdateButton->setText("Start update");
-
-    updateLayout = new QVBoxLayout;
-    updateLayout->addWidget(systemCheckBox);
-    updateLayout->addWidget(appsCheckBox);
-    updateLayout->addWidget(docsCheckBox);
-
-    updateGroup = new QGroupBox;
-    updateGroup->setLayout(updateLayout);
-
-    packageLayout = new QVBoxLayout;
-    packageLayout->addWidget(packageList);
-
-    packageGroup->setLayout(packageLayout);
-
-    mainLayout = new QVBoxLayout;
-    mainLayout->addWidget(updateGroup);
-    mainLayout->addWidget(packageGroup);
-    mainLayout->addSpacing(12);
-    mainLayout->addWidget(startUpdateButton);
-    mainLayout->addStretch(1);
-    
-    setLayout(mainLayout);
-}
-
-GamePage::~GamePage()
-{
+    setLayout(&mainLayout);
 }

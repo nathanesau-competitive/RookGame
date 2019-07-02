@@ -4,6 +4,7 @@
 #include "clickableCard.h"
 #include "common.h"
 #include "gameInfoWidget.h"
+#include "gameMenuWidget.h"
 
 // forward declarations
 class CpuPlayer;
@@ -20,6 +21,7 @@ class MainWidget : public QDialogWithClickableCardArray
 
 public:
     GameInfoWidget infoWidget;
+    GameMenuWidget menuWidget;
 
     ScaledQLabel player1NameLabel;
     ClickableCardArray player1CardPlayed;

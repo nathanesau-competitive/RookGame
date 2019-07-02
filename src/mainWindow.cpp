@@ -26,37 +26,33 @@ MainWindow::MainWindow(QWidget *parent) : ScaledQMainWindow(parent),
     widget.infoWidget.updatePlayerNames(Utils::Db::readPlayerNamesFromDb());
     widget.infoWidget.updatePartner(Card(SUIT_UNDEFINED, VALUE_UNDEFINED));
 
-    newGameAction.setText(QMenu::tr("&New"));
+    newGameAction.setText(QMenu::tr("&New Game"));
     newGameAction.setShortcuts(QKeySequence::New);
     newGameAction.setStatusTip("Start a new game");
     QObject::connect(&newGameAction, &QAction::triggered, this, &MainWindow::onNewGameAction);
 
-    loadGameAction.setText(QMenu::tr("&Load"));
+    loadGameAction.setText(QMenu::tr("&Load Game"));
     loadGameAction.setShortcuts(QKeySequence::Open);
     loadGameAction.setStatusTip("Load an existing game");
     QObject::connect(&loadGameAction, &QAction::triggered, this, &MainWindow::onLoadGameAction);
 
-    saveGameAction.setText(QMenu::tr("&Save"));
-    saveGameAction.setShortcuts(QKeySequence::Save);
-    saveGameAction.setStatusTip("Save the current game");
-    QObject::connect(&saveGameAction, &QAction::triggered, this, &MainWindow::onSaveGameAction);
+    quitAction.setText(QMenu::tr("&Quit Game"));
+    quitAction.setShortcuts(QKeySequence::Quit);
+    quitAction.setStatusTip("Quit the game");
+    QObject::connect(&quitAction, &QAction::triggered, this, &MainWindow::onQuitAction);
+
+    fileMenu.setTitle(QMenu::tr("&File"));
+    fileMenu.addAction(&newGameAction);
+    fileMenu.addAction(&loadGameAction);
+    fileMenu.addAction(&quitAction);
 
     preferencesAction.setText(QMenu::tr("&Preferences"));
     preferencesAction.setShortcuts(QKeySequence::Preferences);
     preferencesAction.setStatusTip("Edit the preferences");
     QObject::connect(&preferencesAction, &QAction::triggered, this, &MainWindow::onPreferencesAction);
 
-    exitAction.setText(QMenu::tr("&Exit"));
-    exitAction.setShortcuts(QKeySequence::Quit);
-    exitAction.setStatusTip("Exit the game");
-    QObject::connect(&exitAction, &QAction::triggered, this, &MainWindow::onExitAction);
-
-    fileMenu.setTitle(QMenu::tr("&File"));
-    fileMenu.addAction(&newGameAction);
-    fileMenu.addAction(&loadGameAction);
-    fileMenu.addAction(&saveGameAction);
-    fileMenu.addAction(&preferencesAction);
-    fileMenu.addAction(&exitAction);
+    editMenu.setTitle(QMenu::tr("&Edit"));
+    editMenu.addAction(&preferencesAction);
 
     viewScoresAction.setText(QMenu::tr("View scores"));
     viewScoresAction.setStatusTip("View scores for current game");
@@ -78,6 +74,7 @@ MainWindow::MainWindow(QWidget *parent) : ScaledQMainWindow(parent),
     helpMenu.addAction(&aboutAction);
 
     menuBar.addMenu(&fileMenu);
+    menuBar.addMenu(&editMenu);
     menuBar.addMenu(&gameMenu);
     menuBar.addMenu(&helpMenu);
 
@@ -146,9 +143,9 @@ void MainWindow::onPreferencesAction()
     // game settings should be written here
 }
 
-void MainWindow::onExitAction()
+void MainWindow::onQuitAction()
 {
-    // todo
+    this->close();
 }
 
 void MainWindow::onViewScoresAction()
@@ -170,6 +167,8 @@ void MainWindow::onAboutAction()
 
 void MainWindow::startNewRound()
 {
+    widget.menuWidget.hide();
+
     // clear existing info
     widget.infoWidget.resetRoundInfoToDefaults();
     widget.player1CardPlayed.hideCards();

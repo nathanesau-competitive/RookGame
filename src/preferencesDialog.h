@@ -32,6 +32,8 @@ class PreferencesDialog : public QDialog
 
     QPushButton *closeButton;
 
+    int *x;
+
 public:
     PreferencesDialog(MainWindow *pMainWindow, QWidget *parent = nullptr);
     virtual ~PreferencesDialog();

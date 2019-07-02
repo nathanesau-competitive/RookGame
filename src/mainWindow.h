@@ -24,9 +24,10 @@ class MainWindow : public ScaledQMainWindow
     QMenu fileMenu;
     QAction newGameAction;
     QAction loadGameAction;
-    QAction saveGameAction;
+    QAction quitAction;
+
+    QMenu editMenu;
     QAction preferencesAction;
-    QAction exitAction;
 
     QMenu gameMenu;
     QAction viewScoresAction;
@@ -49,7 +50,7 @@ public:
     void onLoadGameAction();
     void onSaveGameAction();
     void onPreferencesAction();
-    void onExitAction();
+    void onQuitAction();
     void onViewScoresAction();
     void onCheckUpdatesAction();
     void onAboutAction();
