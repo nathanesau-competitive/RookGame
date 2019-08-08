@@ -1,3 +1,5 @@
+#include <algorithm>
+
 #include "handInfo.h"
 #include "roundInfo.h"
 

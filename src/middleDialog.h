@@ -9,7 +9,7 @@
 #include "card.h"
 #include "clickableCard.h"
 #include "common.h"
-#include "ui_MiddleDialog.h"
+#include "ui_MiddleDialog.h" // uic -o ui_middleDialog.h middleDialog.ui
 
 // forward declarations
 class GameController;

@@ -8,7 +8,7 @@
 
 #include "clickableCard.h"
 #include "common.h"
-#include "ui_MessageBox.h"
+#include "ui_MessageBox.h" // uic -o ui_messageBox.h messageBox.ui
 
 class MessageBox : public QDialogWithClickableCardArray
 {

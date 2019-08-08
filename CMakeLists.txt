@@ -1,8 +1,12 @@
+# REVIEW THE FOLLOWING IN ORDER TO COMPILE
+# 
+# 1. if on windows, modify QtPath
+
 cmake_minimum_required(VERSION 3.1.0)
 
 project(rook)
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 14)
 
 # Find includes in corresponding build directories
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
@@ -11,14 +15,18 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_AUTOMOC ON)
 
 # Create code from a list of Qt designer ui files
-set(CMAKE_AUTOUIC ON)
+if (WIN32)
+    set(CMAKE_AUTOUIC ON)
+endif (WIN32)
 
 # Auto handling of qrc resource files
 set(CMAKE_AUTORCC ON)
 
 # Set Qt Path
-set(QtPath "D:/Qt/5.12.3/msvc2017_64")
-set(CMAKE_PREFIX_PATH ${QtPath})
+if (WIN32)
+    set(QtPath "D:/Qt/5.12.3/msvc2017_64")
+    set(CMAKE_PREFIX_PATH ${QtPath})
+endif (WIN32)
 
 # Find the Qt libraries
 find_package(Qt5Widgets CONFIG REQUIRED)
@@ -83,12 +91,20 @@ set(rook_SRCS
         src/utils.h
 )
 
-add_executable(rook WIN32 ${rook_SRCS})
+if (WIN32)
+    add_executable(rook WIN32 ${rook_SRCS})
+endif (WIN32)
+
+if (UNIX)
+    add_executable(rook ${rook_SRCS})
+endif (UNIX)
 
 # Copy Qt debug dlls
-configure_file(${QtPath}/bin/Qt5Widgetsd.dll ${CMAKE_CURRENT_BINARY_DIR}/Qt5Widgetsd.dll COPYONLY)
-configure_file(${QtPath}/bin/Qt5Cored.dll ${CMAKE_CURRENT_BINARY_DIR}/Qt5Cored.dll COPYONLY)
-configure_file(${QtPath}/bin/Qt5Guid.dll ${CMAKE_CURRENT_BINARY_DIR}/Qt5Guid.dll COPYONLY)
+if (WIN32)
+    configure_file(${QtPath}/bin/Qt5Widgetsd.dll ${CMAKE_CURRENT_BINARY_DIR}/Qt5Widgetsd.dll COPYONLY)
+    configure_file(${QtPath}/bin/Qt5Cored.dll ${CMAKE_CURRENT_BINARY_DIR}/Qt5Cored.dll COPYONLY)
+    configure_file(${QtPath}/bin/Qt5Guid.dll ${CMAKE_CURRENT_BINARY_DIR}/Qt5Guid.dll COPYONLY)
+endif (WIN32)
 
 # link the Qt libraries
 target_link_libraries(rook Qt5::Widgets)

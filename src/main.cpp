@@ -13,10 +13,7 @@ GameController gc;
 QPixmapCache pixmapcache;
 
 int main(int argc, char *argv[])
-{   
-    // for detecting memory leaks
-    _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
-
+{
     QApplication a(argc, argv);
 
     scalefactor = Utils::Db::readScaleFactorFromDb();

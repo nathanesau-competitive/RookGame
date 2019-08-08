@@ -5,7 +5,7 @@
 #include <QMainWindow>
 
 #include "common.h"
-#include "ui_BidDialog.h"
+#include "ui_BidDialog.h" // uic -o ui_bidDialog.h bidDialog.ui
 
 // forward declarations
 class GameController;
