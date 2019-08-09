@@ -10,7 +10,7 @@ GameInfoWidget::GameInfoWidget(QMainWindow *pMainWindow, QWidget *parent) : main
 {
     clearDataVariables();
 
-    topLeftCards = new ClickableCardArray (DRAW_POSITION_GAME_INFO_WIDGET, SIZE_TINY, this);
+    topLeftCards = new ClickableCardArray(DRAW_POSITION_GAME_INFO_WIDGET, SIZE_TINY, this);
 
     auto setupCategoryLabel = [this](ScaledQLabel *categoryLabel, QString text, QSize size, QPoint pos) {
         categoryLabel->setParent(this);
@@ -95,7 +95,7 @@ GameInfoWidget::GameInfoWidget(QMainWindow *pMainWindow, QWidget *parent) : main
     player2OverallScoreLabel = new ScaledQLabel;
     setupLabel(player2OverallScoreLabel, "???", {100, 20}, {1090, 55});
 
-    player3OverallScoreLabel = new ScaledQLabel;    
+    player3OverallScoreLabel = new ScaledQLabel;
     setupLabel(player3OverallScoreLabel, "???", {100, 20}, {1090, 75});
 
     player4OverallScoreLabel = new ScaledQLabel;
@@ -131,8 +131,7 @@ void GameInfoWidget::resetRoundInfoToDefaults()
     updateTeam1({});
     updateTeam2({});
     updatePlayerPoints(map<int, int>());
-    updateTeamPoints(map<int, int> ());
-
+    updateTeamPoints(map<int, int>());
 }
 
 void GameInfoWidget::resetOverallInfoToDefaults()
@@ -153,20 +152,23 @@ void GameInfoWidget::onCardClicked(ClickableCard *clickableCard)
 
 void GameInfoWidget::onCardHoverEnter(ClickableCard *clickableCard)
 {
-    auto toolTipText = [this](int playerNum) -> QString {
-        switch (playerNum)
-        {
-        case PLAYER_1:
-        case PLAYER_2:
-        case PLAYER_3:
-        case PLAYER_4:
-            return QString::fromStdString(playerNames[playerNum]);
-        default:
-            return "???";
-        }
-    }(partnerPlayerNum);
+    if (Utils::Db::readShowPartnerToolTipFromDb())
+    {
+        auto toolTipText = [this](int playerNum) -> QString {
+            switch (playerNum)
+            {
+            case PLAYER_1:
+            case PLAYER_2:
+            case PLAYER_3:
+            case PLAYER_4:
+                return QString::fromStdString(playerNames[playerNum]);
+            default:
+                return "???";
+            }
+        }(partnerPlayerNum);
 
-    QToolTip::showText(mainWindow->pos() + clickableCard->pos(), toolTipText, clickableCard);
+        QToolTip::showText(mainWindow->pos() + clickableCard->pos(), toolTipText, clickableCard);
+    }
 }
 
 void GameInfoWidget::onCardHoverLeave(ClickableCard *clickableCard)
@@ -177,7 +179,7 @@ void GameInfoWidget::onCardHoverLeave(ClickableCard *clickableCard)
 void GameInfoWidget::updatePlayerNames(map<int, string> pPlayerNames)
 {
     playerNames = pPlayerNames;
-    
+
     updatePlayerPoints(playerScores);
     updateOverallScores(overallPlayerScores);
     updateTeam1(teams.first);

@@ -8,22 +8,23 @@
 
 #include "clickableCard.h"
 #include "common.h"
-#include "ui_MessageBox.h" // uic -o ui_messageBox.h messageBox.ui
 
 class MessageBox : public QDialogWithClickableCardArray
 {
+    ScaledQLabel *msgLabel;
+    ScaledQPushButton *okButton;
+    ClickableCardArray *messageBoxCards;
+
 public:
     MessageBox(QWidget *parent = nullptr);
     virtual void rescale();
+
+    void reject() {}
 
     void setText(const QString &text);
     void showCards(const CardVector &cardArr);
 
 protected:
-    Ui::MessageBox ui;
-
-    ClickableCardArray *messageBoxCards;
-
     void okButtonPressed();
 
     void onCardClicked(ClickableCard *clickableCard)

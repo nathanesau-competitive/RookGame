@@ -15,9 +15,9 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_AUTOMOC ON)
 
 # Create code from a list of Qt designer ui files
-if (WIN32)
-    set(CMAKE_AUTOUIC ON)
-endif (WIN32)
+#if (WIN32)
+#    set(CMAKE_AUTOUIC ON)
+#endif (WIN32)
 
 # Auto handling of qrc resource files
 set(CMAKE_AUTORCC ON)
@@ -66,10 +66,8 @@ set(rook_SRCS
         src/mainWindow.h
         src/messageBox.cpp
         src/messageBox.h
-        src/messageBox.ui
         src/middleDialog.cpp
         src/middleDialog.h
-        src/middleDialog.ui
         src/nestDialog.cpp
         src/nestDialog.h
         src/overallInfo.cpp
@@ -87,6 +85,8 @@ set(rook_SRCS
         src/roundSummaryDialog.h
         src/trumpDialog.cpp
         src/trumpDialog.h
+        src/ui_bidDialog.h
+        src/ui_middleDialog.h
         src/utils.cpp
         src/utils.h
 )

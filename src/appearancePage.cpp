@@ -103,18 +103,40 @@ AppearancePage::AppearancePage(MainWindow *pMainWindow, QWidget *parent) : mainW
     namesLayout->addWidget(player4NameEdit);
     namesGroup->setLayout(namesLayout);
 
-    // name tags
+    // HUD
 
     showNameTagsBox = new QCheckBox;
     showNameTagsBox->setText("Show name tags");
     showNameTagsBox->setChecked(Utils::Db::readShowNameTagsFromDb());
     
-    tagsGroup = new QGroupBox;
-    tagsGroup->setTitle("Tags");
+    showPartnerToolTipBox = new QCheckBox;
+    showPartnerToolTipBox->setText("Show partner tool tip");
+    showPartnerToolTipBox->setChecked(Utils::Db::readShowPartnerToolTipFromDb());
 
-    tagsLayout = new QVBoxLayout;
-    tagsLayout->addWidget(showNameTagsBox);
-    tagsGroup->setLayout(tagsLayout);
+    hudGroup = new QGroupBox;
+    hudGroup->setTitle("HUD");
+
+    hudLayout = new QVBoxLayout;
+    hudLayout->addWidget(showNameTagsBox);
+    hudLayout->addWidget(showPartnerToolTipBox);
+    hudGroup->setLayout(hudLayout);
+
+    // screen
+
+    screenWidthLineEdit = new QLineEdit;
+    screenWidthLineEdit->setText(QString::number(Utils::Db::readScreenWidthFromDb()));
+    
+    screenHeightLineEdit = new QLineEdit;
+    screenHeightLineEdit->setText(QString::number(Utils::Db::readScreenHeightFromDb()));
+
+    screenGroup = new QGroupBox;
+    screenGroup->setTitle("Screen Dimensions");
+    screenGroup->setToolTip("These are used to positions widgets on screen (defaults may need to be overriden for WSL, etc.)");
+    
+    screenLayout = new QVBoxLayout;
+    screenLayout->addWidget(screenWidthLineEdit);
+    screenLayout->addWidget(screenHeightLineEdit);
+    screenGroup->setLayout(screenLayout);
 
     applyButton = new QPushButton;
     applyButton->setText("Apply");
@@ -123,7 +145,8 @@ AppearancePage::AppearancePage(MainWindow *pMainWindow, QWidget *parent) : mainW
     mainLayout = new QVBoxLayout;
     mainLayout->addWidget(resolutionGroup);
     mainLayout->addWidget(namesGroup);
-    mainLayout->addWidget(tagsGroup);
+    mainLayout->addWidget(hudGroup);
+    mainLayout->addWidget(screenGroup);
     mainLayout->addStretch(1);
     mainLayout->addWidget(applyButton);
 
@@ -134,7 +157,8 @@ void AppearancePage::onApply()
 {
     applyResolution();
     applyPlayerNames();
-    applyNameTags();
+    applyHUD();
+    applyScreenDimensions();
 }
 
 void AppearancePage::applyResolution()
@@ -164,10 +188,25 @@ void AppearancePage::applyPlayerNames()
     mainWindow->updatePlayerNames(playerNames);
 }
 
-void AppearancePage::applyNameTags()
+void AppearancePage::applyHUD()
 {
     bool showNameTags = showNameTagsBox->isChecked();
+    bool showPartnerToolTip = showPartnerToolTipBox->isChecked();
+
     Utils::Db::writeShowNameTagsToDb(showNameTags);
+    Utils::Db::writeShowPartnerToolTipToDb(showPartnerToolTip);
 
     mainWindow->updateNameTags(showNameTags);
+    // partner tooltip will no longer be shown on "hover" over partner card...
+}
+
+void AppearancePage::applyScreenDimensions()
+{
+    int screenWidth = screenWidthLineEdit->text().toInt();
+    int screenHeight = screenHeightLineEdit->text().toInt();
+
+    Utils::Db::writeScreenWidthToDb(screenWidth);
+    Utils::Db::writeScreenHeightToDb(screenHeight);
+
+    // don't re-position existing widgets... use geometry to position future widgets
 }

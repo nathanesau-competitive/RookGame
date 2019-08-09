@@ -52,10 +52,9 @@ PartnerDialog::PartnerDialog(Card &pCardSelected, QWidget *parent) : cardSelecte
     cancelButton->resize(50, 25);
     cancelButton->move({700, 250});
 
-    QObject::connect(cancelButton, &QPushButton::pressed, this, &PartnerDialog::accept);
+    QObject::connect(cancelButton, &QPushButton::pressed, this, &QDialog::accept);
 
     setWindowTitle("Click partner card...");
-    setWindowFlags(Qt::WindowTitleHint | Qt::WindowMinimizeButtonHint);
     setWindowIcon(QIcon(":rookicon.gif"));
     setGeometry(QRect(0, 0, 850, 300));
 }
@@ -106,7 +105,7 @@ void PartnerDialog::onCardClicked(ClickableCard *clickableCard)
     cardSelected.suit = clickableCard->data.suit;
     cardSelected.value = clickableCard->data.value;
 
-    accept();
+    QDialog::accept();
 }
 
 void PartnerDialog::onCardHoverEnter(ClickableCard *clickableCard)

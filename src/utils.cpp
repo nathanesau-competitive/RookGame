@@ -1,6 +1,7 @@
 #include <QApplication>
 #include <QDesktopWidget>
 #include <QSettings>
+#include <QScreen>
 
 #include "bidDialog.h"
 #include "ui_BidDialog.h"
@@ -9,7 +10,6 @@
 #include "mainWidget.h"
 #include "mainWindow.h"
 #include "messageBox.h"
-#include "ui_MessageBox.h"
 #include "middleDialog.h"
 #include "ui_MiddleDialog.h"
 #include "roundInfo.h"
@@ -20,11 +20,20 @@ namespace Utils
 {
 namespace Ui
 {
+QRect getScreenGeometry()
+{
+    QRect geometry = QApplication::desktop()->screenGeometry();
+    geometry.setWidth(Utils::Db::readScreenWidthFromDb());
+    geometry.setHeight(Utils::Db::readScreenHeightFromDb());
+
+    return geometry;
+}
+
 float getBestScaleFactor()
 {
     QSize origSize = {1200, 850};
 
-    QRect maxSizeRect = QApplication::desktop()->screenGeometry();
+    QRect maxSizeRect = Utils::Ui::getScreenGeometry();
     QSize maxSize = {maxSizeRect.width(), maxSizeRect.height()};
 
     float factor = min((float)maxSize.width() / origSize.width(),
@@ -46,12 +55,12 @@ QSize getResolution(float scaleFactor)
     return {width, height};
 }
 
-void moveWindowToCenter(QMainWindow *mainWindow, int taskBarHeight)
+void moveWindowToCenter(QWidget *widget, int taskBarHeight /*=0*/)
 {
-    auto screenGeometry = QApplication::desktop()->screenGeometry();
-    int x = (screenGeometry.width() - mainWindow->width()) / 2;
-    int y = max(0, (screenGeometry.height() - mainWindow->height()) / 2 - taskBarHeight);
-    mainWindow->move(QPoint(x, y));
+    auto screenGeometry = Utils::Ui::getScreenGeometry();
+    int x = (screenGeometry.width() - widget->width()) / 2;
+    int y = max(0, (screenGeometry.height() - widget->height()) / 2 - taskBarHeight);
+    widget->move(QPoint(x, y));
 }
 
 void moveDialog(QDialog *dialog, QMainWindow *mainWindow, int position)
@@ -98,8 +107,7 @@ void moveDialog(QDialog *dialog, QMainWindow *mainWindow, int position)
 void setupMessageBox(MessageBox *msgBox, QString msg, QString title, QSize size)
 {
     msgBox->setText(msg);
-    msgBox->setWindowFlags(Qt::WindowTitleHint | Qt::WindowMinimizeButtonHint);
-    msgBox->resize(size);
+    //msgBox->resize(size);
     msgBox->setWindowTitle(title);
 }
 } // namespace Ui
@@ -114,14 +122,6 @@ float readScaleFactorFromDb()
     settings.endGroup();
 
     return scaleFactor;
-}
-
-void writeScaleFactorToDb(float scaleFactor)
-{
-    QSettings settings("OpenSourceSoftware", "Rook");
-    settings.beginGroup("Appearance");
-    settings.setValue("scalefactor", scaleFactor);
-    settings.endGroup();
 }
 
 map<int, string> readPlayerNamesFromDb()
@@ -147,6 +147,54 @@ map<int, string> readPlayerNamesFromDb()
     return playerNames;
 }
 
+bool readShowNameTagsFromDb()
+{
+    QSettings settings("OpenSourceSoftware", "Rook");
+    settings.beginGroup("Appearance");
+    bool showNameTags = settings.value("showNameTags", true).toBool();
+    settings.endGroup();
+
+    return showNameTags;
+}
+
+bool readShowPartnerToolTipFromDb()
+{
+    QSettings settings("OpenSourceSoftware", "Rook");
+    settings.beginGroup("Appearance");
+    bool showPartnerToolTip = settings.value("showPartnerToolTip", false).toBool();
+    settings.endGroup();
+
+    return showPartnerToolTip;
+}
+
+int readScreenWidthFromDb()
+{
+    QSettings settings("OpenSourceSoftware", "Rook");
+    settings.beginGroup("Appearance");
+    int screenWidth = settings.value("screenWidth", QApplication::desktop()->screenGeometry().width()).toInt();
+    settings.endGroup();
+
+    return screenWidth;
+}
+
+int readScreenHeightFromDb()
+{
+    QSettings settings("OpenSourceSoftware", "Rook");
+    settings.beginGroup("Appearance");
+    int screenHeight = settings.value("screenHeight", QApplication::desktop()->screenGeometry().height()).toInt();
+    settings.endGroup();
+
+    return screenHeight;
+}
+
+void writeScaleFactorToDb(float scaleFactor)
+{
+    QSettings settings("OpenSourceSoftware", "Rook");
+    settings.beginGroup("Appearance");
+    settings.setValue("scalefactor", scaleFactor);
+    settings.endGroup();
+}
+
 void writePlayerNamesToDb(map<int, string> playerNames)
 {
     QSettings settings("OpenSourceSoftware", "Rook");
@@ -158,21 +206,35 @@ void writePlayerNamesToDb(map<int, string> playerNames)
     settings.endGroup();
 }
 
-bool readShowNameTagsFromDb()
-{
-    QSettings settings("OpenSourceSoftware", "Rook");
-    settings.beginGroup("Appearance");
-    bool showNameTags = settings.value("showNameTags", true).toBool();
-    settings.endGroup();
-
-    return showNameTags;
-}
-
 void writeShowNameTagsToDb(bool showNameTags)
 {
     QSettings settings("OpenSourceSoftware", "Rook");
     settings.beginGroup("Appearance");
     settings.setValue("showNameTags", showNameTags);
+    settings.endGroup();
+}
+
+void writeShowPartnerToolTipToDb(bool showPartnerToolTip)
+{
+    QSettings settings("OpenSourceSoftware", "Rook");
+    settings.beginGroup("Appearance");
+    settings.setValue("showPartnerToolTip", showPartnerToolTip);
+    settings.endGroup();
+}
+
+void writeScreenWidthToDb(int screenWidth)
+{
+    QSettings settings("OpenSourceSoftware", "Rook");
+    settings.beginGroup("Appearance");
+    settings.setValue("screenWidth", screenWidth);
+    settings.endGroup();
+}
+
+void writeScreenHeightToDb(int screenHeight)
+{
+    QSettings settings("OpenSourceSoftware", "Rook");
+    settings.beginGroup("Appearance");
+    settings.setValue("screenHeight", screenHeight);
     settings.endGroup();
 }
 } // namespace Db

@@ -35,9 +35,10 @@ namespace Utils
 {
 namespace Ui
 {
+QRect getScreenGeometry();
 float getBestScaleFactor();
 QSize getResolution(float scaleFactor);
-void moveWindowToCenter(QMainWindow *mainWindow, int taskBarHeight);
+void moveWindowToCenter(QWidget *widget, int taskBarHeight = 0);
 void moveDialog(QDialog *dialog, QMainWindow *mainWindow, int position);
 void setupMessageBox(MessageBox *msgBox, QString msg, QString title, QSize = {477, 250});
 } // namespace Ui
@@ -45,13 +46,18 @@ void setupMessageBox(MessageBox *msgBox, QString msg, QString title, QSize = {47
 namespace Db
 {
 float readScaleFactorFromDb();
-void writeScaleFactorToDb(float scaleFactor);
-
 map<int, string> readPlayerNamesFromDb();
-void writePlayerNamesToDb(map<int, string> playerNames);
-
 bool readShowNameTagsFromDb();
+bool readShowPartnerToolTipFromDb();
+int readScreenWidthFromDb();
+int readScreenHeightFromDb();
+
+void writeScaleFactorToDb(float scaleFactor);
+void writePlayerNamesToDb(map<int, string> playerNames);
 void writeShowNameTagsToDb(bool showNameTags);
+void writeShowPartnerToolTipToDb(bool showPartnerToolTip);
+void writeScreenWidthToDb(int screenWidth);
+void writeScreenHeightToDb(int screenHeight);
 } // namespace Db
 
 namespace Stat

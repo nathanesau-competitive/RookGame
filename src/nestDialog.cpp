@@ -59,7 +59,6 @@ NestDialog::NestDialog(CardVector pOriginalNest, QMainWindow *pMainWindow, QWidg
 
     resize(911, 506);
     setWindowTitle("Nest Dialog");
-    setWindowFlags(Qt::WindowTitleHint | Qt::WindowMinimizeButtonHint);
     setWindowIcon(QIcon(":rookicon.gif"));
     setStyleSheet("background-color: white");
 }
@@ -196,7 +195,7 @@ void NestDialog::doneNestButtonPressed()
     }
     else
     {
-        accept();
+        QDialog::accept();
     }
 }
 

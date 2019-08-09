@@ -35,6 +35,8 @@ public:
     TrumpDialog(int &pSuitSelected, QWidget *parent = nullptr);
     virtual void rescale();
 
+    void reject() {}
+
     void onTrumpLabelClicked(TrumpDialogLabel *label);
 };
 

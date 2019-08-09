@@ -19,7 +19,11 @@ int main(int argc, char *argv[])
     scalefactor = Utils::Db::readScaleFactorFromDb();
     
     MainWindow mainWindow;
-    Utils::Ui::moveWindowToCenter(&mainWindow, 36);
+
+    //#ifdef WIN32
+    Utils::Ui::moveWindowToCenter(&mainWindow, 0);
+    //#endif
+
     mainWindow.show();
 
     return a.exec();

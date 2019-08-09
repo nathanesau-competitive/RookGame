@@ -2,6 +2,7 @@
 #define BIDDIALOG_H
 
 #include <QDialog>
+#include <QCloseEvent>
 #include <QMainWindow>
 
 #include "common.h"
@@ -21,6 +22,8 @@ public:
 
     BidDialog(QMainWindow *pMainWindow, QWidget *parent = nullptr);
     virtual void rescale();
+
+    void reject() {}
 
     void resetLabelsAndComboBox();
 

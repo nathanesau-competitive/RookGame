@@ -43,6 +43,8 @@ public:
     NestDialog(CardVector pOriginalNest, QMainWindow *pMainWindow, QWidget *parent = nullptr);
     virtual void rescale();
     
+    void reject() {}
+
     void setOriginalNestStyles(string style);
 
     virtual void onCardClicked(ClickableCard *clickableCard);

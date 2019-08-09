@@ -32,7 +32,6 @@ BidDialog::BidDialog(QMainWindow *pMainWindow, QWidget *parent) : mainWindow(pMa
     QObject::connect(ui.passButton, &QPushButton::pressed, this, &BidDialog::onPassButtonPressed);
 
     resize(661, 302);
-    setWindowFlags(Qt::WindowTitleHint | Qt::WindowMinimizeButtonHint);
     setWindowIcon(QIcon(":rookicon.gif"));
     setStyleSheet("background-color: white");
 }
@@ -91,7 +90,7 @@ void BidDialog::onBidButtonPressed()
 void BidDialog::onPassButtonPressed()
 {
     gc.onPass();
-    reject(); // close bid dialog
+    QDialog::reject(); // close bid dialog
     showBidResultMsgBox();
 }
 

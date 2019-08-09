@@ -60,7 +60,6 @@ RoundSummaryDialog::RoundSummaryDialog(QWidget *parent) : ScaledQDialog(true, pa
 
     resize(500, 250);
     setWindowTitle("Round summary");
-    setWindowFlags(Qt::WindowTitleHint | Qt::WindowMinimizeButtonHint);
     setWindowIcon(QIcon(":rookicon.gif"));
     setStyleSheet("background-color: white");
 }

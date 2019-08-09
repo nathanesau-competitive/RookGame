@@ -48,6 +48,8 @@ public:
     PartnerDialog(Card &pCardSelected, QWidget *parent = nullptr);
     virtual void rescale();
 
+    void reject() {}
+
     void onPartnerLabelClicked(PartnerDialogLabel *label);
 
     virtual void onCardClicked(ClickableCard *clickableCard);

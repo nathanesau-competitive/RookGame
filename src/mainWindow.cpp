@@ -14,7 +14,6 @@
 #include "messageBox.h"
 #include "middleDialog.h"
 #include "preferencesDialog.h"
-#include "PreferencesDialog.h"
 #include "utils.h"
 
 using namespace std;
@@ -41,10 +40,14 @@ MainWindow::MainWindow(QWidget *parent) : ScaledQMainWindow(parent)
     quitAction->setStatusTip("Quit the game");
     QObject::connect(quitAction, &QAction::triggered, this, &MainWindow::onQuitAction);
 
+    menuBar()->setStyleSheet("background-color: white");
+
     fileMenu = menuBar()->addMenu(QMenu::tr("&File"));
     fileMenu->addAction(newGameAction);
     fileMenu->addAction(loadGameAction);
     fileMenu->addAction(quitAction);
+    fileMenu->setStyleSheet("QMenu::item:selected { background-color: rgb(135, 206, 250); color: rgb(0, 0, 0);}"
+                            "QMenu::item { background-color: white; }");
 
     preferencesAction = new QAction(QMenu::tr("&Preferences"), this);
     preferencesAction->setShortcuts(QKeySequence::Preferences);
@@ -53,6 +56,8 @@ MainWindow::MainWindow(QWidget *parent) : ScaledQMainWindow(parent)
 
     editMenu = menuBar()->addMenu(QMenu::tr("&Edit"));
     editMenu->addAction(preferencesAction);
+    editMenu->setStyleSheet("QMenu::item:selected { background-color: rgb(135, 206, 250); color: rgb(0, 0, 0);}"
+                            "QMenu::item { background-color: white; }");
 
     viewScoresAction = new QAction(QMenu::tr("View scores"), this);
     viewScoresAction->setStatusTip("View scores for current game");
@@ -60,6 +65,8 @@ MainWindow::MainWindow(QWidget *parent) : ScaledQMainWindow(parent)
 
     gameMenu = menuBar()->addMenu(QMenu::tr("&Game"));
     gameMenu->addAction(viewScoresAction);
+    gameMenu->setStyleSheet("QMenu::item:selected { background-color: rgb(135, 206, 250); color: rgb(0, 0, 0);}"
+                            "QMenu::item { background-color: white; }");
 
     checkUpdatesAction = new QAction(QMenu::tr("Check for Updates"), this);
     checkUpdatesAction->setStatusTip("Check for game updates");
@@ -72,6 +79,8 @@ MainWindow::MainWindow(QWidget *parent) : ScaledQMainWindow(parent)
     helpMenu = menuBar()->addMenu(QMenu::tr("&Help"));
     helpMenu->addAction(checkUpdatesAction);
     helpMenu->addAction(aboutAction);
+    helpMenu->setStyleSheet("QMenu::item:selected { background-color: rgb(135, 206, 250); color: rgb(0, 0, 0);}"
+                            "QMenu::item { background-color: white; }");
 
     setCentralWidget(widget);
     setWindowTitle("Rook");
@@ -131,6 +140,7 @@ void MainWindow::onSaveGameAction()
 void MainWindow::onPreferencesAction()
 {
     PreferencesDialog preferencesDlg(this);
+    Utils::Ui::moveWindowToCenter(&preferencesDlg);
     auto result = preferencesDlg.exec();
 
     // appearance settings written when "Apply clicked"
@@ -179,6 +189,7 @@ void MainWindow::startNewRound()
     widget->bottomCards->showCards(gc.playerArr[PLAYER_1].cardArr);
 
     BidDialog bidDlg(this);
+    Utils::Ui::moveWindowToCenter(&bidDlg);
     auto player1WonBid = bidDlg.exec();
 
     widget->infoWidget->updateBid(gc.roundInfo.bidPlayer, gc.roundInfo.bidAmount);

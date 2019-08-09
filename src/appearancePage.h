@@ -45,9 +45,15 @@ class AppearancePage : public QWidget
     QLabel *player4NameLabel;
     QLineEdit *player4NameEdit;
 
-    QGroupBox *tagsGroup;
-    QVBoxLayout *tagsLayout;
+    QGroupBox *hudGroup;
+    QVBoxLayout *hudLayout;
     QCheckBox *showNameTagsBox;
+    QCheckBox *showPartnerToolTipBox;
+
+    QGroupBox *screenGroup;
+    QVBoxLayout *screenLayout;
+    QLineEdit *screenWidthLineEdit;
+    QLineEdit *screenHeightLineEdit;
 
     QPushButton *applyButton;
     
@@ -61,7 +67,8 @@ private:
 
     void applyResolution();
     void applyPlayerNames();
-    void applyNameTags();
+    void applyHUD();
+    void applyScreenDimensions();
 };
 
 #endif

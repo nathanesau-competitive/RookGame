@@ -37,7 +37,6 @@ TrumpDialog::TrumpDialog(int &pSuitSelected, QWidget *parent) : suitSelected(pSu
 
     setGeometry(QRect(0, 0, 600, 250));
     setWindowTitle("Choose Trump Suit...");
-    setWindowFlags(Qt::WindowTitleHint | Qt::WindowMinimizeButtonHint);
     setWindowIcon(QIcon(":rookicon.gif"));
     setStyleSheet("background-color: white");
 }
@@ -72,5 +71,5 @@ void TrumpDialog::onTrumpLabelClicked(TrumpDialogLabel *label)
         suitSelected = SUIT_YELLOW;
     }
 
-    accept();
+    QDialog::accept();
 }

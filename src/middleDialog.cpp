@@ -51,7 +51,6 @@ MiddleDialog::MiddleDialog(int &pTrumpSuitSelected, Card &pPartnerCardSelected,
                      this, &MiddleDialog::okButtonPressed);
 
     resize(724, 435);
-    setWindowFlags(Qt::WindowTitleHint | Qt::WindowMinimizeButtonHint);
     setWindowIcon(QIcon(":rookicon.gif"));
     setStyleSheet("background-color: white");
 }
@@ -198,7 +197,7 @@ void MiddleDialog::okButtonPressed()
     }
     else
     {
-        accept();
+        QDialog::accept();
     }
 }
 
